@@ -1,8 +1,6 @@
 #!/usr/bin/env perl
+use lib "/home/bq/usr/local/lib/perl5";
 use Mojolicious::Lite;
-
-
-
 
 get '/welcome' => sub {
   my $self = shift;
