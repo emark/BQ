@@ -1,0 +1,7 @@
+<!doctype html><html>
+  <head><title><%= title %></title></head>
+  <body>
+    <P align=left><%= link_to BonusQuest=>'/'%></P>
+    <%= content %>
+  </body>
+</html>

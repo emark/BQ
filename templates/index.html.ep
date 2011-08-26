@@ -1,0 +1,16 @@
+% layout 'welcome', title 'BonusQuest';
+<table border=0 width=100%><tr align=center><td>
+
+<%=form_for '/getbonus'=>begin%>
+http://<%=text_field 'url'%>
+<%=submit_button 'Get Bonus!'%>
+<%end%>
+
+</td><td>
+
+<%=form_for '/balance'=>(method=>'post')=>begin%>
+email: <%=text_field 'email'=>(size=>15)%>
+<%=submit_button 'My balance'%>
+<%end%>
+</td></tr></table>
+

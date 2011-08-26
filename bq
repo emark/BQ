@@ -1,22 +1,24 @@
 #!/usr/bin/env perl
-use lib "/home/bq/usr/local/lib/perl5";
+use strict;
 use Mojolicious::Lite;
 
-get '/welcome' => sub {
+get '/' => sub {
   my $self = shift;
   $self->render('index');
 };
 
+get '/getbonus'=>sub{
+  my $self=shift;
+  my $url=$self->param('url');
+  $self->stash(url=>$url);
+  $self->render('getbonus');
+};
+
+post '/balance'=>sub{
+  my $self=shift;
+  my $email=$self->param('email');
+  $self->stash(email=>$email);
+  $self->render('balance');
+};
+
 app->start;
-__DATA__
-
-@@ index.html.ep
-% layout 'default';
-% title 'Welcome';
-Welcome to Mojolicious!
-
-@@ layouts/default.html.ep
-<!doctype html><html>
-  <head><title><%= title %></title></head>
-  <body><%= content %></body>
-</html>

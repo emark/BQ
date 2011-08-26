@@ -1,0 +1,8 @@
+%layout 'default', title 'Get my bonus';
+Shop: <%=$url%><br/>
+<%=form_for 'mybonus'=>(method=>'post')=>begin%>
+<%=text_field 'order-date'=>(size=>10)%><br/>
+<%=text_field 'order-address'=>(size=>80)%><br/>
+<%=text_field 'email'%><br/>
+<%=submit_button 'Я хочу получить бонус'%>
+<%end%>

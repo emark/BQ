@@ -1,0 +1,2 @@
+%layout 'default', title 'My balance';
+Your baalnce send tou you email: <%=$email%>
