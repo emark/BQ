@@ -2,6 +2,18 @@
 use strict;
 use lib "/home/hosting_locumtest/usr/local/lib/perl5";
 use Mojolicious::Lite;
+use DBI;
+use utf8;
+plugin 'mail';
+
+open (DBCONF,"< db.conf") || die "Error open dbconfig file";
+my @dbconf=<DBCONF>;
+close DBCONF;
+chomp @dbconf;
+our $dbh = DBI->connect($dbconf[0],$dbconf[1],$dbconf[2],
+			{ PrintError => 0, RaiseError => 1 });
+$dbh->{'mysql_enable_utf8'} = 1;
+$dbh->do('SET NAMES utf8');
 
 get '/' => sub {
   my $self = shift;
@@ -11,15 +23,27 @@ get '/' => sub {
 get '/getbonus'=>sub{
   my $self=shift;
   my $url=$self->param('url');
-  $self->stash(url=>$url);
+  $url=~s/www\.//;
+  my $bonus=$dbh->selectall_hashref("SELECT BONUS.ID,BONUS.INFO,SHOP.URL AS SHOP,SHOP.DESCRIPTION FROM BONUS LEFT JOIN SHOP ON BONUS.SHOPID=SHOP.ID WHERE BONUS.STATUS=1 AND SHOP.URL='$url'",'ID');
+  my $question=$dbh->selectall_hashref("SELECT ROUTER.ID AS RID,QUESTION.ID AS QID,QUESTION.CONTENT,QUESTION.TYPE,QUESTION.ANSWERS FROM QUESTION INNER JOIN ROUTER ON QUESTION.ID=ROUTER.QUESTIONID LEFT JOIN BONUS ON ROUTER.BONUSID=BONUS.ID LEFT JOIN SHOP ON BONUS.SHOPID=SHOP.ID WHERE BONUS.STATUS=1 AND SHOP.URL='$url'",'RID');
+  $self->stash(bonus=>$bonus,
+               question=>$question);
   $self->render('getbonus');
 };
 
 post '/balance'=>sub{
   my $self=shift;
   my $email=$self->param('email');
-  $self->stash(email=>$email);
+  my $balance=$dbh->selectall_hashref("SELECT BONUSKEY.ID,BONUSKEY.CODE, SHOP.DESCRIPTION FROM BONUSKEY LEFT JOIN ANSWER ON BONUSKEY.ID=ANSWER.BONUSKEYID LEFT JOIN ROUTER ON ANSWER.ROUTERID=ROUTER.ID LEFT JOIN BONUS ON ROUTER.BONUSID=BONUS.ID LEFT JOIN SHOP ON BONUS.SHOPID=SHOP.ID WHERE BONUSKEY.EMAIL='$email' GROUP BY BONUSKEY.CODE",'ID');
+  $self->stash(balance=>$balance);
   $self->render('balance');
+};
+
+post '/thankyou'=>sub{
+  my $self=shift;
+  my $bonuscode='SDd455ew5';
+  $self->stash(bonuscode=>$bonuscode);
+  $self->render;
 };
 
 app->start;

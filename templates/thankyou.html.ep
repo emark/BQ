@@ -1,0 +1,2 @@
+%layout 'default', title 'Спасибо за ответы';
+BonusCode is: <%=$bonuscode%>

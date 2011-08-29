@@ -1,2 +1,5 @@
 %layout 'default', title 'My balance';
-Your baalnce send tou you email: <%=$email%>
+Your balance send to your email.
+%foreach my $balanceid(keys %{$balance}){
+    <LI><%=$balance->{$balanceid}{'CODE'}%> <%=$balance->{$balanceid}{'DESCRIPTION'}%>
+%}
