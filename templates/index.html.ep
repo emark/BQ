@@ -1,7 +1,7 @@
 % layout 'welcome', title 'BonusQuest';
 <table border=0 width=100%><tr align=center><td>
 
-<%=form_for '/getbonus'=>begin%>
+<%=form_for '/quiz'=>begin%>
 http://<%=text_field 'url'%>
 <%=submit_button 'Get Bonus!'%>
 <%end%>

@@ -20,7 +20,7 @@ get '/' => sub {
   $self->render('index');
 };
 
-get '/getbonus'=>sub{
+get '/quiz'=>sub{
   my $self=shift;
   my $url=$self->param('url');
   $url=~s/www\.//;
