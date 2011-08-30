@@ -1,10 +1,10 @@
-%layout 'default', title 'Get my bonus';
+%layout 'default', title 'Get my quiz';
 <%=form_for 'thankyou'=>(method=>'post')=>begin%>
-<H2>Bonus</H2>
-%foreach my $bonusid(keys %{$bonus}){
-    Shop: <%=$bonus->{$bonusid}{'SHOP'}%><br/>
-    About: <%=$bonus->{$bonusid}{'DESCRIPTION'}%><br/>
-    Bonus: <%=$bonus->{$bonusid}{'INFO'}%><br/>
+<H2>Quiz</H2>
+%foreach my $bonusid(keys %{$quiz}){
+    Shop: <%=$quiz->{$bonusid}{'SHOP'}%><br/>
+    About: <%=$quiz->{$bonusid}{'DESCRIPTION'}%><br/>
+    quiz: <%=$quiz->{$bonusid}{'INFO'}%><br/>
     Дата заказа <%=text_field 'order-date'=>(size=>10)%><br/>
     Адрес доставки <%=text_field 'order-address'=>(size=>50)%><br/>
     Email <%=text_field 'email'%><br/>
@@ -14,16 +14,16 @@
 %foreach my $questionid(keys %{$question}){
     <LI><%=$question->{$questionid}{'CONTENT'}%>
     %if($question->{$questionid}{'TYPE'} eq 'a'){
-        <br/><%= text_area 'answer'=>(cols=>60,rows=>3)=>begin%><%=$question->{$questionid}{'ANSWERS'}%><%end%>
+        <br/><%= text_area $question->{$questionid}{'RID'}=>(cols=>60,rows=>3)=>begin%><%=$question->{$questionid}{'ANSWERS'}%><%end%>
     %}elsif($question->{$questionid}{'TYPE'} eq 'b'){
         %my @answer=split('\;',$question->{$questionid}{'ANSWERS'});
         %foreach my $key(@answer){
-            <%= radio_button answer => '$key' %><%=$key%>
+            <%= radio_button $question->{$questionid}{'RID'}=> '$key' %><%=$key%>
         %}
     %}elsif($question->{$questionid}{'TYPE'} eq 'c'){
         %my @answer=split('\;',$question->{$questionid}{'ANSWERS'});
         %foreach my $key(@answer){
-            <%= check_box answer => '$key' %><%=$key%>
+            <%= check_box $question->{$questionid}{'RID'}=> '$key' %><%=$key%>
         %}
     %}
 %};
