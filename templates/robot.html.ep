@@ -1,0 +1,2 @@
+% layout 'default', title 'Robot page';
+<P align=center><%= $message %></P>

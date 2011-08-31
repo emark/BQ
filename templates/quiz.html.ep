@@ -1,34 +1,32 @@
-%layout 'default', title 'Get my quiz';
+%layout 'showquiz', title 'Get my quiz';
 <%#=test%>
-<%=form_for 'thankyou'=>(method=>'get')=>begin%>
+<%=form_for 'thankyou'=>(method=>'post',id=>"quiz-form",class=>'cmxform')=>begin%>
 <H2>Quiz</H2>
 %foreach my $quizid(keys %{$quiz}){
     Shop: <%=$quiz->{$quizid}{'SHOP'}%><br/>
     About: <%=$quiz->{$quizid}{'DESCRIPTION'}%><br/>
     quiz: <%=$quiz->{$quizid}{'INFO'}%><br/>
-    Дата заказа <%=text_field 'order'=>(size=>10)%><br/>
-    Адрес доставки <%=text_field 'order'=>(size=>50)%><br/>
-    Email <%=text_field 'order'%><br/>
+    <P><label for="cdate">Дата заказа</label><em>*</em> <%=text_field 'orderdate'=>(size=>10,class=>'required date',id=>'cdate')%></P>
+    <P><label for="cemail">E-Mail</label><em>*</em> <%=text_field 'orderemail'=>(class=>'required email',id=>'cemail')%></P>
+    <P><label for="caddr">Адрес доставки</label><em>*</em> <%=text_field 'orderaddr'=>(size=>50,class=>'required',id=>'caddr')%></P>
 %};
 <H2>Questions</H2>
-<UL>
-
 %foreach my $questionid(keys %{$question}){
-    <LI><%=$question->{$questionid}{'CONTENT'}%>
+    <P><%=$question->{$questionid}{'CONTENT'}%>
     %if($question->{$questionid}{'TYPE'} eq 'a'){
         <br/><%= text_area $question->{$questionid}{'RID'}=>(cols=>60,rows=>3)=>begin%><%=$question->{$questionid}{'ANSWERS'}%><%end%>
     %}elsif($question->{$questionid}{'TYPE'} eq 'b'){
         %my @answer=split('\;',$question->{$questionid}{'ANSWERS'});
         %foreach my $key(@answer){
-            <%= radio_button $question->{$questionid}{'RID'} => $key %><%=$key%>
+            <%= radio_button $question->{$questionid}{'RID'} => $key =>()%><%=$key%>
         %}
     %}elsif($question->{$questionid}{'TYPE'} eq 'c'){
         %my @answer=split('\;',$question->{$questionid}{'ANSWERS'});
         %foreach my $key(@answer){
-            <%= check_box $question->{$questionid}{'RID'} => $key %><%=$key%>
+            <%= check_box $question->{$questionid}{'RID'} => $key =>()%><%=$key%>
         %}
     %}
-%};
-</UL>
+    </P>
+%}
 <P><%=submit_button 'Я хочу получить бонус'%></P>
 <%end%>

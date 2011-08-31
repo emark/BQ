@@ -5,7 +5,8 @@
 http://<%=text_field 'url'%>
 <%=submit_button 'Get Bonus!'%>
 <%end%>
-
+<br/>
+<%=link_to 'Каталог партнеров'=>'/partners'%>
 </td><td>
 
 <%=form_for '/balance'=>(method=>'post')=>begin%>
