@@ -1,19 +1,25 @@
 %layout 'default', title 'Get my quiz';
 <%#=test%>
-%if ($message){
-<P style="color:#FF0000"><%=$message%></P>
-%}
-<%=form_for 'quiz'=>(method=>'post',id=>"quiz-form",class=>'cmxform')=>begin%>
 <H2>Quiz</H2>
+<%=form_for 'quiz'=>(method=>'post',id=>"quiz-form",class=>'cmxform')=>begin%>
+%if ($formmessage){
+<div><P style="color:#FF0000"><%==$formmessage%></P>
+%}
 %foreach my $quizid(keys %{$quiz}){
     Shop: <%=$quiz->{$quizid}{'SHOP'}%><br/>
     About: <%=$quiz->{$quizid}{'DESCRIPTION'}%><br/>
     quiz: <%=$quiz->{$quizid}{'INFO'}%><br/>
-    <P>Дата прошлого заказа <%=text_field 'orderdate'=>(size=>10,class=>'required date',id=>'cdate')%></P>
+    <P>Дата прошлого заказа 
+    <%= select_field 'orderyear'=>[[Январь=>'01'],[Февраль=>'02'],[Март=>'03'],[Апрель=>'04'],[Май=>'05'],[Июнь=>'06'],[Июль=>'07'],[Август=>'08'],[Сентябрь=>'09'],[Октябрь=>'10'],[Ноябрь=>'11'],[Декабрь=>'12']]%>
+    <%=text_field 'orderdate'=>(size=>4)%></P>
     <P>Ваш e-mail<%=text_field 'orderemail'=>(class=>'required email',id=>'cemail')%></P>
     <P>Адрес доставки<%=text_field 'orderaddr'=>(size=>50,class=>'required',id=>'caddr')%></P>
 %};
+</div>
 <H2>Questions</H2>
+%if ($questmessage){
+<div><P style="color:#FF0000"><%=$questmessage%></P>
+%}
 %foreach my $questionid(keys %{$question}){
     <P><%=$question->{$questionid}{'CONTENT'}%>
     %if($question->{$questionid}{'TYPE'} eq 'a'){
@@ -31,5 +37,6 @@
     %}
     </P>
 %}
+</div>
 <P><%=submit_button 'Я хочу получить бонус'%></P>
 <%end%>

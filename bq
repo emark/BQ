@@ -29,9 +29,10 @@ get '/quiz'=>sub{
   my $url=$self->param('url');
   return $self->redirect_to('/') unless $url;
   $url=~s/shop\.||www\.||store\.//g;#Drop subdomain from URL
-  #if($url ne m/(\w+)\.\w+/){
-    #$self->stash(message=>'Bad URL >:/');
-    #return $self->render('robot');
+  #Regexp utf encoding error
+  #if($url !~ /^[А-Яа-яA-Za-z0-9.-]+\.[A-Za-z]{2,4}$/){
+  #  $self->stash(message=>'Bad URL >:/');
+  #  return $self->render('robot');
   #}
   my $quizid=$dbh->selectrow_array("SELECT QUIZ.ID FROM QUIZ LEFT JOIN SHOP ON QUIZ.SHOPID=SHOP.ID WHERE QUIZ.STATUS=1 AND SHOP.URL='$url'") || 0;
   my $quiz=$dbh->selectall_hashref("SELECT QUIZ.ID,QUIZ.INFO,SHOP.URL AS SHOP,SHOP.DESCRIPTION FROM QUIZ LEFT JOIN SHOP ON QUIZ.SHOPID=SHOP.ID WHERE QUIZ.STATUS=1 AND SHOP.URL='$url'",'ID');
@@ -39,7 +40,8 @@ get '/quiz'=>sub{
   $self->session(quizid=>$quizid);
   $self->stash(quiz=>$quiz,
                question=>$question,
-               message=>'');
+               formmessage=>'',
+               questmessage=>'');
   $self->render('quiz');
 };
 
@@ -47,6 +49,10 @@ post '/balance'=>sub{
   my $self=shift;
   my $email=$self->param('email');
   return $self->redirect_to('/') unless $email;
+  if($email !~ /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$/){
+    $self->stash(message=>'Bad EMAIL >:/');
+    return $self->render('robot');
+  }
   my $balance=$dbh->selectall_hashref("SELECT BONUS.ID,BONUS.CODE, SHOP.DESCRIPTION FROM BONUS LEFT JOIN ANSWER ON BONUS.ID=ANSWER.BONUSID LEFT JOIN ROUTER ON ANSWER.ROUTERID=ROUTER.ID LEFT JOIN QUIZ ON ROUTER.QUIZID=QUIZ.ID LEFT JOIN SHOP ON QUIZ.SHOPID=SHOP.ID WHERE BONUS.EMAIL='$email' GROUP BY BONUS.CODE",'ID');
   $self->stash(balance=>$balance);
   $self->render('balance');
@@ -64,43 +70,57 @@ post '/quiz'=>sub{
   my $SQL='';
   my @char=('a'..'z','A'..'Z','1'..'9');
   my $bonuscode='';
+  my $formvalidate='';
+  my $questvalidate='';
   
-  # Validation Rule
-  my $rule = [
-              orderdate => {message => 'Input Date'} => ['not_blank'],
-              orderaddr => {message => 'Input Content'} => ['not_blank']
-              ];
-  # Validate
-  my $vresult = $vc->validate($param, $rule);
-  my $quiz=$dbh->selectall_hashref("SELECT QUIZ.ID,QUIZ.INFO,SHOP.URL AS SHOP,SHOP.DESCRIPTION FROM QUIZ LEFT JOIN SHOP ON QUIZ.SHOPID=SHOP.ID WHERE QUIZ.STATUS=1 AND QUIZ.ID=$quizid",'ID');
+  my $quiz=$dbh->selectall_hashref("SELECT QUIZ.ID,QUIZ.INFO,SHOP.URL AS SHOP,SHOP.DESCRIPTION,COUNT(ROUTER.QUESTIONID) AS QUESTIONS FROM QUIZ LEFT JOIN SHOP ON QUIZ.SHOPID=SHOP.ID LEFT JOIN ROUTER ON QUIZ.ID=ROUTER.QUIZID WHERE QUIZ.STATUS=1 AND QUIZ.ID=$quizid",'ID');
   my $question=$dbh->selectall_hashref("SELECT ROUTER.ID AS RID,QUESTION.ID AS QID,QUESTION.CONTENT,QUESTION.TYPE,QUESTION.ANSWERS FROM QUESTION INNER JOIN ROUTER ON QUESTION.ID=ROUTER.QUESTIONID LEFT JOIN QUIZ ON ROUTER.QUIZID=QUIZ.ID LEFT JOIN SHOP ON QUIZ.SHOPID=SHOP.ID WHERE QUIZ.STATUS=1 AND QUIZ.ID=$quizid",'RID');
+  my $quizcheck=$dbh->selectall_arrayref("SELECT ROUTER.ID FROM ROUTER WHERE ROUTER.QUIZID=$quizid");
+    
+  #Validation rules    
+  if($param->{'orderdate'} !~/^\d+$/){
+      $formvalidate=$formvalidate.'Укажите дату заказа';
+  }elsif($param->{'orderdate'}<1 || $param->{'orderdate'}>31){
+      $formvalidate=$formvalidate.'Ошибка ввода даты';
+  }elsif($param->{'orderemail'} !~/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$/){
+    $formvalidate=$formvalidate.'Укажите корректный e-mail';
+  }elsif(!$param->{'orderaddr'}){
+    $formvalidate=$formvalidate.'Введите адрес доставки';
+  }
+  foreach my $key(@{$quizcheck}){
+    if(!$param->{$key->[0]}){
+      $questvalidate='Есть неотвеченные вопросы';
+    }
+  }  
   
-  # Validation is OK
-  if ($vresult->is_ok){
-    my $data = $vresult->data;
-    $self->flash(success => 1);
-  
+  if(!$formvalidate && !$questvalidate){
     #Generate bonuscode
     foreach(1..8){
       $bonuscode.=$char[int(rand(60))];
     }
-    #Record bonus and answers to DB
+    
+    #Generate bonus code
     $dbh->do("INSERT INTO BONUS (ID,CODE,STATUS,BCREATE,ORDERDATE,ADDRESS,EMAIL) VALUES (NULL,\"$bonuscode\",1,NOW(),\"$param->{'orderdate'}\",\"$param->{'orderaddr'}\",\"$param->{'orderemail'}\")") || die $dbh->errstr;
     $bonusid=$dbh->last_insert_id('','',"BONUS",'ID');
     $sth=$dbh->prepare("SELECT ROUTER.ID AS RID FROM ROUTER WHERE ROUTER.QUIZID=$quizid");
     $sth->execute;
+    
+    #Record answer to DB
     while(@ref=$sth->fetchrow_array){
       $answer=join(';',$self->param($ref[0]));
       $dbh->do("INSERT INTO ANSWER (ID,ROUTERID,BONUSID,CONTENT) VALUES (NULL,$ref[0],$bonusid,\"$answer\")") || die $dbh->errstr;
     }
+
     $self->session(quizid=>0);
     $self->stash(message=>$bonuscode);
     $self->redirect_to('thankyou');
   }else{
+    
     # Validation is not OK
-    $self->stash(message=>'Пожалуйста, заполните все поля формы.',
+    $self->stash(formmessage=>$formvalidate,
+                 questmessage=>$questvalidate,
                  quiz=>$quiz,
-               question=>$question);
+                 question=>$question);
     $self->render('quiz');
   }
 };
