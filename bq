@@ -20,7 +20,7 @@ my $vc=Validator::Custom->new;
 app->secret('bqsecretphrase');
 app->hook(before_dispatch => sub {
                my $self = shift;
-               #$self->req->url->base(Mojo::URL->new(q{http://www.bonusquest.ru/}))
+               $self->req->url->base(Mojo::URL->new(q{http://www.bonusquest.ru/}))
 	       }
 	  );
 
