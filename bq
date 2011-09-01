@@ -20,7 +20,7 @@ my $vc=Validator::Custom->new;
 app->secret('bqsecretphrase');
 app->hook(before_dispatch => sub {
                my $self = shift;
-               $self->req->url->base(Mojo::URL->new(q{http://www.bonusquest.ru/}))
+               #$self->req->url->base(Mojo::URL->new(q{http://www.bonusquest.ru/}))
 	       }
 	  );
 
@@ -42,6 +42,10 @@ get '/quiz'=>sub{
   my $quizid=$dbh->selectrow_array("SELECT QUIZ.ID FROM QUIZ LEFT JOIN SHOP ON QUIZ.SHOPID=SHOP.ID WHERE QUIZ.STATUS=1 AND SHOP.URL='$url'") || 0;
   my $quiz=$dbh->selectall_hashref("SELECT QUIZ.ID,QUIZ.INFO,SHOP.URL AS SHOP,SHOP.DESCRIPTION FROM QUIZ LEFT JOIN SHOP ON QUIZ.SHOPID=SHOP.ID WHERE QUIZ.STATUS=1 AND SHOP.URL='$url'",'ID');
   my $question=$dbh->selectall_hashref("SELECT ROUTER.ID AS RID,QUESTION.ID AS QID,QUESTION.CONTENT,QUESTION.TYPE,QUESTION.ANSWERS FROM QUESTION INNER JOIN ROUTER ON QUESTION.ID=ROUTER.QUESTIONID LEFT JOIN QUIZ ON ROUTER.QUIZID=QUIZ.ID LEFT JOIN SHOP ON QUIZ.SHOPID=SHOP.ID WHERE QUIZ.STATUS=1 AND SHOP.URL='$url'",'RID');
+  if(!$quizid){
+    $self->stash(message=>'Такого магазина у нас нет :/ Вы не ошиблись с написанием адреса?');  
+    return $self->render('robot') unless $quizid;
+  }
   $self->session(quizid=>$quizid);
   $self->stash(quiz=>$quiz,
                question=>$question,
