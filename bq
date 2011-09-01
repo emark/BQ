@@ -38,7 +38,8 @@ get '/quiz'=>sub{
   my $question=$dbh->selectall_hashref("SELECT ROUTER.ID AS RID,QUESTION.ID AS QID,QUESTION.CONTENT,QUESTION.TYPE,QUESTION.ANSWERS FROM QUESTION INNER JOIN ROUTER ON QUESTION.ID=ROUTER.QUESTIONID LEFT JOIN QUIZ ON ROUTER.QUIZID=QUIZ.ID LEFT JOIN SHOP ON QUIZ.SHOPID=SHOP.ID WHERE QUIZ.STATUS=1 AND SHOP.URL='$url'",'RID');
   $self->session(quizid=>$quizid);
   $self->stash(quiz=>$quiz,
-               question=>$question);
+               question=>$question,
+               message=>'');
   $self->render('quiz');
 };
 
@@ -51,7 +52,7 @@ post '/balance'=>sub{
   $self->render('balance');
 };
 
-post '/robot'=>sub{
+post '/quiz'=>sub{
   my $self=shift;
   return $self->redirect_to('/') unless $self->session('quizid');#Defend from double refresh
   my $quizid=$self->session('quizid');
@@ -64,54 +65,49 @@ post '/robot'=>sub{
   my @char=('a'..'z','A'..'Z','1'..'9');
   my $bonuscode='';
   
-        # Validation Rule
-        my $rule = [
-            orderdate => {message => 'Input Date'} => [
-                'not_blank'
-            ],
-            orderaddr => {message => 'Input Content'} => [
-                'not_blank'
-            ]
-        ];
-        
-        # Validate
-        my $vresult = $vc->validate($param, $rule);
-  
+  # Validation Rule
+  my $rule = [
+              orderdate => {message => 'Input Date'} => ['not_blank'],
+              orderaddr => {message => 'Input Content'} => ['not_blank']
+              ];
+  # Validate
+  my $vresult = $vc->validate($param, $rule);
+  my $quiz=$dbh->selectall_hashref("SELECT QUIZ.ID,QUIZ.INFO,SHOP.URL AS SHOP,SHOP.DESCRIPTION FROM QUIZ LEFT JOIN SHOP ON QUIZ.SHOPID=SHOP.ID WHERE QUIZ.STATUS=1 AND QUIZ.ID=$quizid",'ID');
+  my $question=$dbh->selectall_hashref("SELECT ROUTER.ID AS RID,QUESTION.ID AS QID,QUESTION.CONTENT,QUESTION.TYPE,QUESTION.ANSWERS FROM QUESTION INNER JOIN ROUTER ON QUESTION.ID=ROUTER.QUESTIONID LEFT JOIN QUIZ ON ROUTER.QUIZID=QUIZ.ID LEFT JOIN SHOP ON QUIZ.SHOPID=SHOP.ID WHERE QUIZ.STATUS=1 AND QUIZ.ID=$quizid",'RID');
   
   # Validation is OK
-        if ($vresult->is_ok) {
-            # Get valid data
-            my $data = $vresult->data;
-            
-            # Save data
-            # ... by yourself
-        
-            # Redirect
-            $self->flash(success => 1);
-  #Generate bonuscode
-  foreach(1..8){
-    $bonuscode.=$char[int(rand(60))];
-  }
-  $dbh->do("INSERT INTO BONUS (ID,CODE,STATUS,BCREATE,ORDERDATE,ADDRESS,EMAIL) VALUES (NULL,\"$bonuscode\",1,NOW(),\"$param->{'orderdate'}\",\"$param->{'orderaddr'}\",\"$param->{'orderemail'}\")") || die $dbh->errstr;
-  $bonusid=$dbh->last_insert_id('','',"BONUS",'ID');
-  $sth=$dbh->prepare("SELECT ROUTER.ID AS RID FROM ROUTER WHERE ROUTER.QUIZID=$quizid");
-  $sth->execute;
-  while(@ref=$sth->fetchrow_array){
-    $answer=join(';',$self->param($ref[0]));
-    $dbh->do("INSERT INTO ANSWER (ID,ROUTERID,BONUSID,CONTENT) VALUES (NULL,$ref[0],$bonusid,\"$answer\")") || die $dbh->errstr;
-  }
-  $self->session(quizid=>0);
-  $self->stash(message=>$bonuscode);
-  $self->redirect_to('thankyou');
-  }
-        
-        # Validation is not OK
-        else {
-          $self->stash(missing => 1) if $vresult->has_missing;
-          $self->flash(message => 'confirm the form') if $vresult->has_invalid;
-          $self->redirect_to('/robot');
-        }
+  if ($vresult->is_ok){
+    my $data = $vresult->data;
+    $self->flash(success => 1);
   
+    #Generate bonuscode
+    foreach(1..8){
+      $bonuscode.=$char[int(rand(60))];
+    }
+    #Record bonus and answers to DB
+    $dbh->do("INSERT INTO BONUS (ID,CODE,STATUS,BCREATE,ORDERDATE,ADDRESS,EMAIL) VALUES (NULL,\"$bonuscode\",1,NOW(),\"$param->{'orderdate'}\",\"$param->{'orderaddr'}\",\"$param->{'orderemail'}\")") || die $dbh->errstr;
+    $bonusid=$dbh->last_insert_id('','',"BONUS",'ID');
+    $sth=$dbh->prepare("SELECT ROUTER.ID AS RID FROM ROUTER WHERE ROUTER.QUIZID=$quizid");
+    $sth->execute;
+    while(@ref=$sth->fetchrow_array){
+      $answer=join(';',$self->param($ref[0]));
+      $dbh->do("INSERT INTO ANSWER (ID,ROUTERID,BONUSID,CONTENT) VALUES (NULL,$ref[0],$bonusid,\"$answer\")") || die $dbh->errstr;
+    }
+    $self->session(quizid=>0);
+    $self->stash(message=>$bonuscode);
+    $self->redirect_to('thankyou');
+  }else{
+    # Validation is not OK
+    $self->stash(message=>'Пожалуйста, заполните все поля формы.',
+                 quiz=>$quiz,
+               question=>$question);
+    $self->render('quiz');
+  }
+};
+
+get '/thankyou'=>sub{
+  my $self=shift;
+  $self->render;
 };
 
 get '/partners'=>sub{
