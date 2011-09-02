@@ -1,17 +1,63 @@
 % layout 'welcome', title 'BonusQuest';
-<table border=0 width=100%><tr align=center><td>
-
-<%=form_for '/quiz'=>(method=>'get')=>begin%>
-http://<%=text_field 'url'%>
-<%=submit_button 'Get Bonus!'%>
-<%end%>
-<br/>
-<%=link_to 'Каталог партнеров'=>'/partners'%>
-</td><td>
-
-<%=form_for '/balance'=>(method=>'post')=>begin%>
-email: <%=text_field 'email'=>(size=>15)%>
-<%=submit_button 'My balance'%>
-<%end%>
-</td></tr></table>
-
+<table width=100% border=0>
+    <tr><td height=50></td></tr>
+    <tr align=center valign=top>
+        <td>
+            <div class=pcard style="background-color: #E6EDDA;">
+                <i style="color:#435B45;font-size:18px;font-weight:bold;text-shadow:1px 1px 0px #FFFFFF;">Я хочу получить бонус</i>
+            <div class=cardline style="background-color: #96AD6D;">
+                <%=form_for '/quiz'=>(method=>'get',id=>'bonusform')=>begin%>
+                http://<%=text_field 'url'=>(class=>'formstyle',size=>15)%><%end%><br/>
+            </div>
+            <P align=center><a href="javascript: submitform('bonusform')" class=myButton>Получить бонус</a></P>
+            <i style="color:#7A917A">Укажите адрес интернет-магазина для получения бонус-кода</i>
+            </div>
+        </td>
+        <td>
+            <div>
+                <script src="http://widgets.twimg.com/j/2/widget.js"></script>
+                <script>
+                new TWTR.Widget({
+                    version: 2,
+                    type: 'profile',
+                    rpp: 4,
+                    interval: 30000,
+                    width: 'auto',
+                    height: 250,
+                    theme: {
+                        shell: {
+                            background: '#E5D675',
+                            color: '#3d3d3d'
+                            },
+                        tweets: {
+                        background: '#ffffff',
+                        color: '#474747',
+                        links: '#eb076e'
+                        }
+                    },
+                    features: {
+                        scrollbar: false,
+                        loop: true,
+                        live: true,
+                        hashtags: true,
+                        timestamp: false,
+                        avatars: true,
+                        behavior: 'default'
+                        }
+                }).render().setUser('bonusquest_ru').start();
+                </script>
+            </div><!--twidget-->           
+        </td>
+        <td>
+            <div class=pcard style="background-color: #CEDAE0;">
+                <i style="color:#1D506B;font-size:18px;font-weight:bold;text-shadow:1px 1px 0px #FFFFFF;">Сколько у меня бонусов?</i>
+            <div class="cardline" style="background-color: #4C95BF;">
+                <%=form_for '/balance'=>(method=>'post',id=>'balanceform')=>begin%>Email: <%=text_field 'email'=>(class=>'formstyle',size=>15)%><br/>
+                <%end%>
+            </div>
+            <P align=center><a href="javascript: submitform('balanceform')" class=myButton>Проверить баланс</a></P>
+            <i style="color:#79858E">Адрес электронной почты, указываемый в опросах</i>
+            </div>
+        </td>
+    </tr>
+</table>

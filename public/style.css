@@ -1,0 +1,110 @@
+html {height: 100%;}
+
+body{
+    font-family: Georgia;
+    margin: 0px 0px 0px 0px;
+    background-color:#F9FFE0;
+    background-image: url('/media/bg.png');
+    background-attachment: fixed;
+    height: 100%;
+}
+form{
+    font-family: Georgia;
+    font-size:20px;
+}
+.formstyle{
+    font-family: Georgia;
+    font-size:20px;
+    /*font-style: italic;*/
+}
+
+.myButton {
+	-moz-box-shadow:inset 0px 1px 0px 0px #fff6af;
+	-webkit-box-shadow:inset 0px 1px 0px 0px #fff6af;
+	box-shadow:inset 0px 1px 0px 0px #fff6af;
+	background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #ffec64), color-stop(1, #ffab23) );
+	background:-moz-linear-gradient( center top, #ffec64 5%, #ffab23 100% );
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffec64', endColorstr='#ffab23');
+	background-color:#ffec64;
+	-moz-border-radius:5px;
+	-webkit-border-radius:5px;
+	border-radius:5px;
+	display:inline-block;
+	color:#333333;
+	font-family:arial;
+	font-size:18px;
+	font-weight:bold;
+	padding:12px 30px;
+	text-decoration:none;
+	text-shadow:1px 1px 0px #ffee66;
+}.myButton:hover {
+	background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #ffab23), color-stop(1, #ffec64) );
+	background:-moz-linear-gradient( center top, #ffab23 5%, #ffec64 100% );
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffab23', endColorstr='#ffec64');
+	background-color:#ffab23;
+}.myButton:active {
+	position:relative;
+	top:1px;
+}
+
+#bonusform{
+    padding-top: 30px;
+}
+#balanceform{
+    padding-top: 30px;
+}
+.pcard{
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    padding-top: 40px;
+    height: 300px;
+    width: 330px;
+    color:#FFFFFF;
+}
+.cardline{
+    margin-top: 40px;
+    height: 100px;
+    width: 330px;
+    background-image: url('/media/pcard.png');
+}
+
+#container
+{
+	position: relative;
+	min-height: 100%;
+}
+ 
+#head
+{
+    height: 150px;
+    width: 'auto';
+    background-color: #EA7979;
+    background-image: url('/media/headbg.jpg');
+    padding-top: 30px;
+    font-family: Georgia;
+    font-weight: bold;
+    font-size: 70px;
+    color:#FFFFFF;
+    text-decoration:none;
+	text-shadow:1px 3px 10px #510202;
+}
+ 
+#content
+{
+	padding: 0 0 11em 0;
+    /*padding-bottom:50px*/
+}
+ 
+#footer
+{
+	position: relative;
+    width: auto;
+    height: 150px;
+    color: #4C4C4C;
+    font-size: 16px;
+    margin: -50px auto 0;
+    padding-top: 20px;
+    background-color:#F9FFE0;
+}

@@ -4,7 +4,6 @@ use lib "/home/hosting_locumtest/usr/local/lib/perl5";
 use Mojolicious::Lite;
 use DBI;
 use utf8;
-use Validator::Custom;
 
 open (DBCONF,"< db.conf") || die "Error open dbconfig file";
 my @dbconf=<DBCONF>;
@@ -15,8 +14,6 @@ our $dbh = DBI->connect($dbconf[0],$dbconf[1],$dbconf[2],
 $dbh->{'mysql_enable_utf8'} = 1;
 $dbh->do('SET NAMES utf8');
 
-my $vc=Validator::Custom->new;
-
 app->secret('bqsecretphrase');
 app->hook(before_dispatch => sub {
                my $self = shift;
@@ -26,6 +23,8 @@ app->hook(before_dispatch => sub {
 
 get '/' => sub {
   my $self = shift;
+  my $partners=$dbh->selectrow_array("SELECT COUNT(SHOP.ID) FROM SHOP");
+  $self->stash(partners=>$partners);
   $self->render('index');
 };
 
