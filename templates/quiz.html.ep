@@ -1,42 +1,47 @@
 %layout 'default', title 'Get my quiz';
 <%#=test%>
-<H2>Quiz</H2>
-<%=form_for 'quiz'=>(method=>'post',id=>"quiz-form",class=>'cmxform')=>begin%>
-%if ($formmessage){
-<div><P style="color:#FF0000"><%==$formmessage%></P>
-%}
+<div id="quizform" class=pagecard>
+<%=form_for 'quiz'=>(method=>'post',id=>"qform")=>begin%>
 %foreach my $quizid(keys %{$quiz}){
-    Shop: <%=$quiz->{$quizid}{'SHOP'}%><br/>
-    About: <%=$quiz->{$quizid}{'DESCRIPTION'}%><br/>
-    quiz: <%=$quiz->{$quizid}{'INFO'}%><br/>
-    <P>Дата прошлого заказа 
-    <%= select_field 'orderyear'=>[[Январь=>'01'],[Февраль=>'02'],[Март=>'03'],[Апрель=>'04'],[Май=>'05'],[Июнь=>'06'],[Июль=>'07'],[Август=>'08'],[Сентябрь=>'09'],[Октябрь=>'10'],[Ноябрь=>'11'],[Декабрь=>'12']]%>
-    <%=text_field 'orderdate'=>(size=>4)%></P>
-    <P>Ваш e-mail<%=text_field 'orderemail'=>(class=>'required email',id=>'cemail')%></P>
-    <P>Адрес доставки<%=text_field 'orderaddr'=>(size=>50,class=>'required',id=>'caddr')%></P>
-%};
-</div>
-<H2>Questions</H2>
-%if ($questmessage){
-<div><P style="color:#FF0000"><%=$questmessage%></P>
+<P align=center>
+    <H2>Бонус</H2>
+    <%=$quiz->{$quizid}{'INFO'}%><br/>
+</P>
+%if ($formmessage){
+    <P style="color:#FF0000"><%==$formmessage%></P>
 %}
+    <H2>Укажите данные прошлого заказа</H2>
+    <P>Дата прошлого заказа: 
+    <%= select_field 'orderyear'=>[[Январь=>'01'],[Февраль=>'02'],[Март=>'03'],[Апрель=>'04'],[Май=>'05'],[Июнь=>'06'],[Июль=>'07'],[Август=>'08'],[Сентябрь=>'09'],[Октябрь=>'10'],[Ноябрь=>'11'],[Декабрь=>'12']]=>(class=>'formstyle')%>
+    <%=text_field 'orderdate'=>(size=>4,maxlength=>2,class=>'formstyle')%></P>
+    <P>Ваш e-mail: <%=text_field 'orderemail'=>(class=>'formstyle',size=>15)%>
+    <br><i style="font-size:16px">(используется только для получения бонуса)</i></P>
+    <P>Адрес доставки: <%=text_field 'orderaddr'=>(size=>30,class=>'formstyle')%>
+    <br><i style="font-size:16px">(достаточно улицы и номера дома)</i></P>
+%};
+<H2>Ваше мнение</H2>
+%if ($questmessage){
+    <P style="color:#FF0000"><%=$questmessage%></P>
+%}
+<i>
 %foreach my $questionid(keys %{$question}){
     <P><%=$question->{$questionid}{'CONTENT'}%>
     %if($question->{$questionid}{'TYPE'} eq 'a'){
-        <br/><%= text_area $question->{$questionid}{'RID'}=>(cols=>60,rows=>3)=>begin%><%=$question->{$questionid}{'ANSWERS'}%><%end%>
+        <br/><%= text_area $question->{$questionid}{'RID'}=>(cols=>40,rows=>3,class=>'formstyle')=>begin%><%=$question->{$questionid}{'ANSWERS'}%><%end%>
     %}elsif($question->{$questionid}{'TYPE'} eq 'b'){
         %my @answer=split('\;',$question->{$questionid}{'ANSWERS'});
         %foreach my $key(@answer){
-            <%= radio_button $question->{$questionid}{'RID'} => $key =>()%><%=$key%>
+            <%= radio_button $question->{$questionid}{'RID'} => $key =>(class=>'formstyle')%><%=$key%>
         %}
     %}elsif($question->{$questionid}{'TYPE'} eq 'c'){
         %my @answer=split('\;',$question->{$questionid}{'ANSWERS'});
         %foreach my $key(@answer){
-            <%= check_box $question->{$questionid}{'RID'} => $key =>()%><%=$key%>
+            <%= check_box $question->{$questionid}{'RID'} => $key =>(class=>'formstyle')%><%=$key%>
         %}
     %}
     </P>
 %}
-</div>
-<P><%=submit_button 'Я хочу получить бонус'%></P>
+</i>
 <%end%>
+<P align=center><a href="javascript: submitform('qform')" class=myButton>Я хочу получить бонус</a></P>
+</div><!--quizform-->

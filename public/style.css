@@ -1,7 +1,10 @@
-html {height: 100%;}
+@import url(http://fonts.googleapis.com/css?family=Coustard:900&subset=latin,cyrillic);
+html {
+	height: 100%;
+	font-family: Georgia,serif;
+}
 
 body{
-    font-family: Georgia;
     margin: 0px 0px 0px 0px;
     background-color:#F9FFE0;
     background-image: url('/media/bg.png');
@@ -15,7 +18,6 @@ form{
 .formstyle{
     font-family: Georgia;
     font-size:20px;
-    /*font-style: italic;*/
 }
 
 .myButton {
@@ -70,6 +72,20 @@ form{
     background-image: url('/media/pcard.png');
 }
 
+.pagecard{
+    width: auto;
+	height: auto;
+    /*padding-top: 20px;*/
+    color:#353535;
+	padding-left:30px;
+	padding-bottom: 20px;
+	background-color: #FFF;
+	border-top-left-radius: 5px;
+	border-top-right-radius: 5px;	
+	border-bottom-left-radius: 5px;
+	border-bottom-right-radius: 5px;
+}
+
 #container
 {
 	position: relative;
@@ -80,12 +96,25 @@ form{
 {
     height: 150px;
     width: 'auto';
-    background-color: #EA7979;
+    background-color: #510202;
     background-image: url('/media/headbg.jpg');
     padding-top: 30px;
-    font-family: Georgia;
     font-weight: bold;
     font-size: 70px;
+    color:#FFFFFF;
+    text-decoration:none;
+	text-shadow:1px 3px 10px #510202;
+}
+
+#subhead
+{
+    height: 120px;
+    width: 'auto';
+    background-color: #510202;
+    background-image: url('/media/headbg.jpg');
+    padding-top: 30px;
+	padding-left: 0px;
+    font-size: 30px;
     color:#FFFFFF;
     text-decoration:none;
 	text-shadow:1px 3px 10px #510202;
@@ -94,9 +123,16 @@ form{
 #content
 {
 	padding: 0 0 11em 0;
-    /*padding-bottom:50px*/
 }
- 
+
+#quizform{
+	width: 940px;
+	margin: 0 auto;
+	min-height: 100%;
+	height: auto !important;
+	height: 100%;
+}
+
 #footer
 {
 	position: relative;

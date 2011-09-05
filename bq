@@ -53,19 +53,6 @@ get '/quiz'=>sub{
   $self->render('quiz');
 };
 
-post '/balance'=>sub{
-  my $self=shift;
-  my $email=$self->param('email');
-  return $self->redirect_to('/') unless $email;
-  if($email !~ /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$/){
-    $self->stash(message=>'Bad EMAIL >:/');
-    return $self->render('robot');
-  }
-  my $balance=$dbh->selectall_hashref("SELECT BONUS.ID,BONUS.CODE, SHOP.DESCRIPTION FROM BONUS LEFT JOIN ANSWER ON BONUS.ID=ANSWER.BONUSID LEFT JOIN ROUTER ON ANSWER.ROUTERID=ROUTER.ID LEFT JOIN QUIZ ON ROUTER.QUIZID=QUIZ.ID LEFT JOIN SHOP ON QUIZ.SHOPID=SHOP.ID WHERE BONUS.EMAIL='$email' GROUP BY BONUS.CODE",'ID');
-  $self->stash(balance=>$balance);
-  $self->render('balance');
-};
-
 post '/quiz'=>sub{
   my $self=shift;
   return $self->redirect_to('/') unless $self->session('quizid');#Defend from double refresh
@@ -136,6 +123,19 @@ post '/quiz'=>sub{
 get '/thankyou'=>sub{
   my $self=shift;
   $self->render;
+};
+
+post '/balance'=>sub{
+  my $self=shift;
+  my $email=$self->param('email');
+  return $self->redirect_to('/') unless $email;
+  if($email !~ /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$/){
+    $self->stash(message=>'Bad EMAIL >:/');
+    return $self->render('robot');
+  }
+  my $balance=$dbh->selectall_hashref("SELECT BONUS.ID,BONUS.CODE, SHOP.DESCRIPTION FROM BONUS LEFT JOIN ANSWER ON BONUS.ID=ANSWER.BONUSID LEFT JOIN ROUTER ON ANSWER.ROUTERID=ROUTER.ID LEFT JOIN QUIZ ON ROUTER.QUIZID=QUIZ.ID LEFT JOIN SHOP ON QUIZ.SHOPID=SHOP.ID WHERE BONUS.EMAIL='$email' GROUP BY BONUS.CODE",'ID');
+  $self->stash(balance=>$balance);
+  $self->render('balance');
 };
 
 get '/partners'=>sub{
