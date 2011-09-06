@@ -1,7 +1,0 @@
-%layout 'default', title 'Partners list';
-<%#=test%>
-<table border=1><tr><td>URL</td><td>ABOUT</td><td>BONUS</td></tr>
-%foreach my $key(@{$list}){
-<tr><td><%=$key->[1]%></td><td><%= $key->[2] %></td><td></td></tr>
-%}
-</table>

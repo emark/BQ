@@ -1,47 +1,54 @@
-%layout 'default', title 'Get my quiz';
+%layout 'default', title 'Отвечай на вопросы и получай бонусы';
 <%#=test%>
-<div id="quizform" class=pagecard>
+<div id=subhead>
 <%=form_for 'quiz'=>(method=>'post',id=>"qform")=>begin%>
 %foreach my $quizid(keys %{$quiz}){
-<P align=center>
-    <H2>Бонус</H2>
-    <%=$quiz->{$quizid}{'INFO'}%><br/>
-</P>
-%if ($formmessage){
-    <P style="color:#FF0000"><%==$formmessage%></P>
+    <span align=left class=sublogo><a href="/" style="color:#FFF;text-decoration:none;">BonusQuest</a></span>
+    <center><i><%=$quiz->{$quizid}{'SHOP'}%><br><span style="font-style:normal;font-size:14px;text-shadow:none;">
+    <%= link_to $quiz->{$quizid}{'URL'}=>"http://$quiz->{$quizid}{'URL'}"=>(style=>"color:#FFF;text-decoration:none;",target=>'blank')%></span></i></center>
+</div><!--head-->
+<div id=content>
+    <div id="quizform">
+        <div id=pagecard>
+            <H2>Бонус</H2>
+            <%=$quiz->{$quizid}{'INFO'}%><br/>
+            <H2>Укажите данные прошлого заказа</H2>
+            %if ($formmessage){
+            <P style="color:#FF0000"><%=$formmessage%></P>
+            %}
+            <P>Дата заказа: 
+            <%= select_field 'orderyear'=>[[Январь=>'01'],[Февраль=>'02'],[Март=>'03'],[Апрель=>'04'],[Май=>'05'],[Июнь=>'06'],[Июль=>'07'],[Август=>'08'],[Сентябрь=>'09'],[Октябрь=>'10'],[Ноябрь=>'11'],[Декабрь=>'12']]=>(class=>'formstyle')%>
+            <%=text_field 'orderdate'=>(size=>4,maxlength=>2,class=>'formstyle')%></P>
+            <P>Ваш e-mail: <%=text_field 'orderemail'=>(class=>'formstyle',size=>15)%>
+            <br><i style="font-size:16px">(используется только для получения бонус-кода)</i></P>
+            <P>Адрес доставки: <%=text_field 'orderaddr'=>(size=>30,class=>'formstyle')%>
+            <br><i style="font-size:16px">(достаточно улицы и номера дома)</i></P>
 %}
-    <H2>Укажите данные прошлого заказа</H2>
-    <P>Дата прошлого заказа: 
-    <%= select_field 'orderyear'=>[[Январь=>'01'],[Февраль=>'02'],[Март=>'03'],[Апрель=>'04'],[Май=>'05'],[Июнь=>'06'],[Июль=>'07'],[Август=>'08'],[Сентябрь=>'09'],[Октябрь=>'10'],[Ноябрь=>'11'],[Декабрь=>'12']]=>(class=>'formstyle')%>
-    <%=text_field 'orderdate'=>(size=>4,maxlength=>2,class=>'formstyle')%></P>
-    <P>Ваш e-mail: <%=text_field 'orderemail'=>(class=>'formstyle',size=>15)%>
-    <br><i style="font-size:16px">(используется только для получения бонуса)</i></P>
-    <P>Адрес доставки: <%=text_field 'orderaddr'=>(size=>30,class=>'formstyle')%>
-    <br><i style="font-size:16px">(достаточно улицы и номера дома)</i></P>
-%};
-<H2>Ваше мнение</H2>
-%if ($questmessage){
-    <P style="color:#FF0000"><%=$questmessage%></P>
-%}
-<i>
-%foreach my $questionid(keys %{$question}){
-    <P><%=$question->{$questionid}{'CONTENT'}%>
-    %if($question->{$questionid}{'TYPE'} eq 'a'){
-        <br/><%= text_area $question->{$questionid}{'RID'}=>(cols=>40,rows=>3,class=>'formstyle')=>begin%><%=$question->{$questionid}{'ANSWERS'}%><%end%>
-    %}elsif($question->{$questionid}{'TYPE'} eq 'b'){
-        %my @answer=split('\;',$question->{$questionid}{'ANSWERS'});
-        %foreach my $key(@answer){
-            <%= radio_button $question->{$questionid}{'RID'} => $key =>(class=>'formstyle')%><%=$key%>
-        %}
-    %}elsif($question->{$questionid}{'TYPE'} eq 'c'){
-        %my @answer=split('\;',$question->{$questionid}{'ANSWERS'});
-        %foreach my $key(@answer){
-            <%= check_box $question->{$questionid}{'RID'} => $key =>(class=>'formstyle')%><%=$key%>
-        %}
-    %}
-    </P>
-%}
-</i>
-<%end%>
-<P align=center><a href="javascript: submitform('qform')" class=myButton>Я хочу получить бонус</a></P>
-</div><!--quizform-->
+            <H2>Ваше мнение</H2>
+            %if ($questmessage){
+                <P style="color:#FF0000"><%=$questmessage%></P>
+            %}
+            <i>
+            %foreach my $questionid(keys %{$question}){
+                <P><%=$question->{$questionid}{'CONTENT'}%>
+                %if($question->{$questionid}{'TYPE'} eq 'a'){
+                    <br/><%= text_area $question->{$questionid}{'RID'}=>(cols=>40,rows=>3,class=>'formstyle')=>begin%><%=$question->{$questionid}{'ANSWERS'}%><%end%>
+                %}elsif($question->{$questionid}{'TYPE'} eq 'b'){
+                    %my @answer=split('\;',$question->{$questionid}{'ANSWERS'});
+                    %foreach my $key(@answer){
+                        <%= radio_button $question->{$questionid}{'RID'} => $key =>(class=>'formstyle')%><%=$key%>
+                    %}
+                %}elsif($question->{$questionid}{'TYPE'} eq 'c'){
+                    %my @answer=split('\;',$question->{$questionid}{'ANSWERS'});
+                    %foreach my $key(@answer){
+                        <%= check_box $question->{$questionid}{'RID'} => $key =>(class=>'formstyle')%><%=$key%>
+                    %}
+                %}
+                </P>
+            %}
+            </i>
+            <%end%><!--end form -->
+            <P align=center><a href="javascript: submitform('qform')" class=myButton>Я хочу получить бонус</a></P>
+        </div><!--pagecard-->
+    </div><!--quizform-->
+</div><!--content-->

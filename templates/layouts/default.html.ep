@@ -12,14 +12,8 @@
   </head>
   <body>
     <div id=container>
-      <div id=subhead>            
-              <span align=left style="padding-left:30px;font-family:'Coustard';font-size:20px;"><a href="/" style="color:#FFF;text-decoration:none">BonusQuest</a></span>
-            <center><i>интернет-магазин Вебпокупка<br><span style="font-size:14px">www.web2buy.ru</span></i></center>
-      </div><!--head-->
-      <div id=content>
-        <%= content %>
-      </div><!--content-->
-     <div id=footer>
+      <%= content %>
+      <div id=footer>
         <P align=center>О проекте - Правила оказания услуги - Рассмотрение претензий - Контакты</P>
         <P align=right style="font-size: 12px;padding-right: 15px">
           ООО "Электронный маркетинг", 2011<br/>

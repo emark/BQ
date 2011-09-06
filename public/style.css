@@ -13,7 +13,7 @@ body{
 }
 form{
     font-family: Georgia;
-    font-size:20px;
+    /*font-size:20px;*/
 }
 .formstyle{
     font-family: Georgia;
@@ -64,6 +64,7 @@ form{
     height: 300px;
     width: 330px;
     color:#FFFFFF;
+	font-size:20px;
 }
 .cardline{
     margin-top: 40px;
@@ -72,18 +73,27 @@ form{
     background-image: url('/media/pcard.png');
 }
 
-.pagecard{
-    width: auto;
-	height: auto;
-    /*padding-top: 20px;*/
-    color:#353535;
+#pagecard{
+	color:#3D3D3D;
+	margin-top: 20px;
+	padding-top: 10px;
 	padding-left:30px;
+	padding-right:30px;
 	padding-bottom: 20px;
 	background-color: #FFF;
 	border-top-left-radius: 5px;
 	border-top-right-radius: 5px;	
 	border-bottom-left-radius: 5px;
 	border-bottom-right-radius: 5px;
+	box-shadow: 2px 3px 8px #6D6D6D;
+	font-size:18px;
+
+}
+#pagecard h2{
+	color: #000;
+	font-size: 24px;
+	font-weight: 400;
+	font-family: sans-serif;
 }
 
 #container
@@ -113,16 +123,22 @@ form{
     background-color: #510202;
     background-image: url('/media/headbg.jpg');
     padding-top: 30px;
-	padding-left: 0px;
     font-size: 30px;
     color:#FFFFFF;
     text-decoration:none;
 	text-shadow:1px 3px 10px #510202;
 }
- 
+.sublogo{
+	padding-left:30px;
+	font-family:'Coustard';
+	font-size:20px;
+	color:#FFF;
+	text-decoration:none;
+}
+
 #content
 {
-	padding: 0 0 11em 0;
+	padding: 0 0 8em 0;
 }
 
 #quizform{
@@ -135,12 +151,13 @@ form{
 
 #footer
 {
-	position: relative;
+	position: static;
     width: auto;
     height: 150px;
     color: #4C4C4C;
     font-size: 16px;
     margin: -50px auto 0;
     padding-top: 20px;
-    background-color:#F9FFE0;
+	background-color:#DBEA9D;
+	background-image: url('/media/fbg.png');
 }
