@@ -14,7 +14,7 @@
     <div id=container>
       <%= content %>
       <div id=footer>
-        <P align=center>О проекте - Правила оказания услуги - Рассмотрение претензий - Контакты</P>
+        <P align=center style="font-size:18px"><i>О проекте - Правила оказания услуги - Рассмотрение претензий - Контакты</i></P>
         <P align=right style="font-size: 12px;padding-right: 15px">
           ООО "Электронный маркетинг", 2011<br/>
           ОГРН 1092468020743 ИНН 2463213306<br/>
