@@ -41,6 +41,8 @@ html{
 }.myButton:active {
 	position:relative;
 	top:1px;
+}a:link,a:hover,a:visited,a:active{
+	color: #000000;
 }#bonusform{
 	padding-top: 30px;
 }#balanceform{
