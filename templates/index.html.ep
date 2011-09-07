@@ -15,7 +15,7 @@
         <td>
             <div class=pcard style="background-color: #E6EDDA;">
                 <i style="color:#435B45;font-size:18px;font-weight:bold;text-shadow:1px 1px 0px #FFFFFF;">Я хочу получить бонус</i>
-                <br/><a href="" style="color:#7A917A;font-style:italic;font-size:14px;text-decoration: none;border-bottom-style: dashed;border-bottom-width: thin;">Как это работает?</a>
+                <br/><a href="/help.html#how_it_works" style="color:#7A917A;font-style:italic;font-size:14px;text-decoration: none;border-bottom-style: dashed;border-bottom-width: thin;">Как это работает?</a>
             <div class=cardline style="background-color: #96AD6D;">
                 <%=form_for '/quiz.html'=>(method=>'get',id=>'bonusform')=>begin%>
                 http://<%=text_field 'url'=>(class=>'formstyle',size=>15)%><%end%><br/>
@@ -62,7 +62,7 @@
         <td>
             <div class=pcard style="background-color: #CEDAE0;">
                 <i style="color:#1D506B;font-size:18px;font-weight:bold;text-shadow:1px 1px 0px #FFFFFF;">Сколько у меня бонусов?</i>
-                <br/><a href="" style="color:#79858E;font-style:italic;font-size:14px;text-decoration: none;border-bottom-style: dashed;border-bottom-width: thin;">Что это такое?</a>
+                <br/><a href="/help.html#about_balance" style="color:#79858E;font-style:italic;font-size:14px;text-decoration: none;border-bottom-style: dashed;border-bottom-width: thin;">Что это такое?</a>
             <div class="cardline" style="background-color: #4C95BF;">
                 <%=form_for '/balance.html'=>(method=>'post',id=>'balanceform')=>begin%>Email: <%=text_field 'email'=>(class=>'formstyle',size=>15)%><br/>
                 <%end%>

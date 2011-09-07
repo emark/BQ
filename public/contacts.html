@@ -1,0 +1,81 @@
+<DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Контакты BonusQuest</title>
+    <link rel=stylesheet type="text/css" href="style.css">
+  </head>
+  <body>
+    <div id=container>      
+        <div id=subhead>
+            <span class=sublogo><a href="/" style="color:#FFF;text-decoration:none;">BonusQuest</a></span>
+        </div><!--subhead-->
+        <div id=content>
+            <div id="quizform">
+                <div id=pagecard>
+                    <H2>Наши контакты</H2>
+                    <P></P>
+                    <!-- Этот блок кода нужно вставить в ту часть страницы, где вы хотите разместить карту  (начало) -->
+<script src="http://api-maps.yandex.ru/1.1/?key=ADT7Zk4BAAAAdaWfJQIAXLtMhOescm0U1QytdxxdCAtqBjEAAAAAAAAAAACA026KzacEpybx4eyWQO6K2z6-tA==&modules=pmap&wizard=constructor" type="text/javascript"></script>
+<script type="text/javascript">
+    YMaps.jQuery(window).load(function () {
+        var map = new YMaps.Map(YMaps.jQuery("#YMapsID-643")[0]);
+        map.setCenter(new YMaps.GeoPoint(92.795189,56.021241), 17, YMaps.MapType.MAP);
+        map.addControl(new YMaps.Zoom());
+        map.addControl(new YMaps.ToolBar());
+        YMaps.MapType.PMAP.getName = function () { return "Народная"; };
+        map.addControl(new YMaps.TypeControl([
+            YMaps.MapType.MAP,
+            YMaps.MapType.SATELLITE,
+            YMaps.MapType.HYBRID,
+            YMaps.MapType.PMAP
+        ], [0, 1, 2, 3]));
+
+        YMaps.Styles.add("constructor#pmvvmPlacemark", {
+            iconStyle : {
+                href : "http://api-maps.yandex.ru/i/0.3/placemarks/pmvvm.png",
+                size : new YMaps.Point(28,29),
+                offset: new YMaps.Point(-8,-27)
+            }
+        });
+
+       map.addOverlay(createObject("Placemark", new YMaps.GeoPoint(92.795211,56.021379), "constructor#pmvvmPlacemark", "BonusQuest живет здесь"));
+        
+        function createObject (type, point, style, description) {
+            var allowObjects = ["Placemark", "Polyline", "Polygon"],
+                index = YMaps.jQuery.inArray( type, allowObjects),
+                constructor = allowObjects[(index == -1) ? 0 : index];
+                description = description || "";
+            
+            var object = new YMaps[constructor](point, {style: style, hasBalloon : !!description});
+            object.description = description;
+            
+            return object;
+        }
+    });
+</script>
+
+<div id="YMapsID-643" style="width:450px;height:350px"></div>
+<div style="width:450px;text-align:right;font-family:Arial"><a href="http://api.yandex.ru/maps/tools/constructor/" style="color:#1A3DC1;font-size:12px">Создано с помощью инструментов Яндекс.Карт</a></div>
+<!-- Этот блок кода нужно вставить в ту часть страницы, где вы хотите разместить карту (конец) -->
+                </div><!--pagecard-->
+            </div><!--quizform-->
+        </div><!--content-->
+        <div id=footer>
+            <P align=center style="font-size:16px;">
+              <a href="help.html">Помощь</a> -
+              <a href="tos.html">Правила оказания услуги</a> -
+              <a href="claims.html">Рассмотрение претензий</a> -
+              <a href="partnership.html">Стать партнером</a> -
+              <a href="contacts.html">Контакты</a>
+            </P>
+        <P align=right style="font-size: 12px;padding-right: 15px;color:#FFF;">
+          ООО "Электронный маркетинг", 2011<br/>
+          ОГРН 1092468020743<br/>
+          г. Красноярск, ул. Телевизорная,1, стр.9<br/>
+          тел. 8 (908) 208-7328<br/>
+          email: hello@bonusquest.ru<br/>
+        </P>
+      </div><!--footer-->
+    </div><!--container-->
+  </body>
+</html>
