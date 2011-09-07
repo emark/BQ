@@ -1,7 +1,7 @@
 %layout 'default', title 'Отвечай на вопросы и получай бонусы';
 <%#=test%>
 <div id=subhead>
-<%=form_for 'quiz'=>(method=>'post',id=>"qform")=>begin%>
+<%=form_for 'quiz.html'=>(method=>'post',id=>"qform")=>begin%>
 %foreach my $quizid(keys %{$quiz}){
     <span align=left class=sublogo><a href="/" style="color:#FFF;text-decoration:none;">BonusQuest</a></span>
     <center><i><%=$quiz->{$quizid}{'SHOP'}%><br><span style="font-style:normal;font-size:14px;text-shadow:none;">

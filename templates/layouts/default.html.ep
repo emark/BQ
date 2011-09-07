@@ -14,13 +14,19 @@
     <div id=container>
       <%= content %>
       <div id=footer>
-        <P align=center style="font-size:18px"><i>О проекте - Правила оказания услуги - Рассмотрение претензий - Контакты</i></P>
-        <P align=right style="font-size: 12px;padding-right: 15px">
+        <P align=center style="font-size:16px;"><i>
+          <%=link_to 'Помощь'=>'help.html'%> -
+          <%=link_to 'Правила оказания услуги'=>'tos.html'%> -
+          <%=link_to 'Рассмотрение претензий'=>'claims.html'%> -
+          <%=link_to 'Стать партнером'=>'partnership.html'%> -
+          <%=link_to 'Контакты'=>'contacts.html'%>
+        </i></P>
+        <P align=right style="font-size: 12px;padding-right: 15px;color:#FFF;">
           ООО "Электронный маркетинг", 2011<br/>
-          ОГРН 1092468020743 ИНН 2463213306<br/>
-          Красноярск, ул. Телевизорная,1, стр.9<br/>
-          тел. 8 (391) 258-10-23 факс. 8 (391) 258-10-01<br/>
-          hello@bonusquest.ru<br/>
+          ОГРН 1092468020743<br/>
+          г. Красноярск, ул. Телевизорная,1, стр.9<br/>
+          тел. 8 (908) 208-7328<br/>
+          email: hello@bonusquest.ru<br/>
         </P>
       </div><!--footer-->
     </div><!--container-->

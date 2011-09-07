@@ -42,7 +42,7 @@ get '/quiz'=>sub{
   my $quiz=$dbh->selectall_hashref("SELECT QUIZ.ID,QUIZ.INFO,SHOP.URL,SHOP.NAME AS SHOP FROM QUIZ LEFT JOIN SHOP ON QUIZ.SHOPID=SHOP.ID WHERE QUIZ.STATUS=1 AND SHOP.URL='$url'",'ID');
   my $question=$dbh->selectall_hashref("SELECT ROUTER.ID AS RID,QUESTION.ID AS QID,QUESTION.CONTENT,QUESTION.TYPE,QUESTION.ANSWERS FROM QUESTION INNER JOIN ROUTER ON QUESTION.ID=ROUTER.QUESTIONID LEFT JOIN QUIZ ON ROUTER.QUIZID=QUIZ.ID LEFT JOIN SHOP ON QUIZ.SHOPID=SHOP.ID WHERE QUIZ.STATUS=1 AND SHOP.URL='$url'",'RID');
   if(!$quizid){
-    $self->stash(capt=>'Магазин не найден',message=>'Такого магазина у нас нет :/ Вы не ошиблись с написанием адреса?');  
+    $self->stash(capt=>'Магазин не найден',message=>'Такого магазина у нас нет :-/ Вы не ошиблись с написанием адреса?');  
     return $self->render('robot') unless $quizid;
   }
   $self->session(quizid=>$quizid);
