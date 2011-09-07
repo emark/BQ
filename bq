@@ -4,6 +4,7 @@ use lib "/home/hosting_locumtest/usr/local/lib/perl5";
 use Mojolicious::Lite;
 use DBI;
 use utf8;
+plugin 'mail';
 
 open (DBCONF,"< db.conf") || die "Error open dbconfig file";
 my @dbconf=<DBCONF>;
@@ -14,6 +15,13 @@ our $dbh = DBI->connect($dbconf[0],$dbconf[1],$dbconf[2],
 $dbh->{'mysql_enable_utf8'} = 1;
 $dbh->do('SET NAMES utf8');
 
+my $subscribe="Команда BonusQuest\nwww.bonusquest.ru";
+app->plugin(mail => {
+    from     => 'robot@bonusquest.ru',
+    encoding => 'base64',
+    how      => 'smtp',
+    howargs  => ['mail.locum.ru',AuthUser=>$dbconf[3],AuthPass=>$dbconf[4]],
+  });
 app->secret('bqsecretphrase');
 app->hook(before_dispatch => sub {
                my $self = shift;
@@ -107,7 +115,10 @@ post '/quiz'=>sub{
     }
 
     $self->session(quizid=>0);
-    $self->stash(message=>$bonuscode);
+    $self->mail(to=>$param->{'orderemail'},
+                subject=>'Ваш бонус',
+                data=>"Ваш бонус-код: $bonuscode".$subscribe
+                );
     $self->redirect_to('thankyou');
   }else{
     
@@ -135,6 +146,12 @@ post '/balance'=>sub{
     return $self->render('robot');
   }
   my $balance=$dbh->selectall_hashref("SELECT BONUS.ID,BONUS.CODE, SHOP.DESCRIPTION FROM BONUS LEFT JOIN ANSWER ON BONUS.ID=ANSWER.BONUSID LEFT JOIN ROUTER ON ANSWER.ROUTERID=ROUTER.ID LEFT JOIN QUIZ ON ROUTER.QUIZID=QUIZ.ID LEFT JOIN SHOP ON QUIZ.SHOPID=SHOP.ID WHERE BONUS.EMAIL='$email' GROUP BY BONUS.CODE",'ID');
+  if($balance){
+    my $mailmessage="Приветствуем!\nТы или возможно кто-то другой попросил прислать список активных бонус-кодов.\n";
+    $self->mail(to=>$email,
+                subject=>'Бонус коды от BonusQuest',
+                data=>$balance)
+  }
   $self->stash(capt=>'Ваш баланс отправлен',message=>'Список подтвержденных бонусов отправлен на указанный адрес электронной почты.');
   $self->render('robot');
 };

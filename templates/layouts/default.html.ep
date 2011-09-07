@@ -17,7 +17,7 @@
         <P align=center style="font-size:16px;"><i>
           <%=link_to 'Помощь'=>'help.html'%> -
           <%=link_to 'Правила оказания услуги'=>'tos.html'%> -
-          <%=link_to 'Рассмотрение претензий'=>'claims.html'%> -
+          <%=link_to 'Есть претензии?'=>'claims.html'%> -
           <%=link_to 'Стать партнером'=>'partnership.html'%> -
           <%=link_to 'Контакты'=>'contacts.html'%>
         </i></P>
