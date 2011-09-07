@@ -10,7 +10,7 @@ my @dbconf=<DBCONF>;
 close DBCONF;
 chomp @dbconf;
 our $dbh = DBI->connect($dbconf[0],$dbconf[1],$dbconf[2],
-			{ PrintError => 0, RaiseError => 1 });
+			{ PrintError => 1, RaiseError => 1 });
 $dbh->{'mysql_enable_utf8'} = 1;
 $dbh->do('SET NAMES utf8');
 
@@ -144,6 +144,23 @@ get '/partners'=>sub{
   my $list=$dbh->selectall_arrayref("SELECT SHOP.ID,SHOP.URL,SHOP.DESCRIPTION,QUIZ.INFO FROM SHOP LEFT JOIN QUIZ ON SHOP.ID=QUIZ.SHOPID ORDER BY SHOP.URL");
   $self->stash(list=>$list);
   $self->render('partners');
+};
+
+post '/sendclaim'=>sub{
+  my $self=shift;
+  my $bonuscode=$self->param('bonuscode') || 0;
+  my $description=$self->param('description');
+  my $message='';
+  my $bonuscodeid=$dbh->selectrow_array("SELECT BONUS.ID FROM BONUS WHERE CODE='$bonuscode'") || 0;
+  if($bonuscodeid){
+    $dbh->do("INSERT INTO CLAIM (ID,BONUSID,DESCRIPTION,SDATE) VALUES (NULL,$bonuscodeid,\"$description\",NOW())") || die $dbh->err;
+    $message='Спасибо за обращение. Мы сообщим вам о результатах на адрес электронной почты указанный в бонусе.';
+  }else{
+    $message="Код бонуса <b>$bonuscode</b> неверен. Укажите правильный код.";
+  }
+  $self->stash(capt=>'Получение претензии',
+               message=>$message);
+  $self->render('robot');
 };
 
 app->start;

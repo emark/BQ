@@ -82,6 +82,11 @@ html{
 	font-size: 24px;
 	font-weight: 400;
 	font-family: sans-serif;
+}#pagecard h3{
+	color: #000;
+	font-size: 18px;
+	font-weight: 400;
+	font-family: sans-serif;
 }#container{
 	position: relative;
 	min-height: 100%;

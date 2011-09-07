@@ -6,7 +6,7 @@
     <div id="quizform">
         <div id=pagecard>
             <H2><%=$capt%></H2>
-            <P><%=$message%></P>
+            <P><%==$message%></P>
             Если вы уверены в обратном, тогда сообщите на адрес <a href="mailto:hello@bonusquest.ru" style="color:#000">hello@bonusquest.ru</a>
             <P align=center style="padding-top: 80px">
                 <object type="application/x-shockwave-flash" data="http://www.pixelbuzz.tv/export/flash-widget/pb-widget-loader.swf" id="pixelbuzzwidget" width="250px" height="170px"> <param name="movie" value="http://www.pixelbuzz.tv/export/flash-widget/pb-widget-loader.swf" /> <param name="allowScriptAccess" value="always" /> <param name="wmode" value="transparent" /> <param name="allowFullScreen" value="true" /> </object>
