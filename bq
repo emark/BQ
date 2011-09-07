@@ -119,7 +119,7 @@ post '/quiz'=>sub{
                 subject=>'Ваш бонус',
                 data=>"Ваш бонус-код: $bonuscode".$subscribe
                 );
-    $self->redirect_to('thankyou');
+    $self->redirect_to('thankyou.html');
   }else{
     
     # Validation is not OK
