@@ -15,8 +15,9 @@
       <%= content %>
       <div id=footer>
         <P align=center style="font-size:16px;"><i>
+          <%=link_to 'Бонусы'=>'/'%> -
           <%=link_to 'Помощь'=>'help.html'%> -
-          <%=link_to 'Правила оказания услуги'=>'tos.html'%> -
+          <%=link_to 'Соглашение'=>'tos.html'%> -
           <%=link_to 'Есть претензии?'=>'claims.html'%> -
           <%=link_to 'Стать партнером'=>'partnership.html'%> -
           <%=link_to 'Контакты'=>'contacts.html'%>

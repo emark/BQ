@@ -53,9 +53,19 @@ get '/quiz'=>sub{
     $self->stash(capt=>'Магазин не найден',message=>'Такого магазина у нас нет :-/ Вы не ошиблись с написанием адреса?');  
     return $self->render('robot') unless $quizid;
   }
+  #my $allmonths=[[Январь=>'01'],[Февраль=>'02'],[Март=>'03'],[Апрель=>'04'],[Май=>'05'],[Июнь=>'06'],[Июль=>'07'],[Август=>'08'],[Сентябрь=>'09'],[Октябрь=>'10'],[Ноябрь=>'11'],[Декабрь=>'12']];
+  my @months=('Months','Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь');
+  my $selectmonths=[];
+  my @lt=localtime;
+  my $n=$lt[4]-1;
+  for my $i(0..2){#For 3 last months
+    $selectmonths->[$i]=[$months[$n],$n];
+    $n++;
+  }
   $self->session(quizid=>$quizid);
   $self->stash(quiz=>$quiz,
                question=>$question,
+               selectmonths=>$selectmonths,
                formmessage=>'',
                questmessage=>'');
   $self->render('quiz');
@@ -89,6 +99,8 @@ post '/quiz'=>sub{
     $formvalidate=$formvalidate.'Укажите корректный e-mail';
   }elsif(!$param->{'orderaddr'}){
     $formvalidate=$formvalidate.'Введите адрес доставки';
+  }elsif(!$param->{'tosagree'}){
+    $formvalidate=$formvalidate.'Не приняты условия Пользовательского соглашения';
   }
   foreach my $key(@{$quizcheck}){
     if(!$param->{$key->[0]}){
@@ -123,7 +135,16 @@ post '/quiz'=>sub{
   }else{
     
     # Validation is not OK
-    $self->stash(formmessage=>$formvalidate,
+    my @months=('Months','Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь');
+    my $selectmonths=[];
+    my @lt=localtime;
+    my $n=$lt[4]-1;
+    for my $i(0..2){#For 3 last months
+      $selectmonths->[$i]=[$months[$n],$n];
+      $n++;
+    }
+    $self->stash(selectmonths=>$selectmonths,
+                 formmessage=>$formvalidate,
                  questmessage=>$questvalidate,
                  quiz=>$quiz,
                  question=>$question);

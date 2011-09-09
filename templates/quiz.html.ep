@@ -16,13 +16,15 @@
             %if ($formmessage){
             <P style="color:#FF0000"><%=$formmessage%></P>
             %}
-            <P>Дата заказа: 
-            <%= select_field 'orderyear'=>[[Январь=>'01'],[Февраль=>'02'],[Март=>'03'],[Апрель=>'04'],[Май=>'05'],[Июнь=>'06'],[Июль=>'07'],[Август=>'08'],[Сентябрь=>'09'],[Октябрь=>'10'],[Ноябрь=>'11'],[Декабрь=>'12']]=>(class=>'formstyle')%>
-            <%=text_field 'orderdate'=>(size=>4,maxlength=>2,class=>'formstyle')%></P>
+            <P>Дата заказа:
+            <%= select_field 'orderyear'=>$selectmonths=>(class=>'formstyle')%>
+            <%=text_field 'orderdate'=>(size=>4,maxlength=>2,class=>'formstyle')%>
+            <br><i style="font-size:16px">(покупка совершена не более 3 месяцев назад)</i></P>
             <P>Ваш e-mail: <%=text_field 'orderemail'=>(class=>'formstyle',size=>15)%>
             <br><i style="font-size:16px">(используется только для получения бонус-кода)</i></P>
             <P>Адрес доставки: <%=text_field 'orderaddr'=>(size=>30,class=>'formstyle')%>
             <br><i style="font-size:16px">(достаточно улицы и номера дома)</i></P>
+            <P><%=check_box 'tosagree'=>(class=>'formstyle')%> Я принимаю условия <%=link_to 'Пользовательского соглашения'=>"/tos.html"%></P>
 %}
             <H2>Ваше мнение</H2>
             %if ($questmessage){
