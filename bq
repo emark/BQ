@@ -15,7 +15,7 @@ our $dbh = DBI->connect($dbconf[0],$dbconf[1],$dbconf[2],
 $dbh->{'mysql_enable_utf8'} = 1;
 $dbh->do('SET NAMES utf8');
 
-my $subscribe="Команда BonusQuest\nwww.bonusquest.ru";
+my $subscribe="\nКоманда BonusQuest\nwww.bonusquest.ru";
 app->plugin(mail => {
     from     => 'robot@bonusquest.ru',
     encoding => 'base64',
@@ -53,7 +53,6 @@ get '/quiz'=>sub{
     $self->stash(capt=>'Магазин не найден',message=>'Такого магазина у нас нет :-/ Вы не ошиблись с написанием адреса?');  
     return $self->render('robot') unless $quizid;
   }
-  #my $allmonths=[[Январь=>'01'],[Февраль=>'02'],[Март=>'03'],[Апрель=>'04'],[Май=>'05'],[Июнь=>'06'],[Июль=>'07'],[Август=>'08'],[Сентябрь=>'09'],[Октябрь=>'10'],[Ноябрь=>'11'],[Декабрь=>'12']];
   my @months=('Months','Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь');
   my $selectmonths=[];
   my @lt=localtime;
@@ -128,8 +127,9 @@ post '/quiz'=>sub{
 
     $self->session(quizid=>0);
     $self->mail(to=>$param->{'orderemail'},
-                subject=>'Ваш бонус',
-                data=>"Ваш бонус-код: $bonuscode".$subscribe
+                subject=>"Ваш бонус от магазина ".$quiz->{$quizid}{'URL'},
+                data=>"Приветствуем!\n\nВы участвовали в опросе от магазина ".$quiz->{$quizid}{'SHOP'}." http://".$quiz->{$quizid}{'URL'}.
+                "\nВ благодарность за ваши ответы магазин дарит вам бонус: ".$quiz->{$quizid}{'INFO'}."\nВаш бонус-код: $bonuscode (неактивирован)\nБонус будет активирован после проверки данных вашего прошлого заказа. Это займет немного времени.\n\nСпасибо за то, что вы снами!.\n".$subscribe
                 );
     $self->redirect_to('thankyou.html');
   }else{
