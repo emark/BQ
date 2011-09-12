@@ -45,6 +45,8 @@
                     %foreach my $key(@answer){
                         <%= check_box $question->{$questionid}{'RID'} => $key =>(class=>'formstyle')%><%=$key%>
                     %}
+                %}elsif($question->{$questionid}{'TYPE'} eq 'd'){
+                    <%= text_field $question->{$questionid}{'RID'} =>(class=>'formstyle')%>
                 %}
                 </P>
             %}
