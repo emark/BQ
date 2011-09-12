@@ -179,8 +179,8 @@ post '/balance'=>sub{
 
 get '/partners'=>sub{
   my $self=shift;
-  my $list=$dbh->selectall_arrayref("SELECT SHOP.ID,SHOP.URL,SHOP.DESCRIPTION,QUIZ.INFO FROM SHOP LEFT JOIN QUIZ ON SHOP.ID=QUIZ.SHOPID ORDER BY SHOP.URL");
-  $self->stash(list=>$list);
+  my $shop=$dbh->selectall_hashref("SELECT SHOP.ID,SHOP.NAME,SHOP.URL,SHOP.DESCRIPTION,QUIZ.INFO FROM SHOP LEFT JOIN QUIZ ON SHOP.ID=QUIZ.SHOPID ORDER BY SHOP.URL",'ID');
+  $self->stash(shop=>$shop);
   $self->render('partners');
 };
 
