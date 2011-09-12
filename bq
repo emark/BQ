@@ -128,7 +128,7 @@ post '/quiz'=>sub{
     $self->session(quizid=>0);
     $self->mail(to=>$param->{'orderemail'},
                 subject=>"Ваш бонус от магазина ".$quiz->{$quizid}{'URL'},
-                data=>"Приветствуем!\n\nВы приняли участие в опросе от ".$quiz->{$quizid}{'SHOP'}." http://".$quiz->{$quizid}{'URL'}.
+                data=>"Приветствуем!\n\nВы приняли участие в опросе от магазина ".$quiz->{$quizid}{'SHOP'}." http://".$quiz->{$quizid}{'URL'}.
                 "\nВ благодарность за ваши ответы магазин дарит вам бонус: ".$quiz->{$quizid}{'INFO'}."\nВаш бонус-код: $bonuscode (неактивирован)\nБонус будет активирован сразу после обработки данных опроса. Это займет немного времени.\nОб активации бонус-кода мы сразу же вас оповестим.\nСпасибо за то, что вы с нами!\n".$subscribe
                 );
     $self->redirect_to('thankyou.html');
