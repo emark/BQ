@@ -6,11 +6,11 @@ use DBI;
 use utf8;
 plugin 'mail';
 
-open (DBCONF,"< db.conf") || die "Error open dbconfig file";
-my @dbconf=<DBCONF>;
+open (DBCONF,"< app.conf") || die "Error open dbconfig file";
+my @appconf=<DBCONF>;
 close DBCONF;
-chomp @dbconf;
-our $dbh = DBI->connect($dbconf[0],$dbconf[1],$dbconf[2],
+chomp @appconf;
+our $dbh = DBI->connect($appconf[0],$appconf[1],$appconf[2],
 			{ PrintError => 1, RaiseError => 1 });
 $dbh->{'mysql_enable_utf8'} = 1;
 $dbh->do('SET NAMES utf8');
@@ -20,9 +20,9 @@ app->plugin(mail => {
     from     => 'robot@bonusquest.ru',
     encoding => 'base64',
     how      => 'smtp',
-    howargs  => ['mail.locum.ru',AuthUser=>$dbconf[3],AuthPass=>$dbconf[4]],
+    howargs  => ['mail.locum.ru',AuthUser=>$appconf[3],AuthPass=>$appconf[4]],
   });
-app->secret('bqsecretphrase');
+app->secret($appconf[5]);
 app->hook(before_dispatch => sub {
                my $self = shift;
                $self->req->url->base(Mojo::URL->new(q{http://www.bonusquest.ru/}))
