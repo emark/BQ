@@ -28,11 +28,11 @@
       <div id=footer>
         <P align=center style="font-size:16px;"><i>
           <%=link_to 'БонусКвест'=>'/'%> -
-          <%=link_to 'Помощь'=>'help.html'%> -
-          <%=link_to 'Соглашение'=>'tos.html'%> -
-          <%=link_to 'Есть претензии?'=>'claims.html'%> -
-          <%=link_to 'Стать партнером'=>'partnership.html'%> -
-          <%=link_to 'Контакты'=>'contacts.html'%>
+          <%=link_to 'Помощь'=>'/help.html'%> -
+          <%=link_to 'Соглашение'=>'/tos.html'%> -
+          <%=link_to 'Есть претензии?'=>'/claims.html'%> -
+          <%=link_to 'Стать партнером'=>'/partnership.html'%> -
+          <%=link_to 'Контакты'=>'/contacts.html'%>
         </i></P>
         <P align=right style="font-size: 12px;padding-right: 15px;color:#FFF;">
           ООО "Электронный маркетинг", 2011<br/>
