@@ -36,6 +36,12 @@ get '/' => sub {
   $self->render('index');
 };
 
+get '/:id' => [id=>qw/\d+/]=> sub{
+  my $self=shift;
+  $self->stash(capt=>'Идентификатор партнера',message=>'ID='.$self->param('id'));
+  $self->render('robot');
+};
+
 get '/quiz'=>sub{
   my $self=shift;
   my $url=$self->param('url');
