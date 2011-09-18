@@ -52,11 +52,13 @@ get '/quiz'=>sub{
   #  $self->stash(message=>'Bad URL >:/');
   #  return $self->render('robot');
   #}
+  $url=substr($url,0,50);#Cut url length to 50 char's
+  $dbh->do("INSERT INTO QUERY(URL,SYSDATE) VALUES(\"$url\",NOW())");
   my $quizid=$dbh->selectrow_array("SELECT QUIZ.ID FROM QUIZ LEFT JOIN SHOP ON QUIZ.SHOPID=SHOP.ID WHERE QUIZ.STATUS=1 AND SHOP.URL='$url'") || 0;
   my $quiz=$dbh->selectall_hashref("SELECT QUIZ.ID,QUIZ.INFO,SHOP.URL,SHOP.NAME AS SHOP FROM QUIZ LEFT JOIN SHOP ON QUIZ.SHOPID=SHOP.ID WHERE QUIZ.STATUS=1 AND SHOP.URL='$url'",'ID');
   my $question=$dbh->selectall_hashref("SELECT ROUTER.ID AS RID,QUESTION.ID AS QID,QUESTION.CONTENT,QUESTION.TYPE,QUESTION.ANSWERS FROM QUESTION INNER JOIN ROUTER ON QUESTION.ID=ROUTER.QUESTIONID LEFT JOIN QUIZ ON ROUTER.QUIZID=QUIZ.ID LEFT JOIN SHOP ON QUIZ.SHOPID=SHOP.ID WHERE QUIZ.STATUS=1 AND SHOP.URL='$url'",'RID');
   if(!$quizid){
-    $self->stash(capt=>'Магазин не найден',message=>'Такого магазина у нас нет :-/ Вы не ошиблись с написанием адреса?');  
+    $self->stash(capt=>'Бонус не найден',message=>"Магазин $url пока не предоставляет бонусы.");
     return $self->render('robot') unless $quizid;
   }
   my @months=('Months','Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь');
