@@ -88,12 +88,13 @@ post '/dashboard'=>sub{
 		$dbh->do("UPDATE BONUS SET BONUS.STATUS=$bonusstatus[$n], BONUS.STATUSDATE=NOW() WHERE BONUS.ID=$key");
 		$n++;
 		if($bonusstatus[$n]==2){#Verify bonuscode
-			my $respondent=$dbh->selectall_arrayref("SELECT BONUS.EMAIL,DATE(BONUS.BCREATE),BONUS.CODE FROM BONUS WHERE BONUS.ID=$key") || undef;
-			if($respondent->[0]){
-				$self->mail(to=>$respondent->[0],
+			#my $respondent=$dbh->selectall_arrayref("SELECT BONUS.EMAIL,DATE(BONUS.BCREATE),BONUS.CODE FROM BONUS WHERE BONUS.ID=$key") || undef;
+			my $respondent=$dbh->selectrow_array("SELECT BONUS.EMAIL FROM BONUS WHERE BONUS.ID=$key") || undef;
+			if($respondent){
+				$self->mail(to=>$respondent,
 				          subject=>"Активация бонуса от магазина ".$url,
-				          data=>"Приветствуем!\n\n$respondent->[1], вы принимали участие в опросе от магазина http://$url".
-				          "\nВаш бонус-код: $respondent->[2] (активирован)\nВы можете указать этот бонус уже при следующей покупке в этом магазине.\nСпасибо за то, что вы с нами!\n".$subscribe
+				          data=>"Приветствуем!\n\n$respondent, вы принимали участие в опросе от магазина http://$url".
+				          "\nВаш бонус-код: $respondent (активирован)\nВы можете указать этот бонус уже при следующей покупке в этом магазине.\nСпасибо за то, что вы с нами!\n".$subscribe
 				          );
 			}
 		}
