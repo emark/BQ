@@ -57,7 +57,7 @@ post '/auth'=>sub{
 									 url=>$param->{'login'});
 		return $self->redirect_to('dashboard');  
   }
-  $self->stash(message=>'Error to login');
+  $self->stash(message=>'Ошибка при вводе логина или пароля');
 	$self->render('partner_login');
 };
 
