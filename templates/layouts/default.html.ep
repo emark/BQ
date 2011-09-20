@@ -27,6 +27,7 @@
   <body>
     <div id=container>
       <%= content %>
+      <div class="footer-margin"></div>
       <div id=footer>
         <P align=center style="font-size:16px;"><i>
           <%=link_to 'БонусКвест'=>'/'%> -

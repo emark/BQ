@@ -76,7 +76,6 @@ html{
 	border-bottom-right-radius: 5px;
 	box-shadow: 2px 3px 8px #6D6D6D;
 	font-size:18px;
-
 }#pagecard h2{
 	color: #000;
 	font-size: 24px;
@@ -90,9 +89,11 @@ html{
 }#container{
 	position: relative;
 	min-height: 100%;
+	height: auto !important;
+	_height: 100%;
 }#head{
     height: 150px;
-    width: 'auto';
+    width: 100%;
     background-color: #510202;
     background-image: url('/media/headbg.jpg');
     padding-top: 30px;
@@ -103,7 +104,7 @@ html{
 	text-shadow:1px 3px 10px #510202;
 }#subhead{
     height: 120px;
-    width: 'auto';
+    width: 100%;
     background-color: #510202;
     background-image: url('/media/headbg.jpg');
     padding-top: 30px;
@@ -125,9 +126,25 @@ html{
 	min-height: 100%;
 	height: auto !important;
 	height: 100%;
-}#footer {
-	position: static;
+}.footer-margin{
+    position: static;
     width: auto;
+    border: 0px dotted maroon;
+    clear: both;
+    margin: 0;
+    padding: 0;
+    height: 1;
+    font-size: 1px;
+    height: 100px;
+}#footer{
+	  position: absolute;
+    left: 0;
+    bottom: 0;
+    z-index: 6;
+    width: 100%;
+    overflow: hidden;
+	/*position: static;*/
+    /*width: auto;*/
     height: 150px;
     color: #4C4C4C;
     font-size: 16px;
