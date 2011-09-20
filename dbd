@@ -25,15 +25,72 @@ app->plugin(mail => {
 app->secret($appconf[5]);
 app->hook(before_dispatch => sub {
                my $self = shift;
-               $self->req->url->base(Mojo::URL->new(q{http://partner.bonusquest.ru/}))
+               #$self->req->url->base(Mojo::URL->new(q{http://partner.bonusquest.ru/}))
 	       }
 	  );
 
 get '/' => sub {
   my $self = shift;
-  my $partners=$dbh->selectrow_array("SELECT COUNT(SHOP.ID) FROM SHOP");
-  $self->stash(partners=>$partners);
-  $self->render('index');
+	$self->stash(message=>'');
+	return $self->redirect_to('/dashboard') if $self->session('pid');
+	$self->render('partner_welcome');
+};
+
+get '/login' => sub {
+  my $self = shift;
+	$self->stash(message=>'');
+  $self->render('partner_login');
+};
+
+get '/logout/'=>sub{
+	my $self=shift;
+	$self->session(pid=>'');
+	$self->render('partner_welcome');
+};
+
+post '/auth'=>sub{
+  my $self = shift;
+  my $param=$self->req->params->to_hash;
+  my $pid=$dbh->selectrow_array("SELECT SHOP.ID FROM SHOP WHERE URL=\"$param->{'login'}\" AND PASS=\"$param->{'pass'}\"") || undef;
+  if($pid){
+		$self->session(pid=>$pid,
+									 url=>$param->{'login'});
+		return $self->redirect_to('dashboard');  
+  }
+  $self->stash(message=>'Error to login');
+	$self->render('partner_login');
+};
+
+get '/dashboard'=>sub{
+	my $self=shift;
+	return $self->redirect_to('/login') unless $self->session('pid');
+	my $pid=$self->session('pid');
+	my $url=$self->session('url');
+	my $param=$self->req->params->to_hash;
+	my $search='';
+	if($param->{'search'}){
+		$search="AND BONUS.CODE=\"$param->{'search'}\"";
+	}
+	my $bonuses=$dbh->selectall_hashref("SELECT BONUS.ID,DATE(BONUS.BCREATE) AS BCREATE,BONUS.CODE,BONUS.STATUS,QUIZ.INFO,BONUS.ORDERDATE,BONUS.ORDERMONTH,BONUS.ADDRESS FROM BONUS LEFT JOIN ANSWER ON BONUS.ID=ANSWER.BONUSID LEFT JOIN ROUTER ON ANSWER.ROUTERID=ROUTER.ID LEFT JOIN QUIZ ON ROUTER.QUIZID=QUIZ.ID LEFT JOIN SHOP ON QUIZ.SHOPID=SHOP.ID WHERE SHOP.ID=$pid $search GROUP BY BONUS.CODE ORDER BY BONUS.BCREATE",'ID');
+	$self->stash(bonuses=>$bonuses,url=>$url);
+	$self->render('partner_dashboard');
+};
+
+post '/dashboard'=>sub{
+	my $self=shift;
+	return $self->redirect_to('/') unless $self->session('pid');
+	my $pid=$self->session('pid');
+	my $url=$self->session('url');
+	my @bid=$self->param('bid');
+	my @bonusstatus=$self->param('bonusstatus');
+	my $n=0;
+	foreach my $key(@bid){
+		$dbh->do("UPDATE BONUS SET BONUS.STATUS=$bonusstatus[$n], BONUS.STATUSDATE=NOW() WHERE BONUS.ID=$key");
+		$n++;
+	}
+	my $bonuses=$dbh->selectall_hashref("SELECT BONUS.ID,DATE(BONUS.BCREATE) AS BCREATE,BONUS.CODE,BONUS.STATUS,QUIZ.INFO,BONUS.ORDERDATE,BONUS.ORDERMONTH,BONUS.ADDRESS FROM BONUS LEFT JOIN ANSWER ON BONUS.ID=ANSWER.BONUSID LEFT JOIN ROUTER ON ANSWER.ROUTERID=ROUTER.ID LEFT JOIN QUIZ ON ROUTER.QUIZID=QUIZ.ID LEFT JOIN SHOP ON QUIZ.SHOPID=SHOP.ID WHERE SHOP.ID=$pid GROUP BY BONUS.CODE ORDER BY BONUS.BCREATE",'ID');
+	$self->stash(bonuses=>$bonuses,url=>$url);
+	$self->render('partner_dashboard');
 };
 
 app->start;

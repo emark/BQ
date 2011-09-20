@@ -1,0 +1,68 @@
+%layout 'dashboard',title 'Партнер BonusQuest';
+<div id=subhead>
+  <span class=sublogo><a href="/" style="color:#FFF;text-decoration:none;">BonusQuest</a></span><br/>
+  <center><i><%=$url%><br><span style="font-style:normal;font-size:14px;text-shadow:none;">
+  <%= link_to 'Завершить работу в системе'=>'/logout'=>(style=>"color:#FFF;text-decoration:none;")%></span></i></center>
+</div><!--head-->
+<div id=content>
+    <div id="quizform">
+        <div id=pagecard>
+            <%=form_for '/dashboard'=>begin%>
+              Фильтр: <%=text_field 'search'%>&nbsp;<%=submit_button 'Поиск бонус-кода'%>&nbsp<%=link_to 'Показать все'=>'/dashboard'%>
+            <%end%>
+            <%=form_for '/dashboard'=>(method=>'post')=>begin%>
+%my @bonusstatus=('Неподтвержден','Отклонен','Одобрен','Завершен');
+%my $bonuscount=1;
+<table border=1 width=100%>
+  <tr style="font-weight: bold;" align=center>
+    <td>
+      #
+    </td><td>
+      Дата запроса
+    </td><td>
+      Код
+    </td><td>
+      Бонус
+    </td><td colspan=2>
+      Информация о заказе
+    </td><td>
+      Статус
+    </td>
+  </tr>
+  <%foreach my $bonusid(keys %{$bonuses}){%>
+  <tr class=bonusstatus<%=$bonuses->{$bonusid}{'STATUS'}%>>
+    <td>
+      <%=$bonuscount;$bonuscount++%>
+    </td><td align=center>
+      <%=$bonuses->{$bonusid}{'BCREATE'}%>
+    </td><td>
+      <%=$bonuses->{$bonusid}{'CODE'}%>
+    </td><td>
+      <%=$bonuses->{$bonusid}{'INFO'}%>
+    </td><td>
+      <%=$bonuses->{$bonusid}{'ORDERDATE'}%>/<%=$bonuses->{$bonusid}{'ORDERMONTH'}%>
+    </td><td>
+      <%=$bonuses->{$bonusid}{'ADDRESS'}%>
+    </td><td align=center>
+      %if($bonuses->{$bonusid}{'STATUS'}<3){
+        <%= hidden_field 'bid'=>$bonuses->{$bonusid}{'ID'}%>
+        <select name=bonusstatus id=bonusstatus>
+        %for (my $n=0;$n<4;$n++){
+          <option VALUE="<%=$n%>" 
+          %if($n==$bonuses->{$bonusid}{'STATUS'}){
+            selected
+          %}
+          ><%=$bonusstatus[$n]%>
+        %}
+      %}
+      &nbsp;
+      </select>
+    </td>
+  </tr>
+<%}%>
+</table><br/>
+<center><%=submit_button 'Сохранить статусы'%>&nbsp;<input type=reset value="Сбросить"></center>
+<%end%>
+        </div><!--pagecard-->
+    </div><!--quizform-->
+</div><!--content-->

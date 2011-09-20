@@ -1,0 +1,42 @@
+<DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title><%= title %></title>
+    <%= stylesheet '/style.css'%>
+    <style>
+      .bonusstatus0{
+        color:#000;
+      }
+      .bonusstatus1{
+        color:#AA0505;
+      }
+      .bonusstatus2{
+        color:#0E6C84;
+      }
+      .bonusstatus3{
+        color:#8C8C8C;
+      }
+    </style>
+  </head>
+  <body>
+    <div id=container>
+      <%= content %>
+      <div id=footer>
+        <P align=center style="font-size:16px;"><i>
+          <%=link_to 'БонусКвест'=>'/'%> -
+          <%=link_to 'Помощь'=>'/help.html'%> -
+          <%=link_to 'Соглашение'=>'/tos.html'%> -
+          <%=link_to 'Есть претензии?'=>'/claims.html'%> -
+          <%=link_to 'Для бизнеса'=>'/forbusiness.html'%> -
+          <%=link_to 'Контакты'=>'/contacts.html'%>
+        </i></P>
+        <P align=right style="font-size: 12px;padding-right: 15px;color:#FFF;">
+          ООО "Электронный маркетинг", 2011<br/>
+          ОГРН 1092468020743<br/>
+          г. Красноярск, ул. Телевизорная,1, стр.9<br/>
+          тел. 8 (908) 208-7328<br/>
+          email: hello@bonusquest.ru<br/>
+        </P>
+      </div><!--footer-->
+  </body>
+</html>
