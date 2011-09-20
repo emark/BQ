@@ -25,11 +25,11 @@
       <div id=footer>
         <P align=center style="font-size:16px;"><i>
           <%=link_to 'БонусКвест'=>'/'%> -
-          <%=link_to 'Помощь'=>'/help.html'%> -
-          <%=link_to 'Соглашение'=>'/tos.html'%> -
-          <%=link_to 'Есть претензии?'=>'/claims.html'%> -
-          <%=link_to 'Для бизнеса'=>'/forbusiness.html'%> -
-          <%=link_to 'Контакты'=>'/contacts.html'%>
+          <%=link_to 'Помощь'=>'http://www.bonusquest.ru/help.html'%> -
+          <%=link_to 'Соглашение'=>'http://www.bonusquest.ru//tos.html'%> -
+          <%=link_to 'Есть претензии?'=>'http://www.bonusquest.ru/claims.html'%> -
+          <%=link_to 'Для бизнеса'=>'http://www.bonusquest.ru/forbusiness.html'%> -
+          <%=link_to 'Контакты'=>'http://www.bonusquest.ru/contacts.html'%>
         </i></P>
         <P align=right style="font-size: 12px;padding-right: 15px;color:#FFF;">
           ООО "Электронный маркетинг", 2011<br/>
