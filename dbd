@@ -1,0 +1,39 @@
+#!/usr/bin/env perl
+use strict;
+use lib "/home/hosting_locumtest/usr/local/lib/perl5";
+use Mojolicious::Lite;
+use DBI;
+use utf8;
+plugin 'mail';
+
+open (DBCONF,"< app.conf") || die "Error open dbconfig file";
+my @appconf=<DBCONF>;
+close DBCONF;
+chomp @appconf;
+our $dbh = DBI->connect($appconf[0],$appconf[1],$appconf[2],
+			{ PrintError => 1, RaiseError => 1 });
+$dbh->{'mysql_enable_utf8'} = 1;
+$dbh->do('SET NAMES utf8');
+
+my $subscribe="\nКоманда BonusQuest\nwww.bonusquest.ru";
+app->plugin(mail => {
+    from     => 'robot@bonusquest.ru',
+    encoding => 'base64',
+    how      => 'smtp',
+    howargs  => ['mail.locum.ru',AuthUser=>$appconf[3],AuthPass=>$appconf[4]],
+  });
+app->secret($appconf[5]);
+app->hook(before_dispatch => sub {
+               my $self = shift;
+               $self->req->url->base(Mojo::URL->new(q{http://partner.bonusquest.ru/}))
+	       }
+	  );
+
+get '/' => sub {
+  my $self = shift;
+  my $partners=$dbh->selectrow_array("SELECT COUNT(SHOP.ID) FROM SHOP");
+  $self->stash(partners=>$partners);
+  $self->render('index');
+};
+
+app->start;
