@@ -25,7 +25,7 @@
       Бонус
     </td><td colspan=2>
       Информация о заказе
-    </td><td>
+    </td><td colspan=2>
       Статус
     </td>
   </tr>
@@ -54,13 +54,16 @@
           %}
           ><%=$bonusstatus[$n]%>
         %}
-      %}else{
-        <%=$bonuses->{$bonusid}{'STATUSDATE'}%>
-      %}
       </select>
+      %}else{
+        <%=$bonusstatus[$bonuses->{$bonusid}{'STATUS'}]%>
+      %}
+      </td><td>
+      <%=$bonuses->{$bonusid}{'STATUSDATE'}%>
+      </td>
     </td>
   </tr>
-<%}%>
+%}
 </table><br/>
 <center><%=submit_button 'Сохранить статусы'%>&nbsp;<input type=reset value="Сбросить"></center>
 <%end%>
