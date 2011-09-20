@@ -89,14 +89,14 @@ post '/dashboard'=>sub{
 		$n++;
 		#if($bonusstatus[$n]==2){#Verify bonuscode
 			#my $respondent=$dbh->selectall_arrayref("SELECT BONUS.EMAIL,DATE(BONUS.BCREATE),BONUS.CODE FROM BONUS WHERE BONUS.ID=$key") || undef;
-			my $respondent=$dbh->selectrow_array("SELECT BONUS.EMAIL FROM BONUS WHERE BONUS.ID=$key") || undef;
-			if($respondent){
-				$self->mail(to=>$respondent,
-				          subject=>"Активация бонуса от магазина ".$url,
-				          data=>"Приветствуем!\n\n$respondent, вы принимали участие в опросе от магазина http://$url".
-				          "\nВаш бонус-код: $respondent (активирован)\nВы можете указать этот бонус уже при следующей покупке в этом магазине.\nСпасибо за то, что вы с нами!\n".$subscribe
-				          );
-			}
+			#my $respondent=$dbh->selectrow_array("SELECT BONUS.EMAIL FROM BONUS WHERE BONUS.ID=$key") || undef;
+			#if($respondent){
+			#	$self->mail(to=>$respondent,
+			#	          subject=>"Активация бонуса от магазина ".$url,
+			#	          data=>"Приветствуем!\n\n$respondent, вы принимали участие в опросе от магазина http://$url".
+			#	          "\nВаш бонус-код: $respondent (активирован)\nВы можете указать этот бонус уже при следующей покупке в этом магазине.\nСпасибо за то, что вы с нами!\n".$subscribe
+			#	          );
+			#}
 		#}
 	}
 	my $bonuses=$dbh->selectall_hashref("SELECT BONUS.ID,DATE(BONUS.BCREATE) AS BCREATE,BONUS.CODE,BONUS.STATUS,BONUS.STATUSDATE,QUIZ.INFO,BONUS.ORDERDATE,BONUS.ORDERMONTH,BONUS.ADDRESS FROM BONUS LEFT JOIN ANSWER ON BONUS.ID=ANSWER.BONUSID LEFT JOIN ROUTER ON ANSWER.ROUTERID=ROUTER.ID LEFT JOIN QUIZ ON ROUTER.QUIZID=QUIZ.ID LEFT JOIN SHOP ON QUIZ.SHOPID=SHOP.ID WHERE SHOP.ID=$pid GROUP BY BONUS.CODE ORDER BY BONUS.BCREATE",'ID');
