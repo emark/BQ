@@ -88,7 +88,7 @@ post '/dashboard'=>sub{
 		$dbh->do("UPDATE BONUS SET BONUS.STATUS=$bonusstatus[$n], BONUS.STATUSDATE=NOW() WHERE BONUS.ID=$key");
 		$n++;
 		if($bonusstatus[$n]==2){#Verify bonuscode
-			my $respondent=$dbh->selectrow_array("SELECT BONUS.EMAIL,DATE(BONUS.BCREATE),BONUS.CODE FROM BONUS WHERE BONUS.ID=$key") || undef;
+			my $respondent=$dbh->selectall_arrayref("SELECT BONUS.EMAIL,DATE(BONUS.BCREATE),BONUS.CODE FROM BONUS WHERE BONUS.ID=$key") || undef;
 			if($respondent){
 				$self->mail(to=>$respondent->[0],
 				          subject=>"Активация бонуса от магазина ".$url,
