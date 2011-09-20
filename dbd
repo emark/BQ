@@ -89,7 +89,7 @@ post '/dashboard'=>sub{
 		$n++;
 		if($bonusstatus[$n]==2){#Verify bonuscode
 			my $respondent=$dbh->selectall_arrayref("SELECT BONUS.EMAIL,DATE(BONUS.BCREATE),BONUS.CODE FROM BONUS WHERE BONUS.ID=$key") || undef;
-			if($respondent){
+			if($respondent->[0]){
 				$self->mail(to=>$respondent->[0],
 				          subject=>"Активация бонуса от магазина ".$url,
 				          data=>"Приветствуем!\n\n$respondent->[1], вы принимали участие в опросе от магазина http://$url".
