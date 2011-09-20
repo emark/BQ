@@ -44,7 +44,7 @@
     </td><td>
       <%=$bonuses->{$bonusid}{'ADDRESS'}%>
     </td><td align=center>
-      %if($bonuses->{$bonusid}{'STATUS'}<3){
+      %if($bonuses->{$bonusid}{'STATUS'}!=3 && $bonuses->{$bonusid}{'STATUS'}!=1){
         <%= hidden_field 'bid'=>$bonuses->{$bonusid}{'ID'}%>
         <select name=bonusstatus id=bonusstatus>
         %for (my $n=0;$n<4;$n++){
@@ -54,8 +54,9 @@
           %}
           ><%=$bonusstatus[$n]%>
         %}
+      %}else{
+        <%=$bonuses->{$bonusid}{'STATUSDATE'}%>
       %}
-      &nbsp;
       </select>
     </td>
   </tr>
