@@ -7,8 +7,9 @@
 <div id=content>
     <div id="quizform">
         <div id=pagecard>
+          <%=tag 'H2'=>'Список бонус-кодов'%>
             <%=form_for '/dashboard'=>begin%>
-              Фильтр: <%=text_field 'search'%>&nbsp;<%=submit_button 'Поиск бонус-кода'%>&nbsp<%=link_to 'Показать все'=>'/dashboard'%>
+              Фильтр: <%=text_field 'search'=>(class=>'formstyle',size=>15)%>&nbsp;<%=submit_button 'Поиск бонус-кода'=>(class=>'formstyle')%>&nbsp<%=link_to 'Показать все'=>'/dashboard'%>
             <%end%>
             <%=form_for '/dashboard'=>(method=>'post')=>begin%>
 %my @bonusstatus=('Неподтвержден','Отклонен','Одобрен','Завершен');
@@ -46,7 +47,7 @@
     </td><td align=center>
       %if($bonuses->{$bonusid}{'STATUS'}!=3 && $bonuses->{$bonusid}{'STATUS'}!=1){
         <%= hidden_field 'bid'=>$bonuses->{$bonusid}{'ID'}%>
-        <select name=bonusstatus id=bonusstatus>
+        <select name=bonusstatus id=bonusstatus class=formstyle>
         %for (my $n=0;$n<4;$n++){
           <option VALUE="<%=$n%>" 
           %if($n==$bonuses->{$bonusid}{'STATUS'}){
@@ -65,7 +66,7 @@
   </tr>
 %}
 </table><br/>
-<center><%=submit_button 'Сохранить статусы'%>&nbsp;<input type=reset value="Сбросить"></center>
+<center><%=submit_button 'Сохранить статусы'=>(class=>'formstyle')%>&nbsp;<input type=reset value="Сбросить" class='formstyle'></center>
 <%end%>
         </div><!--pagecard-->
     </div><!--quizform-->

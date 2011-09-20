@@ -25,7 +25,7 @@ app->plugin(mail => {
 app->secret($appconf[5]);
 app->hook(before_dispatch => sub {
                my $self = shift;
-               $self->req->url->base(Mojo::URL->new(q{http://partner.bonusquest.ru/}))
+               #$self->req->url->base(Mojo::URL->new(q{http://partner.bonusquest.ru/}))
 	       }
 	  );
 
@@ -88,12 +88,12 @@ post '/dashboard'=>sub{
 		$dbh->do("UPDATE BONUS SET BONUS.STATUS=$bonusstatus[$n], BONUS.STATUSDATE=NOW() WHERE BONUS.ID=$key");
 		$n++;
 		if($bonusstatus[$n]==2){#Verify bonuscode
-			my @respondent=$dbh->selectrow_array("SELECT BONUS.EMAIL,BONUS.BCREATE,BONUS.CODE FROM BONUS WHERE BONUS.ID=$key") || undef;
-			if(@respondent){
-				$self->mail(to=>$respondent[0],
-				          subject=>"Ваш бонус от магазина ".$url,
-				          data=>"Приветствуем!\n\n$respondent[1], вы принимали участие в опросе от магазина http://$url".
-				          "\nВаш бонус-код: $respondent[2] (активирован)\nВы можете указать этот бонус уже при следующей покупке в этом магазине.\nСпасибо за то, что вы с нами!\n".$subscribe
+			my $respondent=$dbh->selectrow_array("SELECT BONUS.EMAIL,DATE(BONUS.BCREATE),BONUS.CODE FROM BONUS WHERE BONUS.ID=$key") || undef;
+			if($respondent){
+				$self->mail(to=>$respondent->[0],
+				          subject=>"Активация бонуса от магазина ".$url,
+				          data=>"Приветствуем!\n\n$respondent->[1], вы принимали участие в опросе от магазина http://$url".
+				          "\nВаш бонус-код: $respondent->[2] (активирован)\nВы можете указать этот бонус уже при следующей покупке в этом магазине.\nСпасибо за то, что вы с нами!\n".$subscribe
 				          );
 			}
 		}
