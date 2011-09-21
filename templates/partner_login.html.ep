@@ -1,6 +1,6 @@
 %layout 'dashboard',title 'Партнер BonusQuest';
 <div id=subhead>
-    <span class=sublogo><a href="http://www.bonusquest.ru" style="color:#FFF;text-decoration:none;">BonusQuest</a></span>
+    <span class=sublogo><a href="/" style="color:#FFF;text-decoration:none;">BonusQuest</a></span>
 </div><!--head-->
 <div id=content>
     <div id="quizform">

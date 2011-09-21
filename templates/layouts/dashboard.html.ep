@@ -24,7 +24,7 @@
       <div class="footer-margin"></div>
       <div id=footer>
         <P align=center style="font-size:16px;"><i>
-          <%=link_to 'БонусКвест'=>'/'%> -
+          <%=link_to 'БонусКвест'=>'http://www.bonusquest.ru'%> -
           <%=link_to 'Помощь'=>'http://www.bonusquest.ru/help.html'%> -
           <%=link_to 'Соглашение'=>'http://www.bonusquest.ru//tos.html'%> -
           <%=link_to 'Есть претензии?'=>'http://www.bonusquest.ru/claims.html'%> -
