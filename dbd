@@ -45,6 +45,7 @@ get '/login' => sub {
 get '/logout/'=>sub{
 	my $self=shift;
 	$self->session(pid=>'');
+	$self->stash(message=>'');
 	$self->render('partner_login');
 };
 
