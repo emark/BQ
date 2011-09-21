@@ -25,14 +25,14 @@ app->plugin(mail => {
 app->secret($appconf[5]);
 app->hook(before_dispatch => sub {
                my $self = shift;
-               $self->req->url->base(Mojo::URL->new(q{http://partner.bonusquest.ru/}))
+               #$self->req->url->base(Mojo::URL->new(q{http://partner.bonusquest.ru/}))
 	       }
 	  );
 
 get '/' => sub {
   my $self = shift;
 	$self->stash(message=>'');
-	return $self->redirect_to('/dashboard') if $self->session('pid');
+	return $self->redirect_to('/dashboard.html') if $self->session('pid');
 	$self->render('partner_login');
 };
 
@@ -42,7 +42,7 @@ get '/login' => sub {
   $self->render('partner_login');
 };
 
-get '/logout/'=>sub{
+get '/logout'=>sub{
 	my $self=shift;
 	$self->session(pid=>'');
 	$self->stash(message=>'');
@@ -52,7 +52,7 @@ get '/logout/'=>sub{
 post '/auth'=>sub{
   my $self = shift;
   my $param=$self->req->params->to_hash;
-  my $pid=$dbh->selectrow_array("SELECT SHOP.ID FROM SHOP WHERE URL=\"$param->{'login'}\" AND PASS=\"$param->{'pass'}\"") || undef;
+  my $pid=$dbh->selectrow_array("SELECT SHOP.ID FROM SHOP WHERE URL=\"$param->{'login'}\" AND PASS=\"$param->{'pass'}\" AND SHOP.STATUS=1") || undef;
   if($pid){
 		$self->session(pid=>$pid,
 									 url=>$param->{'login'});
@@ -60,6 +60,62 @@ post '/auth'=>sub{
   }
   $self->stash(message=>'Ошибка при вводе логина или пароля');
 	$self->render('partner_login');
+};
+
+get '/register'=>sub{
+	my $self=shift;
+	$self->stash(message=>'');
+	$self->render('partner_register');
+};
+
+post '/register'=>sub{
+	my $self=shift;
+	my $param=$self->req->params->to_hash;
+	$param->{'url'}=~s/(http:\/\/www\.)||(http:\/\/)||(www\.)//g;
+	my $message='Партнер уже зарегистрирован'.$param->{'url'};
+	my $check=$dbh->selectrow_array("SELECT 1 FROM SHOP WHERE URL=\"$param->{'url'}\" AND SHOP.STATUS=1") || undef;
+	if($param->{'email'} !~ /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$/){
+		$message='Вы неверно указали адрес электронной почты.';
+		$check=1;
+	}
+	if(!$check && $param->{'url'}){
+		#Generate bonuscode
+		my @char=('a'..'z','A'..'Z','1'..'9');
+		my $pass='';
+    foreach(1..8){
+      $pass.=$char[int(rand(60))];
+    }
+		$dbh->do("INSERT INTO SHOP(ID,URL,NAME,EMAIL,PASS) VALUES(NULL,\"$param->{'url'}\",\"$param->{'name'}\",\"$param->{'email'}\",\"$pass\")");
+		$self->mail(to=>$param->{'email'},
+								subject=>'Регистрация партнера',
+								data=>"Приветствуем!\nПоздравляем с регистрацией в BonusQuest.\n\nСайт $param->{'url'}, http://$param->{'url'}\n".
+"Ваш пароль доступа: $pass\n\nДоступ к партнерской части будет открыт после подтверждения ваших данных.".$subscribe
+								);
+		$self->stash(capt=>'Спасибо за регистрацию',message=>'Дальнейшие инструкции отправлены на ваш адрес электронной почты.');
+		return $self->render('/robot');
+	}
+	$self->stash(message=>$message);
+	$self->render('partner_register');
+};
+
+get '/restore'=>sub{
+	my $self=shift;
+	$self->render('partner_restore');
+};
+
+post '/restore'=>sub{
+	my $self=shift;
+	my $param=$self->req->params->to_hash;
+	$param->{'url'}=~s/(http:\/\/www\.)||(http:\/\/)||(www\.)//g;
+	my $restore=$dbh->selectrow_arrayref("SELECT SHOP.EMAIL,SHOP.PASS FROM SHOP WHERE URL=\"$param->{'url'}\" AND EMAIL=\"$param->{'email'}\" AND SHOP.STATUS=1") || undef;
+	if($restore->[0] && $param->{'url'} && $param->{'email'}){
+		$self->mail(to=>$restore->[0],
+								subject=>'Восстановление доступа',
+								data=>"Приветствуем!\nВы или возможно кто-то другой попросил напомнить пароль доступа: $restore->[1]".$subscribe
+								);
+	}
+	$self->stash(capt=>'Доступ на сайт',message=>'Инструкция о восстановлении пароля отправлена.');
+	$self->render('robot');	
 };
 
 get '/dashboard'=>sub{

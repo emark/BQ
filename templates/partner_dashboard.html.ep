@@ -2,16 +2,16 @@
 <div id=subhead>
   <span class=sublogo><a href="/" style="color:#FFF;text-decoration:none;">BonusQuest</a></span><br/>
   <center><i><%=$url%><br><span style="font-style:normal;font-size:14px;text-shadow:none;">
-  <%= link_to 'Завершить работу в системе'=>'/logout'=>(style=>"color:#FFF;text-decoration:none;")%></span></i></center>
+  <%= link_to 'Завершить работу в системе'=>'/logout.html'=>(style=>"color:#FFF;text-decoration:none;")%></span></i></center>
 </div><!--head-->
 <div id=content>
     <div id="quizform">
         <div id=pagecard>
           <%=tag 'H2'=>'Список бонус-кодов'%>
-            <%=form_for '/dashboard'=>begin%>
+            <%=form_for '/dashboard.html'=>begin%>
               Фильтр: <%=text_field 'search'=>(class=>'formstyle',size=>15)%>&nbsp;<%=submit_button 'Поиск бонус-кода'=>(class=>'formstyle')%>&nbsp<%=link_to 'Показать все'=>'/dashboard'%>
             <%end%>
-            <%=form_for '/dashboard'=>(method=>'post')=>begin%>
+            <%=form_for '/dashboard.html'=>(method=>'post')=>begin%>
 %my @bonusstatus=('Неподтвержден','Отклонен','Одобрен','Завершен');
 %my $bonuscount=1;
 <table border=1 width=100%>

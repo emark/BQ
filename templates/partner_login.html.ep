@@ -5,15 +5,16 @@
 <div id=content>
     <div id="quizform">
         <div id=pagecard>
-            <%=form_for '/auth'=>(method=>'post')=>begin%>
+            <%=form_for '/auth.html'=>(method=>'post')=>begin%>
                 <div align=center>
-                Вход для партнеров<br/>
-                <%=tag 'P'=>$message%>
+                <%= tag 'H2'=>'Вход для партнеров'%>
+                <%=tag 'P'=>(class=>'errormsg')=>$message%>
                 Логин<br/>
                 <%=text_field 'login'=>(class=>'formstyle',size=>15)%><br/>
                 Пароль<br/>
                 <%=password_field 'pass'=>(class=>'formstyle',size=>15)%><br/>
                 <br/><%=submit_button 'Войти'=>(class=>'formstyle')%>
+                <P><%=link_to 'Регистрация'=>'/register.html'%> / <%=link_to 'Забыли пароль?'=>'/restore.html'%></P>
                 </div>
             <%end%>
         </div><!--pagecard-->

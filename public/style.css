@@ -160,4 +160,6 @@ html{
 	border-bottom-style: dashed;
 	border-bottom-width: thin;
 	font-style: italic;
+}.errormsg{
+    color:#AA0505;
 }

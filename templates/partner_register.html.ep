@@ -1,0 +1,24 @@
+%layout 'dashboard',title 'Регистрация партнера BonusQuest';
+<div id=subhead>
+    <span class=sublogo><a href="/" style="color:#FFF;text-decoration:none;">BonusQuest</a></span>
+</div><!--head-->
+<div id=content>
+    <div id="quizform">
+        <div id=pagecard>
+            <%=form_for '/register.html'=>(method=>'post')=>begin%>
+                <div align=center>
+                <%= tag 'H2'=>'Регистрация партнера'%>
+                <%=tag 'P'=>(class=>'errormsg')=>$message%>
+                Адрес интернет-магазина<br/>
+                <%=text_field 'url'=>(class=>'formstyle',size=>15)%><br/>
+                Название магазина<br/>
+                <%=text_field 'name'=>(class=>'formstyle',size=>15)%><br/>
+                Электронная почта<br/>
+                <%=text_field 'email'=>(class=>'formstyle',size=>15)%><br/>
+                <br/><%=submit_button 'Зарегистрироваться'=>(class=>'formstyle')%>
+                <P><%=link_to 'Я уже зарегистрирован'=>'/login.html'%></P>
+                </div>
+            <%end%>
+        </div><!--pagecard-->
+    </div><!--quizform-->
+</div><!--content-->

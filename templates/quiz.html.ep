@@ -14,7 +14,7 @@
             <%=$quiz->{$quizid}{'INFO'}%><br/>
             <H2>Укажите данные прошлого заказа</H2>
             %if ($formmessage){
-            <P style="color:#FF0000"><%=$formmessage%></P>
+            <%= tag 'P'=>(class=>'errormsg')=>$formmessage%>
             %}
             <P>Дата заказа:
             <%= select_field 'ordermonth'=>$selectmonths=>(class=>'formstyle')%>
