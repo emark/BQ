@@ -28,7 +28,7 @@
 %}
             <H2>Ваше мнение</H2>
             %if ($questmessage){
-                <P style="color:#FF0000"><%=$questmessage%></P>
+                <%= tag 'P'=>(class=>'errormsg')=>$questmessage%>
             %}
             <i>
             %foreach my $questionid(keys %{$question}){

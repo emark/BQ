@@ -31,15 +31,36 @@ app->hook(before_dispatch => sub {
 
 get '/' => sub {
   my $self = shift;
-  my $partners=$dbh->selectrow_array("SELECT COUNT(SHOP.ID) FROM SHOP");
+  my $partners=$dbh->selectrow_array("SELECT COUNT(SHOP.ID) FROM SHOP WHERE SHOP.STATUS=1");
   $self->stash(partners=>$partners);
   $self->render('index');
 };
 
 get '/:id' => [id=>qw/\d+/]=> sub{
   my $self=shift;
-  $self->stash(capt=>'Идентификатор партнера',message=>'ID='.$self->param('id'));
-  $self->render('robot');
+  my $id=$self->param('id');
+  my $quizid=$dbh->selectrow_array("SELECT QUIZ.ID FROM QUIZ LEFT JOIN SHOP ON QUIZ.SHOPID=SHOP.ID WHERE QUIZ.STATUS=1 AND SHOP.ID=$id") || 0;
+  my $quiz=$dbh->selectall_hashref("SELECT QUIZ.ID,QUIZ.INFO,SHOP.URL,SHOP.NAME AS SHOP FROM QUIZ LEFT JOIN SHOP ON QUIZ.SHOPID=SHOP.ID WHERE QUIZ.STATUS=1 AND SHOP.ID=$id",'ID');
+  my $question=$dbh->selectall_hashref("SELECT ROUTER.ID AS RID,QUESTION.ID AS QID,QUESTION.CONTENT,QUESTION.TYPE,QUESTION.ANSWERS FROM QUESTION INNER JOIN ROUTER ON QUESTION.ID=ROUTER.QUESTIONID LEFT JOIN QUIZ ON ROUTER.QUIZID=QUIZ.ID LEFT JOIN SHOP ON QUIZ.SHOPID=SHOP.ID WHERE QUIZ.STATUS=1 AND SHOP.ID=$id",'RID');
+  if(!$quizid){
+    $self->stash(capt=>'Бонус не найден',message=>"Здесь пока нет бонусов. Подождем...");
+    return $self->render('robot') unless $quizid;
+  }
+  my @months=('Months','Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь');
+  my $selectmonths=[];
+  my @lt=localtime;
+  my $n=$lt[4]-1;
+  for my $i(0..2){#For 3 last months
+    $selectmonths->[$i]=[$months[$n],$n];
+    $n++;
+  }
+  $self->session(quizid=>$quizid);
+  $self->stash(quiz=>$quiz,
+               question=>$question,
+               selectmonths=>$selectmonths,
+               formmessage=>'',
+               questmessage=>'');
+  $self->render('quiz');
 };
 
 get '/quiz'=>sub{
@@ -191,7 +212,7 @@ post '/balance'=>sub{
 
 get '/partners'=>sub{
   my $self=shift;
-  my $shop=$dbh->selectall_hashref("SELECT SHOP.ID,SHOP.NAME,SHOP.URL,SHOP.DESCRIPTION,QUIZ.INFO FROM SHOP LEFT JOIN QUIZ ON SHOP.ID=QUIZ.SHOPID ORDER BY SHOP.URL",'ID');
+  my $shop=$dbh->selectall_hashref("SELECT SHOP.ID,SHOP.NAME,SHOP.URL,SHOP.DESCRIPTION,QUIZ.INFO FROM SHOP LEFT JOIN QUIZ ON SHOP.ID=QUIZ.SHOPID WHERE SHOP.STATUS=1 ORDER BY SHOP.URL",'ID');
   $self->stash(shop=>$shop);
   $self->render('partners');
 };
