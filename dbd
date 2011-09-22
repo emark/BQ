@@ -25,7 +25,7 @@ app->plugin(mail => {
 app->secret($appconf[5]);
 app->hook(before_dispatch => sub {
                my $self = shift;
-               $self->req->url->base(Mojo::URL->new(q{http://partner.bonusquest.ru/}))
+               #$self->req->url->base(Mojo::URL->new(q{http://partner.bonusquest.ru/}))
 	       }
 	  );
 
@@ -72,13 +72,14 @@ post '/register'=>sub{
 	my $self=shift;
 	my $param=$self->req->params->to_hash;
 	$param->{'url'}=~s/(http:\/\/www\.)||(http:\/\/)||(www\.)//g;
-	my $message='Партнер уже зарегистрирован'.$param->{'url'};
+	my $message='Все поля обязательны к заполнению';
 	my $check=$dbh->selectrow_array("SELECT 1 FROM SHOP WHERE URL=\"$param->{'url'}\" AND SHOP.STATUS=1") || undef;
+	$message='Партнер уже зарегистрирован' unless !$check;
 	if($param->{'email'} !~ /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$/){
 		$message='Вы неверно указали адрес электронной почты.';
 		$check=1;
 	}
-	if(!$check && $param->{'url'}){
+	if(!$check && $param->{'url'} && $param->{'tel'} && $param->{'name'}){
 		#Generate bonuscode
 		my @char=('a'..'z','A'..'Z','1'..'9');
 		my $pass='';
