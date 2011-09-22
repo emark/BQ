@@ -88,7 +88,7 @@ post '/register'=>sub{
 		$dbh->do("INSERT INTO SHOP(ID,URL,NAME,EMAIL,PASS) VALUES(NULL,\"$param->{'url'}\",\"$param->{'name'}\",\"$param->{'email'}\",\"$pass\")");
 		$self->mail(to=>$param->{'email'},
 								subject=>'Регистрация партнера',
-								data=>"Приветствуем!\nПоздравляем с регистрацией в BonusQuest.\n\nСайт $param->{'url'}, http://$param->{'url'}\n".
+								data=>"Приветствуем!\nПоздравляем с регистрацией в BonusQuest.\n\nСайт $param->{'name'}, http://$param->{'url'}\n".
 "Ваш пароль доступа: $pass\n\nДоступ к партнерской части будет открыт после подтверждения ваших данных.".$subscribe
 								);
 		$self->stash(capt=>'Спасибо за регистрацию',message=>'Дальнейшие инструкции отправлены на ваш адрес электронной почты.');

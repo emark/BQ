@@ -67,7 +67,7 @@ get '/quiz'=>sub{
   my $self=shift;
   my $url=$self->param('url');
   return $self->redirect_to('/') unless $url;
-  $url=~s/shop\.||www\.||store\.//g;#Drop subdomain from URL
+  $url=~s/http:\/\/||shop\.||www\.||store\.//g;#Drop subdomain from URL
   #Regexp utf encoding error
   #if($url !~ /^[А-Яа-яA-Za-z0-9.-]+\.[A-Za-z]{2,4}$/){
   #  $self->stash(message=>'Bad URL >:/');
