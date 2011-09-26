@@ -1,0 +1,43 @@
+%layout 'dashboard',title 'Список вопросов';
+<div id=content>
+    <div id="quizform">
+        <div id=pagecard>
+            <h3><%=link_to 'Мои опросы'=>'/quiz.html'%></h3>
+            <%=tag 'H2'=>'Список вопросов'%>
+%my @status=('Off','On');
+<%=form_for ''=>(method=>'post')=>begin%>
+<table border=1 width=100%>
+  <tr>
+    <td>
+      Question
+    </td><td>
+      Type
+    </td><td>
+    Answer
+    </td><td>
+    Include
+    </td>
+  </tr>
+%foreach my $questionid(keys %{$question}){
+  <tr>
+    <td>
+      <%=$question->{$questionid}{'CONTENT'}%>
+    </td><td>
+      <%=$question->{$questionid}{'TYPE'}%>
+    </td><td>
+      <%=$question->{$questionid}{'ANSWERS'}%>
+    </td><td>
+      <input type=checkbox name=questionid value="<%=$question->{$questionid}{'ID'}%>"
+%if ($quizid==$question->{$questionid}{'QUIZID'}){
+    checked
+%}
+      >
+    </td>
+  </tr>
+%}      
+</table><br/>
+<%=submit_button%>
+<%end%>
+        </div><!--pagecard-->
+    </div><!--quizform-->
+</div><!--content-->

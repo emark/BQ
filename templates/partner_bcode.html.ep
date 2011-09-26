@@ -1,9 +1,4 @@
 %layout 'dashboard',title 'Список бонусов BonusQuest';
-<div id=subhead>
-  <span class=sublogo><a href="/" style="color:#FFF;text-decoration:none;">BonusQuest</a></span><br/>
-  <center><i><%=$url%><br><span style="font-style:normal;font-size:14px;text-shadow:none;">
-  <%= link_to 'Завершить работу в системе'=>'/logout.html'=>(style=>"color:#FFF;text-decoration:none;")%></span></i></center>
-</div><!--head-->
 <div id=content>
     <div id="quizform">
         <div id=pagecard>

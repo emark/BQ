@@ -1,4 +1,4 @@
-%layout 'dashboard',title 'Регистрация партнера BonusQuest';
+%layout 'default',title 'Регистрация партнера BonusQuest';
 <div id=subhead>
     <span class=sublogo><a href="/" style="color:#FFF;text-decoration:none;">BonusQuest</a></span>
 </div><!--head-->

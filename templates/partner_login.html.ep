@@ -1,4 +1,4 @@
-%layout 'dashboard',title 'Партнер BonusQuest';
+%layout 'default',title 'Партнер BonusQuest';
 <div id=subhead>
     <span class=sublogo><a href="/" style="color:#FFF;text-decoration:none;">BonusQuest</a></span>
 </div><!--head-->

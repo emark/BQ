@@ -1,4 +1,4 @@
-%layout 'dashboard',title 'Восстановление пароля';
+%layout 'default',title 'Восстановление пароля';
 <div id=subhead>
     <span class=sublogo><a href="/" style="color:#FFF;text-decoration:none;">BonusQuest</a></span>
 </div><!--head-->
