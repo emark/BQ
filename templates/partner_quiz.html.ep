@@ -6,7 +6,9 @@
 %my @status=('Off','On');
 %my %qtype=('a'=>'Текст','b'=>'Выбор','c'=>'Множество','d'=>'Строка');
 <%=form_for '/quiz.html'=>(method=>'post')=>begin%>
-Бонус: <%=text_field 'quizbonus'=>"$quiz->[0][1]"=>(size=>40,class=>'formstyle')%>&nbsp;<br/><br/>
+Бонус: <%=text_field 'quizbonus'=>"$quiz->[0][1]"=>(size=>30,class=>'formstyle')%>&nbsp;
+<%=submit_button 'Сохранить'=>(class=>'formstyle')%> or <%=link_to 'See your quiz'=>"/$quiz->[0][0]"%>
+<br/><br/>
 <%=hidden_field 'qid'=>"$quiz->[0][0]"%>
 <table border=0 width=100%>
   <tr style="font-style: italic">
@@ -34,10 +36,16 @@
       <%=$question->{$questionid}{'ANSWERS'}%>
     </td>
   </tr>
-%}      
-</table><br/>
-<%=submit_button 'Сохранить'=>(class=>'formstyle')%> or <%=link_to 'See your quiz'=>"/$quiz->[0][0]"%>
+%}
+<tr><td colspan=4><%end%></td></tr>
+<tr><td></td><td>
+<%=form_for '/quiz.html#addquestion'=>(method=>'post')=>begin%>
+<%=text_field 'content'%></td><td>
+<%=select_field 'type'=>[['Текст'=>'a'],['Выбор'=>'b'],['Множество'=>'c'],['Строка'=>'d']]%></td><td>
+<%=text_field 'answer'%>
+<%=submit_button%></td></tr>
 <%end%>
+</table><br/>
         </div><!--pagecard-->
     </div><!--quizform-->
 </div><!--content-->
