@@ -132,6 +132,27 @@ get '/quiz'=>sub{
 	$self->render('partner_quiz');
 };
 
+get '/question'=>sub{#Create new question in the form
+	my $self=shift;
+	return $self->redirect_to('/login') unless $self->session('pid');
+	my $pid=$self->session('pid');
+	my $url=$self->session('url');
+	$self->stash(url=>$url);
+	$self->render('partner_newquestion');
+};
+
+get '/question/:id'=>sub{#Edit question in the form
+	my $self=shift;
+	return $self->redirect_to('/login') unless $self->session('pid');
+	my $pid=$self->session('pid');
+	my $url=$self->session('url');
+	my $questid=$self->param('id');
+	my $question=$dbh->selectall_hashref("SELECT QUESTION.ID,QUESTION.CONTENT,QUESTION.TYPE,QUESTION.ANSWERS FROM QUESTION WHERE QUESTION.ID=$questid AND QUESTION.SHOPID=$pid",'ID');
+	$self->stash(url=>$url,
+							 question=>$question);
+	$self->render('partner_question');
+};
+
 post '/quiz'=>sub{
 	my $self=shift;
 	return $self->redirect_to('/login') unless $self->session('pid');
@@ -140,9 +161,10 @@ post '/quiz'=>sub{
 	my $quizbonus=$self->param('quizbonus');
 	my $quizid=$self->param('qid');
 	my @questionid=$self->param('questionid');
-	my $content=$self->param('content');
+	my $questid=$self->param('questid');#ID for single question
+	my $content=$self->param('content');#Question content
 	my $type=$self->param('type');
-	my $answer=$self->param('answer');
+	my $answers=$self->param('answers');
 	if($quizbonus){
 		$dbh->do("UPDATE QUIZ SET QUIZ.INFO=\"$quizbonus\" WHERE QUIZ.ID=$quizid AND QUIZ.SHOPID=$pid");#Update quiz info
 	}if(@questionid){
@@ -151,7 +173,11 @@ post '/quiz'=>sub{
 			$dbh->do("INSERT INTO ROUTER(ID,QUIZID,QUESTIONID) VALUES(NULL,$quizid,$key)");
 		}
 	}if($content){
-		$dbh->do("INSERT INTO QUESTION(ID,CONTENT,TYPE,ANSWERS,SHOPID) VALUES(NULL,\"$content\",\"$type\",\"$answer\",$pid)");
+		if($questid){
+			$dbh->do("UPDATE QUESTION SET QUESTION.CONTENT=\"$content\",QUESTION.TYPE=\"$type\",QUESTION.ANSWERS=\"$answers\" WHERE QUESTION.ID=$questid AND QUESTION.SHOPID=$pid");			
+		}else{
+			$dbh->do("INSERT INTO QUESTION(ID,CONTENT,TYPE,ANSWERS,SHOPID) VALUES(NULL,\"$content\",\"$type\",\"$answers\",$pid)");			
+		}
 	}
 	my $quiz=$dbh->selectall_arrayref("SELECT QUIZ.ID,QUIZ.INFO FROM QUIZ WHERE QUIZ.SHOPID=$pid");
 	my $question=$dbh->selectall_hashref("SELECT QUESTION.ID,QUESTION.CONTENT,QUESTION.TYPE,QUESTION.ANSWERS,ROUTER.QUIZID FROM QUESTION LEFT JOIN ROUTER ON QUESTION.ID=ROUTER.QUESTIONID WHERE QUESTION.SHOPID=$pid",'ID');

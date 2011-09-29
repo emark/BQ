@@ -4,20 +4,20 @@
         <div id=pagecard>
             <%=tag 'H2'=>'Текущий опрос'%>
 %my @status=('Off','On');
-%my %qtype=('a'=>'Текст','b'=>'Выбор','c'=>'Множество','d'=>'Строка');
+%my @qtype=('Текст','Выбор','Множество','Строка');
 <%=form_for '/quiz.html'=>(method=>'post')=>begin%>
-Бонус: <%=text_field 'quizbonus'=>"$quiz->[0][1]"=>(size=>30,class=>'formstyle')%>&nbsp;
-<%=submit_button 'Сохранить'=>(class=>'formstyle')%> or <%=link_to 'See your quiz'=>"/$quiz->[0][0]"%>
+Бонус: <%=text_field 'quizbonus'=>"$quiz->[0][1]"=>(size=>45,class=>'formstyle')%>&nbsp; <%=link_to 'See your quiz'=>"/$quiz->[0][0]"%>
 <br/><br/>
 <%=hidden_field 'qid'=>"$quiz->[0][0]"%>
 <table border=0 width=100%>
+%if(%{$question}){
   <tr style="font-style: italic">
     <td colspan=2>
       Содержание вопроса
     </td><td>
       Тип вопроса
     </td><td>
-    Варианты
+    Варианты ответов
     </td>
   </tr>
 %foreach my $questionid(keys %{$question}){
@@ -29,23 +29,24 @@
       %}
       >
     </td><td>
-      <%=$question->{$questionid}{'CONTENT'}%>
+      <%= link_to "$question->{$questionid}{'CONTENT'}"=>"/question/$question->{$questionid}{'ID'}"%>
     </td><td>
-      <%=$qtype{$question->{$questionid}{'TYPE'}}%>
+      <%=$qtype[$question->{$questionid}{'TYPE'}]%>
     </td><td>
-      <%=$question->{$questionid}{'ANSWERS'}%>
+      <%#=$question->{$questionid}{'ANSWERS'}%>
     </td>
   </tr>
 %}
-<tr><td colspan=4><%end%></td></tr>
-<tr><td></td><td>
-<%=form_for '/quiz.html#addquestion'=>(method=>'post')=>begin%>
-<%=text_field 'content'%></td><td>
-<%=select_field 'type'=>[['Текст'=>'a'],['Выбор'=>'b'],['Множество'=>'c'],['Строка'=>'d']]%></td><td>
-<%=text_field 'answer'%>
-<%=submit_button%></td></tr>
-<%end%>
+%}else{
+  <tr>
+    <td colspan=4>
+      <%=link_to 'Добавить вопросы'=>'/question.html'%>
+    </td>
+  </tr>
+%}
 </table><br/>
+<%=submit_button 'Сохранить'=>(class=>'formstyle')%>
+<%end%>
         </div><!--pagecard-->
     </div><!--quizform-->
 </div><!--content-->

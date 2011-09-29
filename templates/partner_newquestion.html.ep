@@ -1,0 +1,51 @@
+%layout 'dashboard',title 'Список вопросов';
+<div id=content>
+    <div id="quizform">
+        <div id=pagecard>
+            <%=tag 'H2'=>'Новый вопрос'%>
+%my @qtype=('Текст','Выбор','Множество','Строка');
+<%=form_for '/quiz.html'=>(method=>'post')=>begin%>
+<table border=0 width=100%>
+  <tr style="font-style: italic">
+    <td>
+      Тип вопроса
+    </td>
+    <td colspan=1>
+      Содержание вопроса
+    </td></tr>
+  <tr>
+    <td>
+      <select name='type' class=formstyle>
+      %my $n=0;
+      %foreach my $key (@qtype){
+        <option value="<%=$n%>"><%=$key%>
+      %$n++}
+    </td>
+    <td colspan=1>
+      <%=text_field 'content'=>(size=>40,class=>'formstyle')%>
+    </td>
+  </tr>
+  <tr style="font-style: italic">
+    <!--<td></td>-->
+    <td colspan=2>
+    Варианты ответов
+    </td>
+  </tr>
+  <tr>
+    <!--<td></td>-->
+    <td colspan=2>
+<%=text_area 'answers'=>(rows=>5,cols=>20,class=>'formstyle')=>begin%><%end%>
+<%=hidden_field 'questid'=>0%>
+    </td>
+  </tr>
+<tr>
+    <!--<td></td>-->
+    <td colspan=2>
+        <%=submit_button 'Сохранить вопрос'=>(class=>'formstyle')%>
+    </td>
+</tr>
+</table><br/>
+<%end%>
+        </div><!--pagecard-->
+    </div><!--quizform-->
+</div><!--content-->
