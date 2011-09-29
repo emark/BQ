@@ -1,32 +1,43 @@
-%layout 'dashboard',title 'Опросы BonusQuest';
+%layout 'dashboard',title 'Список вопросов';
 <div id=content>
     <div id="quizform">
         <div id=pagecard>
-          <%=link_to 'Question'=>'/question'%>&nbsp;<%=link_to 'Bonus codes'=>'/bcode'%>
-          <%=tag 'H2'=>'Мои опросы'%>
+            <%=tag 'H2'=>'Текущий опрос'%>
 %my @status=('Off','On');
-<table border=1 width=100%>
-  <tr>
-    <td>
-      Quiz info
+%my %qtype=('a'=>'Текст','b'=>'Выбор','c'=>'Множество','d'=>'Строка');
+<%=form_for '/quiz.html'=>(method=>'post')=>begin%>
+Бонус: <%=text_field 'quizbonus'=>"$quiz->[0][1]"=>(size=>40,class=>'formstyle')%>&nbsp;<br/><br/>
+<%=hidden_field 'qid'=>"$quiz->[0][0]"%>
+<table border=0 width=100%>
+  <tr style="font-style: italic">
+    <td colspan=2>
+      Содержание вопроса
     </td><td>
-      Create
+      Тип вопроса
     </td><td>
-      Status
+    Варианты
     </td>
   </tr>
-%foreach my $quizid(keys %{$quiz}){
+%foreach my $questionid(keys %{$question}){
   <tr>
     <td>
-      <%= link_to $quiz->{$quizid}{'INFO'}=>"/quiz/$quiz->{$quizid}{'ID'}/"%>
+      <input type=checkbox name=questionid value="<%=$question->{$questionid}{'ID'}%>"
+      %if($question->{$questionid}{'QUIZID'} && ($question->{$questionid}{'QUIZID'}==$quiz->[0][0])){
+      checked 
+      %}
+      >
     </td><td>
-      <%=$quiz->{$quizid}{'QCREATE'}%>
+      <%=$question->{$questionid}{'CONTENT'}%>
     </td><td>
-      <a href=""><%=$status[$quiz->{$quizid}{'STATUS'}]%></a>
+      <%=$qtype{$question->{$questionid}{'TYPE'}}%>
+    </td><td>
+      <%=$question->{$questionid}{'ANSWERS'}%>
     </td>
   </tr>
 %}      
 </table><br/>
+<%=submit_button 'Сохранить'=>(class=>'formstyle')%> or <%=link_to 'See your quiz'=>"/$quiz->[0][0]"%>
+<%end%>
         </div><!--pagecard-->
     </div><!--quizform-->
 </div><!--content-->

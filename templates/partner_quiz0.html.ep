@@ -1,0 +1,32 @@
+%layout 'dashboard',title 'Опросы BonusQuest';
+<div id=content>
+    <div id="quizform">
+        <div id=pagecard>
+          <%=link_to 'Question'=>'/question'%>&nbsp;<%=link_to 'Bonus codes'=>'/bcode'%>
+          <%=tag 'H2'=>'Мои опросы'%>
+%my @status=('Off','On');
+<table border=1 width=100%>
+  <tr>
+    <td>
+      Quiz info
+    </td><td>
+      Create
+    </td><td>
+      Status
+    </td>
+  </tr>
+%foreach my $quizid(keys %{$quiz}){
+  <tr>
+    <td>
+      <%= link_to $quiz->{$quizid}{'INFO'}=>"/quiz/$quiz->{$quizid}{'ID'}/"%>
+    </td><td>
+      <%=$quiz->{$quizid}{'QCREATE'}%>
+    </td><td>
+      <a href=""><%=$status[$quiz->{$quizid}{'STATUS'}]%></a>
+    </td>
+  </tr>
+%}      
+</table><br/>
+        </div><!--pagecard-->
+    </div><!--quizform-->
+</div><!--content-->
