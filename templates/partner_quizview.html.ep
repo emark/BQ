@@ -5,24 +5,17 @@
           <%=link_to 'Question'=>'/question'%>&nbsp;<%=link_to 'Bonus codes'=>'/bcode'%>
           <%=tag 'H2'=>'Мои опросы'%>
 %my @status=('Off','On');
+QUIZ: <%=$quiz%>
 <table border=1 width=100%>
   <tr>
     <td>
-      Quiz info
-    </td><td>
-      Create
-    </td><td>
-      Status
+      Questions
     </td>
   </tr>
-%foreach my $quizid(keys %{$quiz}){
+%foreach my $questionid(keys %{$question}){
   <tr>
     <td>
-      <%= link_to $quiz->{$quizid}{'INFO'}=>"/quiz/$quiz->{$quizid}{'ID'}/"%>
-    </td><td>
-      <%=$quiz->{$quizid}{'QCREATE'}%>
-    </td><td>
-      <a href=""><%=$status[$quiz->{$quizid}{'STATUS'}]%></a>
+        <%=$question->{$questionid}{'CONTENT'}%>
     </td>
   </tr>
 %}      

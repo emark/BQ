@@ -32,7 +32,7 @@ app->hook(before_dispatch => sub {
 get '/' => sub {
   my $self = shift;
 	$self->stash(message=>'');
-	return $self->redirect_to('/quiz.html') if $self->session('pid');
+	return $self->redirect_to('/question.html') if $self->session('pid');
 	$self->render('partner_login');
 };
 
@@ -56,7 +56,7 @@ post '/auth'=>sub{
   if($pid){
 		$self->session(pid=>$pid,
 									 url=>$param->{'login'});
-		return $self->redirect_to('quiz.html');  
+		return $self->redirect_to('question.html');  
   }
   $self->stash(message=>'Ошибка при вводе логина или пароля');
 	$self->render('partner_login');
@@ -119,15 +119,26 @@ post '/restore'=>sub{
 	$self->render('robot');	
 };
 
-get '/quiz'=>sub{
+get '/question'=>sub{
 	my $self=shift;
 	return $self->redirect_to('/login') unless $self->session('pid');
 	my $pid=$self->session('pid');
 	my $url=$self->session('url');
-	my $quiz=$dbh->selectall_hashref("SELECT QUIZ.ID,QUIZ.INFO,QUIZ.STATUS FROM QUIZ WHERE QUIZ.SHOPID=$pid",'ID');
+	my $question=$dbh->selectall_hashref("SELECT QUESTION.ID,QUESTION.CONTENT,QUESTION.TYPE,QUESTION.ANSWERS FROM QUESTION WHERE QUESTION.SHOPID=$pid",'ID');
 	$self->stash(url=>$url,
-							 quiz=>$quiz);
-	$self->render('partner_quiz');
+							 question=>$question);
+	$self->render('partner_question');
+};
+
+post '/question'=>sub{
+	my $self=shift;
+	return $self->redirect_to('/login') unless $self->session('pid');
+	my $pid=$self->session('pid');
+	my $url=$self->session('url');
+	my $question=$dbh->selectall_hashref("SELECT QUESTION.ID,QUESTION.CONTENT,QUESTION.TYPE,QUESTION.ANSWERS FROM QUESTION WHERE QUESTION.SHOPID=$pid",'ID');
+	$self->stash(url=>$url,
+							 question=>$question);
+	$self->render('partner_question');
 };
 
 post '/quiz'=>sub{
@@ -135,12 +146,30 @@ post '/quiz'=>sub{
 	return $self->redirect_to('/login') unless $self->session('pid');
 	my $pid=$self->session('pid');
 	my $url=$self->session('url');
-	my $quizinfo=$self->param('quizinfo');
-	$dbh->do("INSERT INTO QUIZ(ID,INFO,SHOPID,QCREATE) VALUES(NULL,\"$quizinfo\",$pid,NOW())") unless !$quizinfo;#Create new quiz
-	my $quiz=$dbh->selectall_hashref("SELECT QUIZ.ID,QUIZ.INFO,QUIZ.STATUS FROM QUIZ WHERE QUIZ.SHOPID=$pid",'ID');
+	my $quizname=$self->param('quizname');
+	my $quizbonus=$self->param('quizbonus');
+	my @questionid=$self->param('questionid');
+	if(@questionid && $quizname && $quizbonus){
+		$dbh->do("INSERT INTO QUIZ(ID,NAME,INFO,SHOPID,QCREATE) VALUES(NULL,\"$quizname\",\"$quizbonus\",$pid,NOW())") unless !$quizname;#Create new quiz
+		foreach my $key(@questionid){
+			$dbh->do("INSERT INTO ROUTER(ID,QUIZID,QUESTIONID) VALUES(NULL,$pid,$key)");
+		}
+	}
+	my $quiz=$dbh->selectall_hashref("SELECT QUIZ.ID,QUIZ.INFO,QUIZ.STATUS,QUIZ.QCREATE FROM QUIZ WHERE QUIZ.SHOPID=$pid",'ID');
 	$self->stash(url=>$url,
 							 quiz=>$quiz);
 	$self->render('partner_quiz');
+};
+
+get '/quiz'=>sub{
+	my $self=shift;
+	return $self->redirect_to('/login') unless $self->session('pid');
+	my $pid=$self->session('pid');
+	my $url=$self->session('url');
+	my $quiz=$dbh->selectall_hashref("SELECT QUIZ.ID,QUIZ.INFO,QUIZ.STATUS,QUIZ.QCREATE FROM QUIZ WHERE QUIZ.SHOPID=$pid",'ID');
+	$self->stash(url=>$url,
+							 quiz=>$quiz);
+	$self->render('partner_quiz');	
 };
 
 get '/quiz/:id'=>sub{
@@ -149,14 +178,15 @@ get '/quiz/:id'=>sub{
 	my $pid=$self->session('pid');
 	my $url=$self->session('url');
 	my $quizid=$self->param('id');
-	my $question=$dbh->selectall_hashref("SELECT QUESTION.ID,QUESTION.CONTENT,QUESTION.TYPE,QUESTION.ANSWERS,ROUTER.QUIZID,QUIZ.INFO AS QUIZ FROM QUESTION LEFT JOIN ROUTER ON QUESTION.ID=ROUTER.QUESTIONID LEFT JOIN QUIZ ON ROUTER.QUIZID=QUIZ.ID WHERE QUIZ.ID=$quizid AND QUESTION.SHOPID=$pid",'ID');
+	my $quiz=$dbh->selectrow_array("SELECT QUIZ.INFO FROM QUIZ WHERE QUIZ.ID=$quizid AND QUIZ.SHOPID=$pid");
+	my $question=$dbh->selectall_hashref("SELECT QUESTION.ID,QUESTION.CONTENT,QUESTION.TYPE,QUESTION.ANSWERS FROM QUESTION LEFT JOIN  ROUTER ON QUESTION.ID=ROUTER.QUESTIONID WHERE ROUTER.QUIZID=$quizid AND QUESTION.SHOPID=$pid",'ID');
 	$self->stash(url=>$url,
-							 quizid=>$quizid,
-							 question=>$question);
-	$self->render('partner_question');	
+							 question=>$question,
+							 quiz=>$quiz);
+	$self->render('partner_quizview');	
 };
 
-post '/quiz/:id'=>sub{
+post '/quiz'=>sub{
 	my $self=shift;
 	return $self->redirect_to('/login') unless $self->session('pid');
 	my $pid=$self->session('pid');
@@ -174,7 +204,7 @@ post '/quiz/:id'=>sub{
 	$self->stash(url=>$url,
 							 quizid=>$quizid,
 							 question=>$question);
-	$self->render('partner_question');	
+	$self->render('partner_quiz');	
 };
 
 get '/bcode'=>sub{

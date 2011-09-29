@@ -11,7 +11,7 @@
 %my $bonuscount=1;
 %my @months=('Months','Января','Февраля','Марта','Апреля','Мая','Июня','Июля','Августа','Сентября','Октября','Ноября','Декабря');
 <table border=1 width=100%>
-  <tr style="font-weight: bold;" align=center>
+  <tr align=center>
     <td>
       #
     </td><td>
