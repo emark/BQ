@@ -142,8 +142,10 @@ post '/quiz'=>sub{
       $bonuscode.=$char[int(rand(60))];
     }
     
-    #Generate bonus code
-    $dbh->do("INSERT INTO BONUS (ID,CODE,STATUS,STATUSDATE,BCREATE,ORDERDATE,ORDERMONTH,ADDRESS,EMAIL) VALUES (NULL,\"$bonuscode\",0,NOW(),NOW(),$param->{'orderdate'},$param->{'ordermonth'},\"$param->{'orderaddr'}\",\"$param->{'orderemail'}\")") || die $dbh->errstr;
+    #Get bonus information from quiz
+    my $bonusinfo=$dbh->selectrow_array("SELECT QUIZ.INFO FROM QUIZ WHERE QUIZ.ID=$quizid") || undef;
+    #Create bonus code
+    $dbh->do("INSERT INTO BONUS (ID,CODE,STATUS,STATUSDATE,BCREATE,ORDERDATE,ORDERMONTH,ADDRESS,EMAIL,BONUSINFO) VALUES (NULL,\"$bonuscode\",0,NOW(),NOW(),$param->{'orderdate'},$param->{'ordermonth'},\"$param->{'orderaddr'}\",\"$param->{'orderemail'}\",\"$bonusinfo\")") || die $dbh->errstr;
     $bonusid=$dbh->last_insert_id('','',"BONUS",'ID');
     $sth=$dbh->prepare("SELECT ROUTER.ID AS RID FROM ROUTER WHERE ROUTER.QUIZID=$quizid");
     $sth->execute;
