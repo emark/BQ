@@ -6,7 +6,9 @@
 %my @status=('Off','On');
 %my @qtype=('Текст','Выбор','Множество','Строка');
 <%=form_for '/quiz.html'=>(method=>'post')=>begin%>
-Бонус: <%=text_field 'quizbonus'=>"$quiz->[0][1]"=>size=>45,class=>'formstyle',maxlength=>150%>&nbsp; <%=link_to 'Посмотреть'=>"/$quiz->[0][0]"%>
+Бонус: <%=text_field
+'quizbonus'=>"$quiz->[0][1]"=>size=>45,class=>'formstyle',maxlength=>150%>&nbsp;
+<%=link_to 'Просмотр'=>"/$quiz->[0][2]"%>
 <br/><br/>
 <%=hidden_field 'qid'=>"$quiz->[0][0]"%>
 <table border=0 width=100%>

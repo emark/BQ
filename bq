@@ -41,7 +41,7 @@ get '/:id' => [id=>qw/\d+/]=> sub{
   my $id=$self->param('id');
   my $quizid=$dbh->selectrow_array("SELECT QUIZ.ID FROM QUIZ LEFT JOIN SHOP ON QUIZ.SHOPID=SHOP.ID WHERE QUIZ.STATUS=1 AND SHOP.ID=$id") || 0;
   my $quiz=$dbh->selectall_hashref("SELECT QUIZ.ID,QUIZ.INFO,SHOP.URL,SHOP.NAME AS SHOP FROM QUIZ LEFT JOIN SHOP ON QUIZ.SHOPID=SHOP.ID WHERE QUIZ.STATUS=1 AND SHOP.ID=$id",'ID');
-  my $question=$dbh->selectall_hashref("SELECT ROUTER.ID AS RID,QUESTION.ID AS QID,QUESTION.CONTENT,QUESTION.TYPE,QUESTION.ANSWERS FROM QUESTION INNER JOIN ROUTER ON QUESTION.ID=ROUTER.QUESTIONID LEFT JOIN QUIZ ON ROUTER.QUIZID=QUIZ.ID LEFT JOIN SHOP ON QUIZ.SHOPID=SHOP.ID WHERE QUIZ.STATUS=1 AND SHOP.ID=$id",'RID');
+  my $question=$dbh->selectall_hashref("SELECT QUESTION.ID,QUESTION.CONTENT,QUESTION.TYPE,QUESTION.ANSWERS FROM QUESTION INNER JOIN ROUTER ON QUESTION.ID=ROUTER.QUESTIONID LEFT JOIN QUIZ ON ROUTER.QUIZID=QUIZ.ID LEFT JOIN SHOP ON QUIZ.SHOPID=SHOP.ID WHERE QUIZ.STATUS=1 AND SHOP.ID=$id",'ID');
   if(!$quizid){
     $self->stash(capt=>'Бонус не найден',message=>"Здесь пока нет бонусов. Подождем...");
     return $self->render('robot') unless $quizid;
@@ -77,7 +77,7 @@ get '/quiz'=>sub{
   #$dbh->do("INSERT INTO QUERY(URL,SYSDATE) VALUES(\"$url\",NOW())");
   my $quizid=$dbh->selectrow_array("SELECT QUIZ.ID FROM QUIZ LEFT JOIN SHOP ON QUIZ.SHOPID=SHOP.ID WHERE QUIZ.STATUS=1 AND SHOP.URL='$url'") || 0;
   my $quiz=$dbh->selectall_hashref("SELECT QUIZ.ID,QUIZ.INFO,SHOP.URL,SHOP.NAME AS SHOP FROM QUIZ LEFT JOIN SHOP ON QUIZ.SHOPID=SHOP.ID WHERE QUIZ.STATUS=1 AND SHOP.URL='$url'",'ID');
-  my $question=$dbh->selectall_hashref("SELECT ROUTER.ID AS RID,QUESTION.ID AS QID,QUESTION.CONTENT,QUESTION.TYPE,QUESTION.ANSWERS FROM QUESTION INNER JOIN ROUTER ON QUESTION.ID=ROUTER.QUESTIONID LEFT JOIN QUIZ ON ROUTER.QUIZID=QUIZ.ID LEFT JOIN SHOP ON QUIZ.SHOPID=SHOP.ID WHERE QUIZ.STATUS=1 AND SHOP.URL='$url'",'RID');
+  my $question=$dbh->selectall_hashref("SELECT QUESTION.ID,QUESTION.CONTENT,QUESTION.TYPE,QUESTION.ANSWERS FROM QUESTION INNER JOIN ROUTER ON QUESTION.ID=ROUTER.QUESTIONID LEFT JOIN QUIZ ON ROUTER.QUIZID=QUIZ.ID LEFT JOIN SHOP ON QUIZ.SHOPID=SHOP.ID WHERE QUIZ.STATUS=1 AND SHOP.URL='$url'",'ID');
   if(!$quizid){
     $self->stash(capt=>'Бонус не найден',message=>"Магазин $url пока не предоставляет бонусы.");
     return $self->render('robot') unless $quizid;
@@ -115,8 +115,8 @@ post '/quiz'=>sub{
   my $questvalidate='';
   
   my $quiz=$dbh->selectall_hashref("SELECT QUIZ.ID,QUIZ.INFO,SHOP.URL,SHOP.NAME AS SHOP,SHOP.DESCRIPTION FROM QUIZ LEFT JOIN SHOP ON QUIZ.SHOPID=SHOP.ID LEFT JOIN ROUTER ON QUIZ.ID=ROUTER.QUIZID WHERE QUIZ.STATUS=1 AND QUIZ.ID=$quizid",'ID');
-  my $question=$dbh->selectall_hashref("SELECT ROUTER.ID AS RID,QUESTION.ID AS QID,QUESTION.CONTENT,QUESTION.TYPE,QUESTION.ANSWERS FROM QUESTION INNER JOIN ROUTER ON QUESTION.ID=ROUTER.QUESTIONID LEFT JOIN QUIZ ON ROUTER.QUIZID=QUIZ.ID LEFT JOIN SHOP ON QUIZ.SHOPID=SHOP.ID WHERE QUIZ.STATUS=1 AND QUIZ.ID=$quizid",'RID');
-  my $quizcheck=$dbh->selectall_arrayref("SELECT ROUTER.ID FROM ROUTER WHERE ROUTER.QUIZID=$quizid");
+  my $question=$dbh->selectall_hashref("SELECT QUESTION.ID,QUESTION.CONTENT,QUESTION.TYPE,QUESTION.ANSWERS FROM QUESTION INNER JOIN ROUTER ON QUESTION.ID=ROUTER.QUESTIONID LEFT JOIN QUIZ ON ROUTER.QUIZID=QUIZ.ID LEFT JOIN SHOP ON QUIZ.SHOPID=SHOP.ID WHERE QUIZ.STATUS=1 AND QUIZ.ID=$quizid",'ID');
+  my $quizcheck=$dbh->selectall_arrayref("SELECT ROUTER.QUESTIONID FROM ROUTER WHERE ROUTER.QUIZID=$quizid");
     
   #Validation rules    
   if($param->{'orderdate'} !~/^\d+$/){
@@ -147,13 +147,13 @@ post '/quiz'=>sub{
     #Create bonus code
     $dbh->do("INSERT INTO BONUS (ID,CODE,STATUS,STATUSDATE,BCREATE,ORDERDATE,ORDERMONTH,ADDRESS,EMAIL,BONUSINFO) VALUES (NULL,\"$bonuscode\",0,NOW(),NOW(),$param->{'orderdate'},$param->{'ordermonth'},\"$param->{'orderaddr'}\",\"$param->{'orderemail'}\",\"$bonusinfo\")") || die $dbh->errstr;
     $bonusid=$dbh->last_insert_id('','',"BONUS",'ID');
-    $sth=$dbh->prepare("SELECT ROUTER.ID AS RID FROM ROUTER WHERE ROUTER.QUIZID=$quizid");
+    $sth=$dbh->prepare("SELECT ROUTER.QUESTIONID AS QID FROM ROUTER WHERE ROUTER.QUIZID=$quizid");
     $sth->execute;
     
     #Record answer to DB
     while(@ref=$sth->fetchrow_array){
       $answer=join(';',$self->param($ref[0]));
-      $dbh->do("INSERT INTO ANSWER (ID,ROUTERID,BONUSID,CONTENT) VALUES (NULL,$ref[0],$bonusid,\"$answer\")") || die $dbh->errstr;
+      $dbh->do("INSERT INTO ANSWER (ID,QUESTIONID,BONUSID,CONTENT,DCREATE) VALUES (NULL,$ref[0],$bonusid,\"$answer\",NOW())") || die $dbh->errstr;
     }
 
     $self->session(quizid=>0);
