@@ -33,20 +33,20 @@
             <i>
             %foreach my $questionid(keys %{$question}){
                 <P><%=$question->{$questionid}{'CONTENT'}%>
-                %if($question->{$questionid}{'TYPE'} eq 'a'){
+                %if($question->{$questionid}{'TYPE'} eq '0'){
                     <br/><%= text_area $question->{$questionid}{'RID'}=>(cols=>40,rows=>3,class=>'formstyle')=>begin%><%=$question->{$questionid}{'ANSWERS'}%><%end%>
-                %}elsif($question->{$questionid}{'TYPE'} eq 'b'){
+                %}elsif($question->{$questionid}{'TYPE'} eq '1'){
                     %my @answer=split('\;',$question->{$questionid}{'ANSWERS'});
                     %foreach my $key(@answer){
                         <%= radio_button $question->{$questionid}{'RID'} => $key =>(class=>'formstyle')%><%=$key%>
                     %}
-                %}elsif($question->{$questionid}{'TYPE'} eq 'c'){
+                %}elsif($question->{$questionid}{'TYPE'} eq '2'){
                     %my @answer=split('\;',$question->{$questionid}{'ANSWERS'});
                     %foreach my $key(@answer){
                         <%= check_box $question->{$questionid}{'RID'} => $key =>(class=>'formstyle')%><%=$key%>
                     %}
-                %}elsif($question->{$questionid}{'TYPE'} eq 'd'){
-                    <%= text_field $question->{$questionid}{'RID'} =>(class=>'formstyle')%>
+                %}elsif($question->{$questionid}{'TYPE'} eq '3'){
+                    <%= text_field $question->{$questionid}{'RID'} =>(class=>'formstyle')%><%=$question->{$questionid}{'ANSWERS'}%>
                 %}
                 </P>
             %}

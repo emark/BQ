@@ -56,7 +56,7 @@ post '/auth'=>sub{
   if($pid){
 		$self->session(pid=>$pid,
 									 url=>$param->{'login'});
-		return $self->redirect_to('question.html');  
+		return $self->redirect_to('quiz.html');  
   }
   $self->stash(message=>'Ошибка при вводе логина или пароля');
 	$self->render('partner_login');
@@ -125,7 +125,7 @@ get '/quiz'=>sub{
 	my $pid=$self->session('pid');
 	my $url=$self->session('url');
 	my $quiz=$dbh->selectall_arrayref("SELECT QUIZ.ID,QUIZ.INFO FROM QUIZ WHERE QUIZ.SHOPID=$pid");
-	my $question=$dbh->selectall_hashref("SELECT QUESTION.ID,QUESTION.CONTENT,QUESTION.TYPE,QUESTION.ANSWERS,ROUTER.QUIZID FROM QUESTION LEFT JOIN ROUTER ON QUESTION.ID=ROUTER.QUESTIONID WHERE QUESTION.SHOPID=$pid",'ID');
+	my $question=$dbh->selectall_hashref("SELECT QUESTION.ID,QUESTION.CONTENT,QUESTION.TYPE,COUNT(ANSWER.ID) AS ANSWERS,ROUTER.QUIZID FROM QUESTION LEFT JOIN ROUTER ON QUESTION.ID=ROUTER.QUESTIONID LEFT JOIN ANSWER ON QUESTION.ID=ANSWER.QUESTIONID WHERE QUESTION.SHOPID=$pid GROUP BY QUESTION.ID",'ID');
 	$self->stash(url=>$url,
 							 quiz=>$quiz,
 							 question=>$question);
@@ -165,6 +165,7 @@ post '/quiz'=>sub{
 	my $content=$self->param('content');#Question content
 	my $type=$self->param('type');
 	my $answers=$self->param('answers');
+	$answers=~s/\s\n/;/g;
 	if($quizbonus){
 		$dbh->do("UPDATE QUIZ SET QUIZ.INFO=\"$quizbonus\" WHERE QUIZ.ID=$quizid AND QUIZ.SHOPID=$pid");#Update quiz info
 	}if(@questionid){
@@ -180,7 +181,7 @@ post '/quiz'=>sub{
 		}
 	}
 	my $quiz=$dbh->selectall_arrayref("SELECT QUIZ.ID,QUIZ.INFO FROM QUIZ WHERE QUIZ.SHOPID=$pid");
-	my $question=$dbh->selectall_hashref("SELECT QUESTION.ID,QUESTION.CONTENT,QUESTION.TYPE,QUESTION.ANSWERS,ROUTER.QUIZID FROM QUESTION LEFT JOIN ROUTER ON QUESTION.ID=ROUTER.QUESTIONID WHERE QUESTION.SHOPID=$pid",'ID');
+	my $question=$dbh->selectall_hashref("SELECT QUESTION.ID,QUESTION.CONTENT,QUESTION.TYPE,COUNT(ANSWER.ID) AS ANSWERS,ROUTER.QUIZID FROM QUESTION LEFT JOIN ROUTER ON QUESTION.ID=ROUTER.QUESTIONID LEFT JOIN ANSWER ON QUESTION.ID=ANSWER.QUESTIONID WHERE QUESTION.SHOPID=$pid GROUP BY QUESTION.ID",'ID');
 	$self->stash(url=>$url,
 							 quiz=>$quiz,
 							 question=>$question);

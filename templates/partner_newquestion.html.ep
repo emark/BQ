@@ -1,4 +1,4 @@
-%layout 'dashboard',title 'Список вопросов';
+%layout 'dashboard',title 'Новый вопрос';
 <div id=content>
     <div id="quizform">
         <div id=pagecard>
@@ -20,28 +20,26 @@
       %foreach my $key (@qtype){
         <option value="<%=$n%>"><%=$key%>
       %$n++}
+      </select>
     </td>
     <td colspan=1>
-      <%=text_field 'content'=>(size=>40,class=>'formstyle')%>
+      <%=text_field 'content'=>type=>'text',maxlength=>100,size=>40,class=>'formstyle'%><br/>
     </td>
   </tr>
   <tr style="font-style: italic">
-    <!--<td></td>-->
     <td colspan=2>
     Варианты ответов
     </td>
   </tr>
   <tr>
-    <!--<td></td>-->
     <td colspan=2>
 <%=text_area 'answers'=>(rows=>5,cols=>20,class=>'formstyle')=>begin%><%end%>
 <%=hidden_field 'questid'=>0%>
     </td>
   </tr>
 <tr>
-    <!--<td></td>-->
-    <td colspan=2>
-        <%=submit_button 'Сохранить вопрос'=>(class=>'formstyle')%>
+    <td colspan=2><br/>
+        <%=submit_button 'Сохранить вопрос'=>(class=>'formstyle')%> или <%=link_to 'Закрыть без сохранения'=>'/quiz.html'%>
     </td>
 </tr>
 </table><br/>

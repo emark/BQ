@@ -1,4 +1,4 @@
-%layout 'dashboard',title 'Список вопросов';
+%layout 'dashboard',title 'Мой опрос';
 <div id=content>
     <div id="quizform">
         <div id=pagecard>
@@ -6,7 +6,7 @@
 %my @status=('Off','On');
 %my @qtype=('Текст','Выбор','Множество','Строка');
 <%=form_for '/quiz.html'=>(method=>'post')=>begin%>
-Бонус: <%=text_field 'quizbonus'=>"$quiz->[0][1]"=>(size=>45,class=>'formstyle')%>&nbsp; <%=link_to 'See your quiz'=>"/$quiz->[0][0]"%>
+Бонус: <%=text_field 'quizbonus'=>"$quiz->[0][1]"=>size=>45,class=>'formstyle',maxlength=>150%>&nbsp; <%=link_to 'Посмотреть'=>"/$quiz->[0][0]"%>
 <br/><br/>
 <%=hidden_field 'qid'=>"$quiz->[0][0]"%>
 <table border=0 width=100%>
@@ -16,11 +16,11 @@
       Содержание вопроса
     </td><td>
       Тип вопроса
-    </td><td>
-    Варианты ответов
+    </td><td align=center>
+    Ответов
     </td>
   </tr>
-%foreach my $questionid(keys %{$question}){
+  %foreach my $questionid(keys %{$question}){
   <tr>
     <td>
       <input type=checkbox name=questionid value="<%=$question->{$questionid}{'ID'}%>"
@@ -29,23 +29,22 @@
       %}
       >
     </td><td>
-      <%= link_to "$question->{$questionid}{'CONTENT'}"=>"/question/$question->{$questionid}{'ID'}"%>
+      <%#= link_to "$question->{$questionid}{'CONTENT'}"=>"/question/$question->{$questionid}{'ID'}"%>
+      <%=$question->{$questionid}{'CONTENT'}%> <a href="/question/<%=$question->{$questionid}{'ID'}%>"><img src='/media/icon/edit.gif' border=0 title='Редактировать вопрос'></a>
     </td><td>
       <%=$qtype[$question->{$questionid}{'TYPE'}]%>
-    </td><td>
-      <%#=$question->{$questionid}{'ANSWERS'}%>
+    </td><td align=center>
+      <%=$question->{$questionid}{'ANSWERS'}%>
     </td>
   </tr>
+  %}
 %}
-%}else{
-  <tr>
-    <td colspan=4>
-      <%=link_to 'Добавить вопросы'=>'/question.html'%>
-    </td>
-  </tr>
-%}
+<tr>
+  <td colspan=4><br/>
+    <%=submit_button 'Обновить'=>(class=>'formstyle')%> или <%=link_to 'Добавить вопрос'=>'/question.html'%>
+  </td>
+</tr>
 </table><br/>
-<%=submit_button 'Сохранить'=>(class=>'formstyle')%>
 <%end%>
         </div><!--pagecard-->
     </div><!--quizform-->
