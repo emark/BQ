@@ -25,7 +25,7 @@ app->plugin(mail => {
 app->secret($appconf[5]);
 app->hook(before_dispatch => sub {
                my $self = shift;
-               $self->req->url->base(Mojo::URL->new(q{http://partner.bonusquest.ru/}))
+               #$self->req->url->base(Mojo::URL->new(q{http://partner.bonusquest.ru/}))
 	       }
 	  );
 

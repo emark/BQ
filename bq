@@ -197,7 +197,7 @@ post '/balance'=>sub{
     $self->stash(capt=>'Ошибка написания',message=>'Вы неверно указали адрес электронной почты.');
     return $self->render('robot');
   }
-  my $balance=$dbh->selectall_arrayref("SELECT BONUS.ID,BONUS.CODE,SHOP.NAME,SHOP.URL,SHOP.DESCRIPTION,QUIZ.INFO FROM BONUS LEFT JOIN ANSWER ON BONUS.ID=ANSWER.BONUSID LEFT JOIN ROUTER ON ANSWER.ROUTERID=ROUTER.ID LEFT JOIN QUIZ ON ROUTER.QUIZID=QUIZ.ID LEFT JOIN SHOP ON QUIZ.SHOPID=SHOP.ID WHERE BONUS.STATUS=2 AND BONUS.EMAIL=\"$email\" GROUP BY BONUS.CODE") || undef;
+  my $balance=$dbh->selectall_arrayref("SELECT BONUS.ID,BONUS.CODE,SHOP.NAME,SHOP.URL,SHOP.DESCRIPTION,QUIZ.INFO FROM BONUS LEFT JOIN ANSWER ON BONUS.ID=ANSWER.BONUSID LEFT JOIN QUESTION ON ANSWER.QUESTIONID=QUESTION.ID LEFT JOIN ROUTER ON QUESTION.ID=ROUTER.ID LEFT JOIN QUIZ ON ROUTER.QUIZID=QUIZ.ID LEFT JOIN SHOP ON QUIZ.SHOPID=SHOP.ID WHERE BONUS.STATUS=2 AND BONUS.EMAIL=\"$email\" GROUP BY BONUS.CODE") || undef;
   my $mailmessage='';
   if($balance->[0]){
     $mailmessage="Приветствуем!\nТы или возможно кто-то другой попросил прислать список твоих действующих бонус-кодов.\n\n";

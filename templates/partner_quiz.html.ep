@@ -1,4 +1,4 @@
-%layout 'dashboard',title 'Мой опрос';
+%layout 'dashboard',title 'Мой опрос от BonusQuest';
 <div id=content>
     <div id="quizform">
         <div id=pagecard>
