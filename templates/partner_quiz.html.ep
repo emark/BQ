@@ -2,14 +2,13 @@
 <div id=content>
     <div id="quizform">
         <div id=pagecard>
+            <div id=nav style="text-align:right">
+              <%=link_to 'Поступившие заявки'=>'/orders.html'%>
+            </div>
             <%=tag 'H2'=>'Текущий опрос'%>
 %my @status=('Off','On');
 %my @qtype=('Текст','Выбор','Множество','Строка');
 <%=form_for '/quiz.html'=>(method=>'post')=>begin%>
-Бонус: <%=text_field
-'quizbonus'=>"$quiz->[0][1]"=>size=>45,class=>'formstyle',maxlength=>150%>&nbsp;
-<%=link_to 'Просмотр'=>"http://www.bonusquest.ru/$quiz->[0][2]"=>(target=>'_blank')%>
-<br/><br/>
 <%=hidden_field 'qid'=>"$quiz->[0][0]"%>
 <table border=0 width=100%>
 %if(%{$question}){
@@ -43,11 +42,16 @@
 %}
 <tr>
   <td colspan=4><br/>
-    <%=submit_button 'Обновить'=>(class=>'formstyle')%> или <%=link_to 'Добавить вопрос'=>'/question.html'%>
+    <%=submit_button 'Сохранить'=>(class=>'formstyle')%> или <%=link_to 'Добавить вопрос'=>'/question.html'%>
   </td>
 </tr>
 </table><br/>
 <%end%>
+<div id=view">
+  <center>
+  <%=link_to 'Посмотреть опрос'=>"http://www.bonusquest.ru/$quiz->[0][2]"=>(target=>'_blank',class=>'MyButton',title=>'Посмотреть как выглядит опрос')%>
+  </center>
+</div>
         </div><!--pagecard-->
     </div><!--quizform-->
 </div><!--content-->

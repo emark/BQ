@@ -1,0 +1,67 @@
+%layout 'dashboard',title 'Поступившие заявки';
+%#dev
+<div id=content>
+    <div id="quizform">
+        <div id=pagecard>
+            <div id=nav style="text-align:right">
+                <%=link_to 'Мой опрос'=>"/quiz.html"%>
+            </div>
+            <%=tag 'H2'=>'Поступившие заявки'%>
+%my @months=('Months','Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь');
+<%=form_for '/orders.html'=>(method=>'post')=>begin%>
+<table border=0 width=100%>
+%if(%{$orders}){
+  <tr style="font-style: italic">
+    <td>
+      Дата
+    </td><td>
+      Месяц
+    </td><td align=center>
+    Номер
+    </td><td align=center>
+    Сумма
+    </td><td align=center>
+    Контроль
+    </td>
+  </tr>
+  %foreach my $orderid(keys %{$orders}){
+  <tr>
+    <td>
+        <%=$orders->{$orderid}{'SYSDATE'}%>
+    </td><td>
+        <%=$months[$orders->{$orderid}{'ORDERMONTH'}]%>
+    </td><td>
+        <%=$orders->{$orderid}{'NUMBER'}%>
+    </td><td align=center>
+        <%=$orders->{$orderid}{'SUMM'}%>
+    </td><td align=center>
+        <%=radio_button $orders->{$orderid}{'ID'}=>2%>Принять
+        <%=radio_button $orders->{$orderid}{'ID'}=>1%>Отклонить
+    </td>
+  </tr>
+  %}
+<tr>
+    <td colspan=5 align=center><br/>
+        <%=submit_button 'Подтвердить'=>(class=>'formstyle')%>
+        <input type=reset class='formstyle' value='Сбросить'>
+    </td>
+</tr>
+%}else{
+<tr>
+    <td colspan=5 align=center>
+        <%=tag 'h3'=>'Новых заявок пока нет. Ждем.'%>
+    </td>
+</tr>
+%}
+</table><br/>
+<%end%>
+<form id=orderstatus method='post' action="/orders.html">
+<input type=hidden name=status id=status value=0>
+<input type=hidden name=oid id=oid value=0>
+</form>
+<div id=stat>
+Всего поступило заявок: <%=$orderstat->[0][0]%>. Из них <%= link_to 'принято'=>'/orders/status/2'%> - <%=$orderstat->[0][3]%>, <%= link_to 'отклонено'=>'/orders/status/1'%> - <%=$orderstat->[0][2]%>
+</div>
+        </div><!--pagecard-->
+    </div><!--quizform-->
+</div><!--content-->

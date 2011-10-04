@@ -3,17 +3,6 @@
   <head>
     <title><%= title %></title>
     <%= stylesheet '/style.css'%>
-    <style>
-      .bonusstatus0{
-        color:#000;
-      }.bonusstatus1{
-        color:#AA0505;
-      }.bonusstatus2{
-        color:#0E6C84;
-      }.bonusstatus3{
-        color:#8C8C8C;
-      }
-    </style>
   </head>
   <body>
     <div  id=container>

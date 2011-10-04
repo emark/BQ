@@ -1,0 +1,61 @@
+%layout 'dashboard',title 'Архив заявок';
+%#dev
+<div id=content>
+    <div id="quizform">
+        <div id=pagecard>
+            <div id=nav style="text-align:right">
+                <%=link_to 'Поступившие заявки'=>"/orders.html"%>
+                <%=link_to 'Мой опрос'=>"/quiz.html"%>
+            </div>
+            <%=tag 'H2'=>'Архив заявок'%>
+%my @months=('Months','Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь');
+%my @status=('Status','Отклонено','Принято');
+<%=form_for '/orders.html'=>(method=>'post')=>begin%>
+<table border=0 width=100%>
+%if(%{$orders}){
+  <tr style="font-style: italic">
+    <td>
+      Дата
+    </td><td>
+      Месяц
+    </td><td align=center>
+    Номер
+    </td><td align=center>
+    Сумма
+    </td><td align=center>
+    Контроль
+    </td>
+  </tr>
+  %foreach my $orderid(keys %{$orders}){
+  <tr>
+    <td>
+        <%=$orders->{$orderid}{'SYSDATE'}%>
+    </td><td>
+        <%=$months[$orders->{$orderid}{'ORDERMONTH'}]%>
+    </td><td>
+        <%=$orders->{$orderid}{'NUMBER'}%>
+    </td><td align=center>
+        <%=$orders->{$orderid}{'SUMM'}%>
+    </td><td align=center>
+        <%=$status[$orderstatus]%>
+    </td>
+  </tr>
+  %}
+%}else{
+<tr>
+    <td colspan=5 align=center>
+        <%=tag 'h3'=>'Новых заявок пока нет. Ждем.'%>
+    </td>
+</tr>
+%}
+</table><br/>
+<%end%>
+<form id=orderstatus method='post' action="/orders.html">
+<input type=hidden name=status id=status value=0>
+<input type=hidden name=oid id=oid value=0>
+</form>
+<div id=stat>
+</div>
+        </div><!--pagecard-->
+    </div><!--quizform-->
+</div><!--content-->
