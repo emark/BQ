@@ -10,20 +10,19 @@
 <div id=content>
     <div id="quizform">
         <div id=pagecard>
-            <H2>Бонус</H2>
-            <%=$quiz->{$quizid}{'INFO'}%><br/>
             <H2>Укажите данные прошлого заказа</H2>
             %if ($formmessage){
             <%= tag 'P'=>(class=>'errormsg')=>$formmessage%>
             %}
-            <P>Дата заказа:
+            <P>Месяц заказа:
             <%= select_field 'ordermonth'=>$selectmonths=>(class=>'formstyle')%>
-            <%=text_field 'orderdate'=>(size=>4,maxlength=>2,class=>'formstyle')%>
             <br><i style="font-size:16px">(покупка совершена не более 3 месяцев назад)</i></P>
+            <P>Номер заказа: <%=text_field 'ordernum'=>(size=>10,class=>'formstyle')%>
+            <!--<br><i style="font-size:16px">(укажите )</i></P>-->
+            <P>Сумма заказа: <%=text_field 'ordercheck'=>(size=>4,class=>'formstyle')%> руб.
+            <!--<br><i style="font-size:16px">(достаточно улицы и номера дома)</i></P>-->
             <P>Ваш e-mail: <%=text_field 'orderemail'=>(class=>'formstyle',size=>15)%>
             <br><i style="font-size:16px">(используется только для получения бонус-кода)</i></P>
-            <P>Адрес доставки: <%=text_field 'orderaddr'=>(size=>30,class=>'formstyle')%>
-            <br><i style="font-size:16px">(достаточно улицы и номера дома)</i></P>
             <P><%=check_box 'tosagree'=>(class=>'formstyle')%> Я принимаю условия <%=link_to 'Пользовательского соглашения'=>"/tos.html"%></P>
 %}
             <H2>Ваше мнение</H2>

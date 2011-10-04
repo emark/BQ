@@ -105,7 +105,7 @@ post '/quiz'=>sub{
   my $quizid=$self->session('quizid');
   my $param = $self->req->params->to_hash;
   my $answer='';
-  my $bonusid='';
+  my $orderid='';
   my $sth;
   my @ref;
   my $SQL='';
@@ -119,14 +119,14 @@ post '/quiz'=>sub{
   my $quizcheck=$dbh->selectall_arrayref("SELECT ROUTER.QUESTIONID FROM ROUTER WHERE ROUTER.QUIZID=$quizid");
     
   #Validation rules    
-  if($param->{'orderdate'} !~/^\d+$/){
-      $formvalidate=$formvalidate.'Укажите дату заказа';
-  }elsif($param->{'orderdate'}<1 || $param->{'orderdate'}>31){
-      $formvalidate=$formvalidate.'Ошибка ввода даты';
+  if(!$param->{'ordernum'}){
+    $formvalidate=$formvalidate.'Введите номер заказа';
+  }elsif(!$param->{'ordercheck'}){
+    $formvalidate=$formvalidate.'Введите сумму заказа';
+  #}elsif($param->{'ordercheck'}=/\d+/){
+    #$formvalidate=$formvalidate.'Укажите только целые цифры суммы заказа';
   }elsif($param->{'orderemail'} !~/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$/){
     $formvalidate=$formvalidate.'Укажите корректный e-mail';
-  }elsif(!$param->{'orderaddr'}){
-    $formvalidate=$formvalidate.'Введите адрес доставки';
   }elsif(!$param->{'tosagree'}){
     $formvalidate=$formvalidate.'Не приняты условия Пользовательского соглашения';
   }
@@ -142,25 +142,22 @@ post '/quiz'=>sub{
       $bonuscode.=$char[int(rand(60))];
     }
     
-    #Get bonus information from quiz
-    my $bonusinfo=$dbh->selectrow_array("SELECT QUIZ.INFO FROM QUIZ WHERE QUIZ.ID=$quizid") || undef;
-    #Create bonus code
-    $dbh->do("INSERT INTO BONUS (ID,CODE,STATUS,STATUSDATE,BCREATE,ORDERDATE,ORDERMONTH,ADDRESS,EMAIL,BONUSINFO) VALUES (NULL,\"$bonuscode\",0,NOW(),NOW(),$param->{'orderdate'},$param->{'ordermonth'},\"$param->{'orderaddr'}\",\"$param->{'orderemail'}\",\"$bonusinfo\")") || die $dbh->errstr;
-    $bonusid=$dbh->last_insert_id('','',"BONUS",'ID');
+    #Create order code
+    $dbh->do("INSERT INTO ORDERS (ID,STATUS,SYSDATE,ORDERMONTH,NUMBER,EMAIL,SUMM) VALUES (NULL,0,NOW(),$param->{'ordermonth'},\"$param->{'ordernum'}\",\"$param->{'orderemail'}\",\"$param->{'ordercheck'}\")") || die $dbh->errstr;
+    $orderid=$dbh->last_insert_id('','',"ORDERS",'ID');
     $sth=$dbh->prepare("SELECT ROUTER.QUESTIONID AS QID FROM ROUTER WHERE ROUTER.QUIZID=$quizid");
     $sth->execute;
     
     #Record answer to DB
     while(@ref=$sth->fetchrow_array){
       $answer=join(';',$self->param($ref[0]));
-      $dbh->do("INSERT INTO ANSWER (ID,QUESTIONID,BONUSID,CONTENT,DCREATE) VALUES (NULL,$ref[0],$bonusid,\"$answer\",NOW())") || die $dbh->errstr;
+      $dbh->do("INSERT INTO ANSWER (ID,QUESTIONID,ORDERID,CONTENT,SYSDATE) VALUES (NULL,$ref[0],$orderid,\"$answer\",NOW())") || die $dbh->errstr;
     }
-
     $self->session(quizid=>0);
     $self->mail(to=>$param->{'orderemail'},
-                subject=>"Ваш бонус от магазина ".$quiz->{$quizid}{'URL'},
+                subject=>"Ваш бонусквест от магазина ".$quiz->{$quizid}{'URL'},
                 data=>"Приветствуем!\n\nВы приняли участие в опросе от магазина ".$quiz->{$quizid}{'SHOP'}." http://".$quiz->{$quizid}{'URL'}.
-                "\nВ благодарность за ваши ответы магазин дарит вам бонус: ".$quiz->{$quizid}{'INFO'}."\nВаш бонус-код: $bonuscode (неактивирован)\nБонус будет активирован сразу после обработки данных опроса. Это займет немного времени.\nОб активации бонус-кода мы сразу же вас оповестим.\nСпасибо за то, что вы с нами!\n".$subscribe
+                "\nВ благодарность за ваши ответы магазин дарит вам бонус.\nБонус будет активирован сразу после обработки данных опроса. Это займет немного времени.\nОб активации бонуса мы сразу же вас оповестим.\nНомер вашего опроса: $orderid\nСпасибо за то, что вы с нами!\n".$subscribe
                 );
     $self->redirect_to('thankyou.html');
   }else{
@@ -185,7 +182,7 @@ post '/quiz'=>sub{
 
 get '/thankyou'=>sub{
   my $self=shift;
-  $self->stash(capt=>'Спасибо за ответы',message=>'Код бонуса отправлен на указанную электронную почту.');
+  $self->stash(capt=>'Спасибо за ответы',message=>'Дальнейшие инструкции отправлены на указанную электронную почту.');
   $self->render('robot');
 };
 
