@@ -200,7 +200,7 @@ get '/orders/status/:orderstatus'=>sub{
 	my $pid=$self->session('pid');
 	my $url=$self->session('url');
 	my $orderstatus=$self->param('orderstatus');
-	my $orders=$dbh->selectall_hashref("SELECT ORDERS.ID,ORDERS.ORDERMONTH,ORDERS.NUMBER,ORDERS.SUMM,DATE(ORDERS.SYSDATE) AS SYSDATE FROM ORDERS LEFT JOIN ANSWER ON ORDERS.ID=ANSWER.ORDERID LEFT JOIN QUESTION ON ANSWER.QUESTIONID=QUESTION.ID WHERE ORDERS.STATUS=$orderstatus AND QUESTION.SHOPID=$pid",'ID');
+	my $orders=$dbh->selectall_hashref("SELECT ORDERS.ID,ORDERS.ORDERMONTH,ORDERS.NUMBER,ORDERS.SUMM,DATE(ORDERS.SYSDATE) AS SYSDATE,ORDERS.STATUSDATE FROM ORDERS LEFT JOIN ANSWER ON ORDERS.ID=ANSWER.ORDERID LEFT JOIN QUESTION ON ANSWER.QUESTIONID=QUESTION.ID WHERE ORDERS.STATUS=$orderstatus AND QUESTION.SHOPID=$pid",'ID');
 	$self->stash(url=>$url,
 							 orders=>$orders,
 							 orderstatus=>$orderstatus);

@@ -23,7 +23,7 @@
   %foreach my $questionid(keys %{$question}){
   <tr>
     <td>
-      <input type=checkbox name=questionid value="<%=$question->{$questionid}{'ID'}%>"
+      <input type=checkbox title='Включить вопрос' name=questionid value="<%=$question->{$questionid}{'ID'}%>"
       %if($question->{$questionid}{'QUIZ'}){
       checked 
       %}

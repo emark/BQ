@@ -7,9 +7,9 @@
                 <i><%=link_to 'Поступившие заявки'=>"/orders.html"%></i> или
                 <i><%=link_to 'Мой опрос'=>"/quiz.html"%></i>
             </div>
-            <%=tag 'H2'=>'Архив заявок'%>
+            <%=tag 'H2'=>"Архив $status[$orderstatus] заявок"%>
 %my @months=('Months','Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь');
-%my @status=('Status','Отклонено','Принято');
+%my @status=('Status','отклоненных','принятых');
 <%=form_for '/orders.html'=>(method=>'post')=>begin%>
 <table border=0 width=100%>
 %if(%{$orders}){
@@ -37,7 +37,7 @@
     </td><td align=center>
         <%=$orders->{$orderid}{'SUMM'}%>
     </td><td align=center>
-        <%=$status[$orderstatus]%>
+        <%=$orders->{$orderid}{'STATUSDATE'}%>
     </td>
   </tr>
   %}
