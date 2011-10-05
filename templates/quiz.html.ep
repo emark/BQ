@@ -19,6 +19,7 @@
             <%= select_field 'ordermonth'=>$selectmonths=>(class=>'formstyle')%>
             <br><i style="font-size:16px">(покупка совершена не более 3 месяцев назад)</i></P>
             <P>Номер заказа: <%=text_field 'ordernum'=>(size=>10,class=>'formstyle')%>
+            <br><i style="font-size:16px">(укажите номер вашего предыдущего заказа)</i></P>
             <P>Сумма заказа: <%=text_field 'ordercheck'=>(size=>4,class=>'formstyle')%> руб.
             <P>Ваш e-mail: <%=text_field 'orderemail'=>(class=>'formstyle',size=>15)%>
             <br><i style="font-size:16px">(используется только для получения бонус-кода)</i></P>
