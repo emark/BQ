@@ -208,9 +208,9 @@ post '/balance'=>sub{
     }else{
       $mailmessage=$mailmessage."\nПоздравляем, у вас достаточно бонусов для выбора подарка.\nСписок подарков здесь http://www.bonusquest.ru/prizes.html";
     }
-    #$self->mail(to=>$email,
-    #            subject=>'Список действующих бонусов',
-    #            data=>$mailmessage.$subscribe);
+    $self->mail(to=>$email,
+                subject=>'Список действующих бонусов',
+                data=>$mailmessage.$subscribe);
   }
   $self->stash(capt=>'Ваш баланс отправлен',message=>'Список подтвержденных бонусов отправлен на указанный адрес электронной почты.'.$mailmessage);
   $self->render('robot');
