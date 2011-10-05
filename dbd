@@ -25,7 +25,7 @@ app->plugin(mail => {
 app->secret($appconf[5]);
 app->hook(before_dispatch => sub {
                my $self = shift;
-               $self->req->url->base(Mojo::URL->new(q{http://partner.bonusquest.ru/}))
+               #$self->req->url->base(Mojo::URL->new(q{http://partner.bonusquest.ru/}))
 	       }
 	  );
 
@@ -124,10 +124,39 @@ get '/quiz'=>sub{
 	return $self->redirect_to('/login') unless $self->session('pid');
 	my $pid=$self->session('pid');
 	my $url=$self->session('url');
-	my $quiz=$dbh->selectall_arrayref("SELECT QUIZ.ID,QUIZ.INFO,QUIZ.SHOPID FROM QUIZ WHERE QUIZ.SHOPID=$pid");
-	my $question=$dbh->selectall_hashref("SELECT QUESTION.ID,QUESTION.CONTENT,QUESTION.TYPE,COUNT(ANSWER.ID) AS ANSWERS,ROUTER.QUIZID FROM QUESTION LEFT JOIN ROUTER ON QUESTION.ID=ROUTER.QUESTIONID LEFT JOIN ANSWER ON QUESTION.ID=ANSWER.QUESTIONID WHERE QUESTION.SHOPID=$pid GROUP BY QUESTION.ID",'ID');
+	my $question=$dbh->selectall_hashref("SELECT QUESTION.ID,QUESTION.CONTENT,QUESTION.TYPE,QUESTION.QUIZ,COUNT(ANSWER.ID) AS ANSWERS FROM QUESTION LEFT JOIN ANSWER ON QUESTION.ID=ANSWER.QUESTIONID WHERE QUESTION.SHOPID=$pid GROUP BY QUESTION.ID",'ID');
 	$self->stash(url=>$url,
-							 quiz=>$quiz,
+							 pid=>$pid,
+							 question=>$question);
+	$self->render('partner_quiz');
+};
+
+post '/quiz'=>sub{
+	my $self=shift;
+	return $self->redirect_to('/login') unless $self->session('pid');
+	my $pid=$self->session('pid');
+	my $url=$self->session('url');
+	my @questionid=$self->param('questionid');
+	my $questid=$self->param('questid');#ID for single question
+	my $content=$self->param('content');#Question content
+	my $type=$self->param('type');
+	my $answers=$self->param('answers');
+	$answers=~s/\s\n/;/g;
+	if(@questionid){
+		$dbh->do("UPDATE QUESTION SET QUESTION.QUIZ=0 WHERE QUESTION.SHOPID=$pid");#Set quiz status to null
+		foreach my $key(@questionid){
+			$dbh->do("UPDATE QUESTION SET QUESTION.QUIZ=1 WHERE QUESTION.SHOPID=$pid AND QUESTION.ID=$key");
+		}
+	}if($content){
+		if($questid){
+			$dbh->do("UPDATE QUESTION SET QUESTION.CONTENT=\"$content\",QUESTION.TYPE=\"$type\",QUESTION.ANSWERS=\"$answers\" WHERE QUESTION.ID=$questid AND QUESTION.SHOPID=$pid");
+		}else{
+			$dbh->do("INSERT INTO QUESTION(ID,CONTENT,TYPE,ANSWERS,SHOPID,QUIZ) VALUES(NULL,\"$content\",\"$type\",\"$answers\",$pid,0)");
+		}
+	}
+	my $question=$dbh->selectall_hashref("SELECT QUESTION.ID,QUESTION.CONTENT,QUESTION.TYPE,QUESTION.QUIZ,COUNT(ANSWER.ID) AS ANSWERS FROM QUESTION LEFT JOIN ANSWER ON QUESTION.ID=ANSWER.QUESTIONID WHERE QUESTION.SHOPID=$pid GROUP BY QUESTION.ID",'ID');
+	$self->stash(url=>$url,
+							 pid=>$pid,
 							 question=>$question);
 	$self->render('partner_quiz');
 };
@@ -151,38 +180,6 @@ get '/question/:id'=>sub{#Edit question in the form
 	$self->stash(url=>$url,
 							 question=>$question);
 	$self->render('partner_question');
-};
-
-post '/quiz'=>sub{
-	my $self=shift;
-	return $self->redirect_to('/login') unless $self->session('pid');
-	my $pid=$self->session('pid');
-	my $url=$self->session('url');
-	my $quizid=$self->param('qid');
-	my @questionid=$self->param('questionid');
-	my $questid=$self->param('questid');#ID for single question
-	my $content=$self->param('content');#Question content
-	my $type=$self->param('type');
-	my $answers=$self->param('answers');
-	$answers=~s/\s\n/;/g;
-	if(@questionid){
-		$dbh->do("DELETE FROM ROUTER WHERE ROUTER.QUIZID=$quizid");#Delete router records from old quiz
-		foreach my $key(@questionid){
-			$dbh->do("INSERT INTO ROUTER(ID,QUIZID,QUESTIONID) VALUES(NULL,$quizid,$key)");
-		}
-	}if($content){
-		if($questid){
-			$dbh->do("UPDATE QUESTION SET QUESTION.CONTENT=\"$content\",QUESTION.TYPE=\"$type\",QUESTION.ANSWERS=\"$answers\" WHERE QUESTION.ID=$questid AND QUESTION.SHOPID=$pid");			
-		}else{
-			$dbh->do("INSERT INTO QUESTION(ID,CONTENT,TYPE,ANSWERS,SHOPID) VALUES(NULL,\"$content\",\"$type\",\"$answers\",$pid)");			
-		}
-	}
-	my $quiz=$dbh->selectall_arrayref("SELECT QUIZ.ID,QUIZ.INFO,QUIZ.SHOPID FROM QUIZ WHERE QUIZ.SHOPID=$pid");
-	my $question=$dbh->selectall_hashref("SELECT QUESTION.ID,QUESTION.CONTENT,QUESTION.TYPE,COUNT(ANSWER.ID) AS ANSWERS,ROUTER.QUIZID FROM QUESTION LEFT JOIN ROUTER ON QUESTION.ID=ROUTER.QUESTIONID LEFT JOIN ANSWER ON QUESTION.ID=ANSWER.QUESTIONID WHERE QUESTION.SHOPID=$pid GROUP BY QUESTION.ID",'ID');
-	$self->stash(url=>$url,
-							 quiz=>$quiz,
-							 question=>$question);
-	$self->render('partner_quiz');
 };
 
 get '/orders'=>sub{

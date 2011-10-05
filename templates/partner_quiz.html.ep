@@ -9,7 +9,6 @@
 %my @status=('Off','On');
 %my @qtype=('Текст','Выбор','Множество','Строка');
 <%=form_for '/quiz.html'=>(method=>'post')=>begin%>
-<%=hidden_field 'qid'=>"$quiz->[0][0]"%>
 <table border=0 width=100%>
 %if(%{$question}){
   <tr style="font-style: italic">
@@ -25,7 +24,7 @@
   <tr>
     <td>
       <input type=checkbox name=questionid value="<%=$question->{$questionid}{'ID'}%>"
-      %if($question->{$questionid}{'QUIZID'} && ($question->{$questionid}{'QUIZID'}==$quiz->[0][0])){
+      %if($question->{$questionid}{'QUIZ'}){
       checked 
       %}
       >
@@ -49,7 +48,7 @@
 <%end%>
 <div id=view">
   <center>
-  <%=link_to 'Посмотреть опрос'=>"http://www.bonusquest.ru/$quiz->[0][2]"=>(target=>'_blank',class=>'MyButton',title=>'Посмотреть как выглядит опрос')%>
+  <%=link_to 'Посмотреть опрос'=>"http://www.bonusquest.ru/$pid"=>(target=>'_blank',class=>'MyButton',title=>'Посмотреть как выглядит опрос')%>
   </center>
 </div>
         </div><!--pagecard-->
