@@ -4,8 +4,8 @@
     <div id="quizform">
         <div id=pagecard>
             <div id=nav style="text-align:right">
-                <%=link_to 'Поступившие заявки'=>"/orders.html"%>
-                <%=link_to 'Мой опрос'=>"/quiz.html"%>
+                <i><%=link_to 'Поступившие заявки'=>"/orders.html"%></i> или
+                <i><%=link_to 'Мой опрос'=>"/quiz.html"%></i>
             </div>
             <%=tag 'H2'=>'Архив заявок'%>
 %my @months=('Months','Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь');
@@ -18,7 +18,7 @@
       Дата
     </td><td>
       Месяц
-    </td><td align=center>
+    </td><td>
     Номер
     </td><td align=center>
     Сумма

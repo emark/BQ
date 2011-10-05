@@ -4,7 +4,7 @@
     <div id="quizform">
         <div id=pagecard>
             <div id=nav style="text-align:right">
-                <%=link_to 'Мой опрос'=>"/quiz.html"%>
+                <i><%=link_to 'Мой опрос'=>"/quiz.html"%></i>
             </div>
             <%=tag 'H2'=>'Поступившие заявки'%>
 %my @months=('Months','Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь');
@@ -16,7 +16,7 @@
       Дата
     </td><td>
       Месяц
-    </td><td align=center>
+    </td><td>
     Номер
     </td><td align=center>
     Сумма
@@ -60,7 +60,7 @@
 <input type=hidden name=oid id=oid value=0>
 </form>
 <div id=stat>
-Всего поступило заявок: <%=$orderstat->[0][0]%>. Из них <%= link_to 'принято'=>'/orders/status/2'%> - <%=$orderstat->[0][3]%>, <%= link_to 'отклонено'=>'/orders/status/1'%> - <%=$orderstat->[0][2]%>
+Архив <%= link_to 'принятых'=>'/orders/status/2'%> и <%= link_to 'отклоненных'=>'/orders/status/1'%> заявок.
 </div>
         </div><!--pagecard-->
     </div><!--quizform-->
