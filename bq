@@ -181,7 +181,7 @@ post '/quiz'=>sub{
 
 get '/thankyou'=>sub{
   my $self=shift;
-  $self->stash(capt=>'Спасибо за ответы',message=>'Дальнейшие инструкции отправлены на твою электронную почту.');
+  $self->stash(capt=>'Спасибо за ответы',message=>'Дальнейшие инструкции отправлены на электронную почту.');
   $self->render('robot');
 };
 
@@ -206,7 +206,7 @@ post '/balance'=>sub{
       my $x=6-$n;
       $mailmessage=$mailmessage."\nДля получения подарка осталось собрать всего $x бонуса.\nКак заработать бонус смотрите здесь http://www.bonusquest.ru/help.html";
     }else{
-      $mailmessage=$mailmessage."\nПоздравляем, у вас достаточно бонусов для выбора подарка.\nСписок подарков здесь http://www.bonusquest.ru/prizes.html";
+      $mailmessage=$mailmessage."\nПоздравляем, у вас достаточно бонусов для получения подарка.\nСписок подарков здесь http://www.bonusquest.ru/prizes.html";
     }
     $self->mail(to=>$email,
                 subject=>'Список действующих бонусов',
