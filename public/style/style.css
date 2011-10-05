@@ -1,4 +1,5 @@
 @import url(http://fonts.googleapis.com/css?family=Coustard:900&subset=latin,cyrillic);
+@import url('buttons.css');
 html{
 	height: 100%;
 	font-family: Georgia,serif;
@@ -10,37 +11,9 @@ html{
     height: 100%;
 }form{
     font-family: Georgia;
-    /*font-size:20px;*/
 }.formstyle{
     font-family: Georgia;
     font-size:20px;
-}.myButton {
-	-moz-box-shadow:inset 0px 1px 0px 0px #fff6af;
-	-webkit-box-shadow:inset 0px 1px 0px 0px #fff6af;
-	box-shadow:inset 0px 1px 0px 0px #fff6af;
-	background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #ffec64), color-stop(1, #ffab23) );
-	background:-moz-linear-gradient( center top, #ffec64 5%, #ffab23 100% );
-	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffec64', endColorstr='#ffab23');
-	background-color:#ffec64;
-	-moz-border-radius:5px;
-	-webkit-border-radius:5px;
-	border-radius:5px;
-	display:inline-block;
-	color:#333333;
-	font-family:arial;
-	font-size:18px;
-	font-weight:bold;
-	padding:12px 30px;
-	text-decoration:none;
-	text-shadow:1px 1px 0px #ffee66;
-}.myButton:hover {
-	background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #ffab23), color-stop(1, #ffec64) );
-	background:-moz-linear-gradient( center top, #ffab23 5%, #ffec64 100% );
-	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffab23', endColorstr='#ffec64');
-	background-color:#ffab23;
-}.myButton:active {
-	position:relative;
-	top:1px;
 }a:link,a:hover,a:visited,a:active{
 	color: #000000;
 }#bonusform{
@@ -143,8 +116,6 @@ html{
     z-index: 6;
     width: 100%;
     overflow: hidden;
-	/*position: static;*/
-    /*width: auto;*/
     height: 150px;
     color: #4C4C4C;
     font-size: 16px;
@@ -153,7 +124,6 @@ html{
 	background-color:#DBEA9D;
 	background-image: url('/media/fbg.png');
 }
-/*#footer a:link a:hover a:visited a:active{*/
 #footer a:link,#footer a:hover,#footer a:visited,#footer a:active{
 	color: #4C4C4C;
 	text-decoration: none;

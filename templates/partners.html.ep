@@ -9,7 +9,6 @@
             %foreach my $shopid(keys %{$shop}){
                 <H3><%=$shop->{$shopid}{'NAME'}%></H3>
                 <P style="text-indent: 20px;">Адрес: <%=link_to "http://$shop->{$shopid}{'URL'}"=>"http://$shop->{$shopid}{'URL'}"=>(target=>'blank')%></P>
-                <P style="text-indent: 20px;">Бонус: <%=$shop->{$shopid}{'INFO'}%></P>
             %}
         </div><!--pagecard-->
     </div><!--quizform-->

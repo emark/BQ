@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <title><%= title %></title>
-    <%= stylesheet '/style.css'%>
+    <%= stylesheet '/style/style.css'%>
   </head>
   <body>
     <div  id=container>

@@ -2,6 +2,7 @@
 <%#=test%>
 <div id=subhead>
 <%=form_for 'quiz.html'=>(method=>'post',id=>"qform")=>begin%>
+<%=hidden_field 'pid'=>$pid%>
 %foreach my $shopid(keys %{$shop}){
     <span align=left class=sublogo><a href="/" style="color:#FFF;text-decoration:none;">BonusQuest</a></span>
     <center><i><%=$shop->{$shopid}{'SHOP'}%><br><span style="font-style:normal;font-size:14px;text-shadow:none;">
@@ -43,7 +44,7 @@
                         <%= check_box $question->{$questionid}{'ID'} => $key =>(class=>'formstyle')%><%=$key%>
                     %}
                 %}elsif($question->{$questionid}{'TYPE'} eq '3'){
-                    <%= text_field $question->{$questionid}{'ID'} =>(class=>'formstyle')%><%=$question->{$questionid}{'ANSWERS'}%>
+                    <%= text_field $question->{$questionid}{'ID'} =>(class=>'formstyle',size=>10)%>
                 %}
                 </P>
             %}

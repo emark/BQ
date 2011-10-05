@@ -25,7 +25,7 @@ app->plugin(mail => {
 app->secret($appconf[5]);
 app->hook(before_dispatch => sub {
                my $self = shift;
-               #$self->req->url->base(Mojo::URL->new(q{http://www.bonusquest.ru/}))
+               $self->req->url->base(Mojo::URL->new(q{http://www.bonusquest.ru/}))
 	       }
 	  );
 
@@ -53,8 +53,8 @@ get '/:id' => [id=>qw/\d+/]=> sub{
     $selectmonths->[$i]=[$months[$n],$n];
     $n++;
   }
-  $self->session(pid=>$pid);
-  $self->stash(shop=>$shop,
+  $self->stash(pid=>$pid,
+               shop=>$shop,
                question=>$question,
                selectmonths=>$selectmonths,
                formmessage=>'',
@@ -88,8 +88,8 @@ get '/quiz'=>sub{
     $selectmonths->[$i]=[$months[$n],$n];
     $n++;
   }
-  $self->session(pid=>$pid);
-  $self->stash(shop=>$shop,
+  $self->stash(pid=>$pid,
+               shop=>$shop,
                question=>$question,
                selectmonths=>$selectmonths,
                formmessage=>'',
@@ -99,8 +99,8 @@ get '/quiz'=>sub{
 
 post '/quiz'=>sub{
   my $self=shift;
-  return $self->redirect_to('/') unless $self->session('pid');#Defend from double refresh
-  my $pid=$self->session('pid');
+  #return $self->redirect_to('/') unless $self->param('pid');#Defend from double refresh
+  my $pid=$self->param('pid');
   my $param = $self->req->params->to_hash;
   my $answer='';
   my $orderid='';
@@ -114,9 +114,6 @@ post '/quiz'=>sub{
   
   my $shop=$dbh->selectall_hashref("SELECT SHOP.ID,SHOP.URL,SHOP.NAME AS SHOP FROM SHOP WHERE SHOP.ID='$pid'",'ID');
   my $question=$dbh->selectall_hashref("SELECT QUESTION.ID,QUESTION.CONTENT,QUESTION.TYPE,QUESTION.ANSWERS FROM QUESTION LEFT JOIN SHOP ON QUESTION.SHOPID=SHOP.ID WHERE QUESTION.QUIZ=1 AND SHOP.ID=$pid",'ID') || 0;
-  
-  #my $quiz=$dbh->selectall_hashref("SELECT QUIZ.ID,QUIZ.INFO,SHOP.URL,SHOP.NAME AS SHOP,SHOP.DESCRIPTION FROM QUIZ LEFT JOIN SHOP ON QUIZ.SHOPID=SHOP.ID LEFT JOIN ROUTER ON QUIZ.ID=ROUTER.QUIZID WHERE QUIZ.STATUS=1 AND QUIZ.ID=$quizid",'ID');
-  #my $question=$dbh->selectall_hashref("SELECT QUESTION.ID,QUESTION.CONTENT,QUESTION.TYPE,QUESTION.ANSWERS FROM QUESTION INNER JOIN ROUTER ON QUESTION.ID=ROUTER.QUESTIONID LEFT JOIN QUIZ ON ROUTER.QUIZID=QUIZ.ID LEFT JOIN SHOP ON QUIZ.SHOPID=SHOP.ID WHERE QUIZ.STATUS=1 AND QUIZ.ID=$pid",'ID');
   my $quizcheck=$dbh->selectall_arrayref("SELECT QUESTION.ID FROM QUESTION WHERE QUESTION.SHOPID=$pid AND QUESTION.QUIZ=1");
     
   #Validation rules    
@@ -172,7 +169,8 @@ post '/quiz'=>sub{
       $selectmonths->[$i]=[$months[$n],$n];
       $n++;
     }
-    $self->stash(shop=>$shop,
+    $self->stash(pid=>$pid,
+                 shop=>$shop,
                  selectmonths=>$selectmonths,
                  formmessage=>$formvalidate,
                  questmessage=>$questvalidate,
@@ -183,7 +181,7 @@ post '/quiz'=>sub{
 
 get '/thankyou'=>sub{
   my $self=shift;
-  $self->stash(capt=>'Спасибо за ответы',message=>'Дальнейшие инструкции отправлены на указанную электронную почту.');
+  $self->stash(capt=>'Спасибо за ответы',message=>'Дальнейшие инструкции отправлены на твою электронную почту.');
   $self->render('robot');
 };
 
@@ -195,24 +193,32 @@ post '/balance'=>sub{
     $self->stash(capt=>'Ошибка написания',message=>'Вы неверно указали адрес электронной почты.');
     return $self->render('robot');
   }
-  my $balance=$dbh->selectall_arrayref("SELECT BONUS.ID,BONUS.CODE,SHOP.NAME,SHOP.URL,SHOP.DESCRIPTION,QUIZ.INFO FROM BONUS LEFT JOIN ANSWER ON BONUS.ID=ANSWER.BONUSID LEFT JOIN QUESTION ON ANSWER.QUESTIONID=QUESTION.ID LEFT JOIN ROUTER ON QUESTION.ID=ROUTER.ID LEFT JOIN QUIZ ON ROUTER.QUIZID=QUIZ.ID LEFT JOIN SHOP ON QUIZ.SHOPID=SHOP.ID WHERE BONUS.STATUS=2 AND BONUS.EMAIL=\"$email\" GROUP BY BONUS.CODE") || undef;
+  my $balance=$dbh->selectall_arrayref("SELECT ORDERS.ID,SHOP.NAME,SHOP.URL FROM ORDERS LEFT JOIN ANSWER ON ORDERS.ID=ANSWER.ORDERID LEFT JOIN QUESTION ON ANSWER.QUESTIONID=QUESTION.ID LEFT JOIN SHOP ON QUESTION.SHOPID=SHOP.ID WHERE ORDERS.STATUS=2 AND ORDERS.EMAIL=\"$email\" GROUP BY ORDERS.ID") || undef;
   my $mailmessage='';
   if($balance->[0]){
-    $mailmessage="Приветствуем!\nТы или возможно кто-то другой попросил прислать список твоих действующих бонус-кодов.\n\n";
+    my $n=1;
+    $mailmessage="Приветствуем!\nВы или возможно кто-то другой попросил прислать список действующих бонусов.\nИтак, ваши бонусы:\n";
     foreach my $key(@{$balance}){
-      $mailmessage=$mailmessage."$key->[2], http://$key->[3]\n$key->[4]\nБонус:$key->[5]\nБонус-код: $key->[1]\n\n";
+      $mailmessage=$mailmessage."$n. Бонус от магазина $key->[1], http://$key->[2]\n";
+      $n++;
     }
-    $self->mail(to=>$email,
-                subject=>'Список действующих бонус-кодов',
-                data=>$mailmessage.$subscribe)
+    if($n<6){
+      my $x=6-$n;
+      $mailmessage=$mailmessage."\nДля получения подарка осталось собрать всего $x бонуса.\nКак заработать бонус смотрите здесь http://www.bonusquest.ru/help.html";
+    }else{
+      $mailmessage=$mailmessage."\nПоздравляем, у вас достаточно бонусов для выбора подарка.\nСписок подарков здесь http://www.bonusquest.ru/prizes.html";
+    }
+    #$self->mail(to=>$email,
+    #            subject=>'Список действующих бонусов',
+    #            data=>$mailmessage.$subscribe);
   }
-  $self->stash(capt=>'Ваш баланс отправлен',message=>'Список подтвержденных бонусов отправлен на указанный адрес электронной почты.');
+  $self->stash(capt=>'Ваш баланс отправлен',message=>'Список подтвержденных бонусов отправлен на указанный адрес электронной почты.'.$mailmessage);
   $self->render('robot');
 };
 
 get '/partners'=>sub{
   my $self=shift;
-  my $shop=$dbh->selectall_hashref("SELECT SHOP.ID,SHOP.NAME,SHOP.URL,SHOP.DESCRIPTION,QUIZ.INFO FROM SHOP LEFT JOIN QUIZ ON SHOP.ID=QUIZ.SHOPID WHERE SHOP.STATUS=1 ORDER BY SHOP.URL",'ID');
+  my $shop=$dbh->selectall_hashref("SELECT SHOP.ID,SHOP.NAME,SHOP.URL,SHOP.DESCRIPTION FROM SHOP WHERE SHOP.STATUS=1 ORDER BY SHOP.URL",'ID');
   $self->stash(shop=>$shop);
   $self->render('partners');
 };
