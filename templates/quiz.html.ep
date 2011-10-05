@@ -2,10 +2,10 @@
 <%#=test%>
 <div id=subhead>
 <%=form_for 'quiz.html'=>(method=>'post',id=>"qform")=>begin%>
-%foreach my $quizid(keys %{$quiz}){
+%foreach my $shopid(keys %{$shop}){
     <span align=left class=sublogo><a href="/" style="color:#FFF;text-decoration:none;">BonusQuest</a></span>
-    <center><i><%=$quiz->{$quizid}{'SHOP'}%><br><span style="font-style:normal;font-size:14px;text-shadow:none;">
-    <%= link_to $quiz->{$quizid}{'URL'}=>"http://$quiz->{$quizid}{'URL'}"=>(style=>"color:#FFF;text-decoration:none;",target=>'blank')%></span></i></center>
+    <center><i><%=$shop->{$shopid}{'SHOP'}%><br><span style="font-style:normal;font-size:14px;text-shadow:none;">
+    <%= link_to $shop->{$shopid}{'URL'}=>"http://$shop->{$shopid}{'URL'}"=>(style=>"color:#FFF;text-decoration:none;",target=>'blank')%></span></i></center>
 </div><!--head-->
 <div id=content>
     <div id="quizform">
@@ -18,9 +18,7 @@
             <%= select_field 'ordermonth'=>$selectmonths=>(class=>'formstyle')%>
             <br><i style="font-size:16px">(покупка совершена не более 3 месяцев назад)</i></P>
             <P>Номер заказа: <%=text_field 'ordernum'=>(size=>10,class=>'formstyle')%>
-            <!--<br><i style="font-size:16px">(укажите )</i></P>-->
             <P>Сумма заказа: <%=text_field 'ordercheck'=>(size=>4,class=>'formstyle')%> руб.
-            <!--<br><i style="font-size:16px">(достаточно улицы и номера дома)</i></P>-->
             <P>Ваш e-mail: <%=text_field 'orderemail'=>(class=>'formstyle',size=>15)%>
             <br><i style="font-size:16px">(используется только для получения бонус-кода)</i></P>
             <P><%=check_box 'tosagree'=>(class=>'formstyle')%> Я принимаю условия <%=link_to 'Пользовательского соглашения'=>"/tos.html"%></P>

@@ -25,7 +25,7 @@ app->plugin(mail => {
 app->secret($appconf[5]);
 app->hook(before_dispatch => sub {
                my $self = shift;
-               $self->req->url->base(Mojo::URL->new(q{http://www.bonusquest.ru/}))
+               #$self->req->url->base(Mojo::URL->new(q{http://www.bonusquest.ru/}))
 	       }
 	  );
 
@@ -38,13 +38,12 @@ get '/' => sub {
 
 get '/:id' => [id=>qw/\d+/]=> sub{
   my $self=shift;
-  my $id=$self->param('id');
-  my $quizid=$dbh->selectrow_array("SELECT QUIZ.ID FROM QUIZ LEFT JOIN SHOP ON QUIZ.SHOPID=SHOP.ID WHERE QUIZ.STATUS=1 AND SHOP.ID=$id") || 0;
-  my $quiz=$dbh->selectall_hashref("SELECT QUIZ.ID,QUIZ.INFO,SHOP.URL,SHOP.NAME AS SHOP FROM QUIZ LEFT JOIN SHOP ON QUIZ.SHOPID=SHOP.ID WHERE QUIZ.STATUS=1 AND SHOP.ID=$id",'ID');
-  my $question=$dbh->selectall_hashref("SELECT QUESTION.ID,QUESTION.CONTENT,QUESTION.TYPE,QUESTION.ANSWERS FROM QUESTION INNER JOIN ROUTER ON QUESTION.ID=ROUTER.QUESTIONID LEFT JOIN QUIZ ON ROUTER.QUIZID=QUIZ.ID LEFT JOIN SHOP ON QUIZ.SHOPID=SHOP.ID WHERE QUIZ.STATUS=1 AND SHOP.ID=$id",'ID');
-  if(!$quizid){
+  my $pid=$self->param('id');
+  my $shop=$dbh->selectall_hashref("SELECT SHOP.ID,SHOP.URL,SHOP.NAME AS SHOP FROM SHOP WHERE SHOP.ID='$pid'",'ID');
+  my $question=$dbh->selectall_hashref("SELECT QUESTION.ID,QUESTION.CONTENT,QUESTION.TYPE,QUESTION.ANSWERS FROM QUESTION LEFT JOIN SHOP ON QUESTION.SHOPID=SHOP.ID WHERE QUESTION.QUIZ=1 AND SHOP.ID=$pid",'ID') || 0;
+  if(!$question){
     $self->stash(capt=>'Бонус не найден',message=>"Здесь пока нет бонусов. Подождем...");
-    return $self->render('robot') unless $quizid;
+    return $self->render('robot') unless $question;
   }
   my @months=('Months','Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь');
   my $selectmonths=[];
@@ -54,8 +53,8 @@ get '/:id' => [id=>qw/\d+/]=> sub{
     $selectmonths->[$i]=[$months[$n],$n];
     $n++;
   }
-  $self->session(quizid=>$quizid);
-  $self->stash(quiz=>$quiz,
+  $self->session(pid=>$pid);
+  $self->stash(shop=>$shop,
                question=>$question,
                selectmonths=>$selectmonths,
                formmessage=>'',
@@ -74,13 +73,12 @@ get '/quiz'=>sub{
   #  return $self->render('robot');
   #}
   $url=substr($url,0,50);#Cut url length to 50 char's
-  #$dbh->do("INSERT INTO QUERY(URL,SYSDATE) VALUES(\"$url\",NOW())");
-  my $quizid=$dbh->selectrow_array("SELECT QUIZ.ID FROM QUIZ LEFT JOIN SHOP ON QUIZ.SHOPID=SHOP.ID WHERE QUIZ.STATUS=1 AND SHOP.URL='$url'") || 0;
-  my $quiz=$dbh->selectall_hashref("SELECT QUIZ.ID,QUIZ.INFO,SHOP.URL,SHOP.NAME AS SHOP FROM QUIZ LEFT JOIN SHOP ON QUIZ.SHOPID=SHOP.ID WHERE QUIZ.STATUS=1 AND SHOP.URL='$url'",'ID');
-  my $question=$dbh->selectall_hashref("SELECT QUESTION.ID,QUESTION.CONTENT,QUESTION.TYPE,QUESTION.ANSWERS FROM QUESTION INNER JOIN ROUTER ON QUESTION.ID=ROUTER.QUESTIONID LEFT JOIN QUIZ ON ROUTER.QUIZID=QUIZ.ID LEFT JOIN SHOP ON QUIZ.SHOPID=SHOP.ID WHERE QUIZ.STATUS=1 AND SHOP.URL='$url'",'ID');
-  if(!$quizid){
+  my $pid=$dbh->do("SELECT SHOP.ID FROM SHOP WHERE SHOP.URL='$url'") || 0;
+  my $shop=$dbh->selectall_hashref("SELECT SHOP.ID,SHOP.URL,SHOP.NAME AS SHOP FROM SHOP WHERE SHOP.URL='$url'",'ID');
+  my $question=$dbh->selectall_hashref("SELECT QUESTION.ID,QUESTION.CONTENT,QUESTION.TYPE,QUESTION.ANSWERS FROM QUESTION LEFT JOIN SHOP ON QUESTION.SHOPID=SHOP.ID WHERE QUESTION.QUIZ=1 AND SHOP.URL='$url'",'ID');
+  if(!$pid){
     $self->stash(capt=>'Бонус не найден',message=>"Магазин $url пока не предоставляет бонусы.");
-    return $self->render('robot') unless $quizid;
+    return $self->render('robot') unless $pid;
   }
   my @months=('Months','Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь');
   my $selectmonths=[];
@@ -90,8 +88,8 @@ get '/quiz'=>sub{
     $selectmonths->[$i]=[$months[$n],$n];
     $n++;
   }
-  $self->session(quizid=>$quizid);
-  $self->stash(quiz=>$quiz,
+  $self->session(pid=>$pid);
+  $self->stash(shop=>$shop,
                question=>$question,
                selectmonths=>$selectmonths,
                formmessage=>'',
@@ -101,8 +99,8 @@ get '/quiz'=>sub{
 
 post '/quiz'=>sub{
   my $self=shift;
-  return $self->redirect_to('/') unless $self->session('quizid');#Defend from double refresh
-  my $quizid=$self->session('quizid');
+  return $self->redirect_to('/') unless $self->session('pid');#Defend from double refresh
+  my $pid=$self->session('pid');
   my $param = $self->req->params->to_hash;
   my $answer='';
   my $orderid='';
@@ -114,9 +112,12 @@ post '/quiz'=>sub{
   my $formvalidate='';
   my $questvalidate='';
   
-  my $quiz=$dbh->selectall_hashref("SELECT QUIZ.ID,QUIZ.INFO,SHOP.URL,SHOP.NAME AS SHOP,SHOP.DESCRIPTION FROM QUIZ LEFT JOIN SHOP ON QUIZ.SHOPID=SHOP.ID LEFT JOIN ROUTER ON QUIZ.ID=ROUTER.QUIZID WHERE QUIZ.STATUS=1 AND QUIZ.ID=$quizid",'ID');
-  my $question=$dbh->selectall_hashref("SELECT QUESTION.ID,QUESTION.CONTENT,QUESTION.TYPE,QUESTION.ANSWERS FROM QUESTION INNER JOIN ROUTER ON QUESTION.ID=ROUTER.QUESTIONID LEFT JOIN QUIZ ON ROUTER.QUIZID=QUIZ.ID LEFT JOIN SHOP ON QUIZ.SHOPID=SHOP.ID WHERE QUIZ.STATUS=1 AND QUIZ.ID=$quizid",'ID');
-  my $quizcheck=$dbh->selectall_arrayref("SELECT ROUTER.QUESTIONID FROM ROUTER WHERE ROUTER.QUIZID=$quizid");
+  my $shop=$dbh->selectall_hashref("SELECT SHOP.ID,SHOP.URL,SHOP.NAME AS SHOP FROM SHOP WHERE SHOP.ID='$pid'",'ID');
+  my $question=$dbh->selectall_hashref("SELECT QUESTION.ID,QUESTION.CONTENT,QUESTION.TYPE,QUESTION.ANSWERS FROM QUESTION LEFT JOIN SHOP ON QUESTION.SHOPID=SHOP.ID WHERE QUESTION.QUIZ=1 AND SHOP.ID=$pid",'ID') || 0;
+  
+  #my $quiz=$dbh->selectall_hashref("SELECT QUIZ.ID,QUIZ.INFO,SHOP.URL,SHOP.NAME AS SHOP,SHOP.DESCRIPTION FROM QUIZ LEFT JOIN SHOP ON QUIZ.SHOPID=SHOP.ID LEFT JOIN ROUTER ON QUIZ.ID=ROUTER.QUIZID WHERE QUIZ.STATUS=1 AND QUIZ.ID=$quizid",'ID');
+  #my $question=$dbh->selectall_hashref("SELECT QUESTION.ID,QUESTION.CONTENT,QUESTION.TYPE,QUESTION.ANSWERS FROM QUESTION INNER JOIN ROUTER ON QUESTION.ID=ROUTER.QUESTIONID LEFT JOIN QUIZ ON ROUTER.QUIZID=QUIZ.ID LEFT JOIN SHOP ON QUIZ.SHOPID=SHOP.ID WHERE QUIZ.STATUS=1 AND QUIZ.ID=$pid",'ID');
+  my $quizcheck=$dbh->selectall_arrayref("SELECT QUESTION.ID FROM QUESTION WHERE QUESTION.SHOPID=$pid AND QUESTION.QUIZ=1");
     
   #Validation rules    
   if(!$param->{'ordernum'}){
@@ -145,7 +146,7 @@ post '/quiz'=>sub{
     #Create order code
     $dbh->do("INSERT INTO ORDERS (ID,STATUS,SYSDATE,ORDERMONTH,NUMBER,EMAIL,SUMM) VALUES (NULL,0,NOW(),$param->{'ordermonth'},\"$param->{'ordernum'}\",\"$param->{'orderemail'}\",\"$param->{'ordercheck'}\")") || die $dbh->errstr;
     $orderid=$dbh->last_insert_id('','',"ORDERS",'ID');
-    $sth=$dbh->prepare("SELECT ROUTER.QUESTIONID AS QID FROM ROUTER WHERE ROUTER.QUIZID=$quizid");
+    $sth=$dbh->prepare("SELECT QUESTION.ID AS QID FROM QUESTION WHERE QUESTION.SHOPID=$pid AND QUESTION.QUIZ=1");
     $sth->execute;
     
     #Record answer to DB
@@ -155,8 +156,8 @@ post '/quiz'=>sub{
     }
     $self->session(quizid=>0);
     $self->mail(to=>$param->{'orderemail'},
-                subject=>"Ваш бонусквест от магазина ".$quiz->{$quizid}{'URL'},
-                data=>"Приветствуем!\n\nВы приняли участие в опросе от магазина ".$quiz->{$quizid}{'SHOP'}." http://".$quiz->{$quizid}{'URL'}.
+                subject=>"Ваш бонусквест от магазина ".$shop->{$pid}{'URL'},
+                data=>"Приветствуем!\n\nВы приняли участие в опросе от магазина ".$shop->{$pid}{'SHOP'}." http://".$shop->{$pid}{'URL'}.
                 "\nВ благодарность за ваши ответы магазин дарит вам бонус.\nБонус будет активирован сразу после обработки данных опроса. Это займет немного времени.\nОб активации бонуса мы сразу же вас оповестим.\nНомер вашего опроса: $orderid\nСпасибо за то, что вы с нами!\n".$subscribe
                 );
     $self->redirect_to('thankyou.html');
@@ -171,10 +172,10 @@ post '/quiz'=>sub{
       $selectmonths->[$i]=[$months[$n],$n];
       $n++;
     }
-    $self->stash(selectmonths=>$selectmonths,
+    $self->stash(shop=>$shop,
+                 selectmonths=>$selectmonths,
                  formmessage=>$formvalidate,
                  questmessage=>$questvalidate,
-                 quiz=>$quiz,
                  question=>$question);
     $self->render('quiz');
   }

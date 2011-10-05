@@ -22,7 +22,7 @@ app->plugin(mail => {
     how      => 'smtp',
     howargs  => ['mail.locum.ru',AuthUser=>$appconf[3],AuthPass=>$appconf[4]],
   });
-app->secret($appconf[5]);
+app->secret($appconf[6]);
 app->hook(before_dispatch => sub {
                my $self = shift;
                #$self->req->url->base(Mojo::URL->new(q{http://partner.bonusquest.ru/}))
