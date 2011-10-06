@@ -3,7 +3,7 @@
     <div id="quizform">
         <div id=pagecard>
             <div id=nav style="text-align:right">
-              <i><%=link_to 'Поступившие заявки'=>'/orders.html'%></i>
+              <i><%=link_to 'Поступившие ответы'=>'/orders.html'%></i>
             </div>
             <%=tag 'H2'=>'Текущий опрос'%>
 %my @status=('Off','On');

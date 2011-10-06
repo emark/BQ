@@ -1,4 +1,4 @@
-%layout 'dashboard',title 'Поступившие заявки';
+%layout 'dashboard',title 'Поступившие ответы';
 %#dev
 <div id=content>
     <div id="quizform">
@@ -6,7 +6,7 @@
             <div id=nav style="text-align:right">
                 <i><%=link_to 'Мой опрос'=>"/quiz.html"%></i>
             </div>
-            <%=tag 'H2'=>'Поступившие заявки'%>
+            <%=tag 'H2'=>'Поступившие ответы'%>
 %my @months=('Months','Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь');
 <%=form_for '/orders.html'=>(method=>'post')=>begin%>
 <table border=0 width=100%>
@@ -49,7 +49,7 @@
 %}else{
 <tr>
     <td colspan=5 align=center>
-        <%=tag 'h3'=>'Новых заявок пока нет. Ждем.'%>
+        <%=tag 'h3'=>'Новых ответов пока нет. Ждем.'%>
     </td>
 </tr>
 %}
@@ -60,7 +60,7 @@
 <input type=hidden name=oid id=oid value=0>
 </form>
 <div id=stat>
-Архив <%= link_to 'принятых'=>'/orders/status/2'%> и <%= link_to 'отклоненных'=>'/orders/status/1'%> заявок.
+Архив <%= link_to 'принятых'=>'/orders/status/2'%> и <%= link_to 'отклоненных'=>'/orders/status/1'%> ответов.
 </div>
         </div><!--pagecard-->
     </div><!--quizform-->

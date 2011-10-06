@@ -4,12 +4,12 @@
     <div id="quizform">
         <div id=pagecard>
             <div id=nav style="text-align:right">
-                <i><%=link_to 'Поступившие заявки'=>"/orders.html"%></i> или
+                <i><%=link_to 'Поступившие ответы'=>"/orders.html"%></i> или
                 <i><%=link_to 'Мой опрос'=>"/quiz.html"%></i>
             </div>
 %my @months=('Months','Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь');
 %my @status=('Status','отклоненных','принятых');
-            <%=tag 'H2'=>"Архив $status[$orderstatus] заявок"%>
+            <%=tag 'H2'=>"Архив $status[$orderstatus] ответов"%>
 <%=form_for '/orders.html'=>(method=>'post')=>begin%>
 <table border=0 width=100%>
 %if(%{$orders}){
@@ -44,7 +44,7 @@
 %}else{
 <tr>
     <td colspan=5 align=center>
-        <%=tag 'h3'=>'Здесь заявок пока нет.'%>
+        <%=tag 'h3'=>'Здесь пока ничего нет.'%>
     </td>
 </tr>
 %}
