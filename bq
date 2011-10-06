@@ -181,7 +181,7 @@ post '/quiz'=>sub{
 
 get '/thankyou'=>sub{
   my $self=shift;
-  $self->stash(capt=>'Спасибо за ответы',message=>'Дальнейшие инструкции отправлены на электронную почту.');
+  $self->stash(capt=>'Спасибо за ответы',message=>'О зачислении бонуса мы сообщим по электронной почте.');
   $self->render('robot');
 };
 
@@ -212,7 +212,7 @@ post '/balance'=>sub{
                 subject=>'Список действующих бонусов',
                 data=>$mailmessage.$subscribe);
   }
-  $self->stash(capt=>'Ваш баланс отправлен',message=>'Список подтвержденных бонусов отправлен на указанный адрес электронной почты.'.$mailmessage);
+  $self->stash(capt=>'Ваш баланс отправлен',message=>'Список подтвержденных бонусов отправлен на указанный адрес электронной почты.');
   $self->render('robot');
 };
 
@@ -228,7 +228,7 @@ post '/sendclaim'=>sub{
   my $bonuscode=$self->param('bonuscode') || 0;
   my $description=$self->param('description');
   my $message='';
-  my $bonuscodeid=$dbh->selectrow_array("SELECT BONUS.ID FROM BONUS WHERE CODE='$bonuscode'") || 0;
+  my $bonuscodeid=$dbh->selectrow_array("SELECT ORDERS.ID FROM ORDERS WHERE ORDERS.ID='$bonuscode'") || 0;
   if($bonuscodeid){
     $dbh->do("INSERT INTO CLAIM (ID,BONUSID,DESCRIPTION,SDATE) VALUES (NULL,$bonuscodeid,\"$description\",NOW())") || die $dbh->err;
     $message='Спасибо за обращение. Мы сообщим вам о результатах на адрес электронной почты указанный в бонусе.';
