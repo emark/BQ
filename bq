@@ -119,8 +119,8 @@ post '/quiz'=>sub{
   #Validation rules    
   if(!$param->{'ordernum'}){
     $formvalidate=$formvalidate.'Введите номер заказа';
-  }elsif(!$param->{'ordercheck'}){
-    $formvalidate=$formvalidate.'Введите сумму заказа';
+  #}elsif(!$param->{'ordercheck'}){
+  #  $formvalidate=$formvalidate.'Введите сумму заказа';
   #}elsif($param->{'ordercheck'}=/\d+/){
     #$formvalidate=$formvalidate.'Укажите только целые цифры суммы заказа';
   }elsif($param->{'orderemail'} !~/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$/){
@@ -141,7 +141,7 @@ post '/quiz'=>sub{
     }
     
     #Create order code
-    $dbh->do("INSERT INTO ORDERS (ID,STATUS,SYSDATE,ORDERMONTH,NUMBER,EMAIL,SUMM) VALUES (NULL,0,NOW(),$param->{'ordermonth'},\"$param->{'ordernum'}\",\"$param->{'orderemail'}\",\"$param->{'ordercheck'}\")") || die $dbh->errstr;
+    $dbh->do("INSERT INTO ORDERS (ID,STATUS,SYSDATE,ORDERMONTH,NUMBER,EMAIL) VALUES (NULL,0,NOW(),$param->{'ordermonth'},\"$param->{'ordernum'}\",\"$param->{'orderemail'}\")") || die $dbh->errstr;
     $orderid=$dbh->last_insert_id('','',"ORDERS",'ID');
     $sth=$dbh->prepare("SELECT QUESTION.ID AS QID FROM QUESTION WHERE QUESTION.SHOPID=$pid AND QUESTION.QUIZ=1");
     $sth->execute;

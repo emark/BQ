@@ -20,9 +20,8 @@
             <br><i style="font-size:16px">(покупка совершена не более 3 месяцев назад)</i></P>
             <P>Номер заказа: <%=text_field 'ordernum'=>(size=>10,class=>'formstyle')%>
             <br><i style="font-size:16px">(укажите номер вашего предыдущего заказа)</i></P>
-            <P>Сумма заказа: <%=text_field 'ordercheck'=>(size=>4,class=>'formstyle')%> руб.
             <P>Ваш e-mail: <%=text_field 'orderemail'=>(class=>'formstyle',size=>15)%>
-            <br><i style="font-size:16px">(используется только для получения бонуса)</i></P>
+            <br><i style="font-size:16px">(использовался при заказе)</i></P>
             <P><%=check_box 'tosagree'=>(class=>'formstyle')%> Я принимаю условия <%=link_to 'Пользовательского соглашения'=>"/tos.html"%></P>
 %}
             <H2>Ваше мнение</H2>

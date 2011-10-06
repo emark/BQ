@@ -19,7 +19,7 @@
     </td><td>
     Номер
     </td><td align=center>
-    Сумма
+    Почта
     </td><td align=center>
     Контроль
     </td>
@@ -33,7 +33,7 @@
     </td><td>
         <%=$orders->{$orderid}{'NUMBER'}%>
     </td><td align=center>
-        <%=$orders->{$orderid}{'SUMM'}%>
+        <%=$orders->{$orderid}{'EMAIL'}%>
     </td><td align=center>
         <%=radio_button $orders->{$orderid}{'ID'}=>2%>Принять
         <%=radio_button $orders->{$orderid}{'ID'}=>1%>Отклонить
@@ -55,10 +55,6 @@
 %}
 </table><br/>
 <%end%>
-<form id=orderstatus method='post' action="/orders.html">
-<input type=hidden name=status id=status value=0>
-<input type=hidden name=oid id=oid value=0>
-</form>
 <div id=stat>
 Архив <%= link_to 'принятых'=>'/orders/status/2'%> и <%= link_to 'отклоненных'=>'/orders/status/1'%> ответов.
 </div>
