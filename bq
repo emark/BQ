@@ -73,7 +73,7 @@ get '/quiz'=>sub{
   #  return $self->render('robot');
   #}
   $url=substr($url,0,50);#Cut url length to 50 char's
-  my $pid=$dbh->do("SELECT SHOP.ID FROM SHOP WHERE SHOP.URL='$url'") || 0;
+  my $pid=$dbh->selectrow_array("SELECT SHOP.ID FROM SHOP WHERE SHOP.URL='$url'") || 0;
   my $shop=$dbh->selectall_hashref("SELECT SHOP.ID,SHOP.URL,SHOP.NAME AS SHOP FROM SHOP WHERE SHOP.URL='$url'",'ID');
   my $question=$dbh->selectall_hashref("SELECT QUESTION.ID,QUESTION.CONTENT,QUESTION.TYPE,QUESTION.ANSWERS FROM QUESTION LEFT JOIN SHOP ON QUESTION.SHOPID=SHOP.ID WHERE QUESTION.QUIZ=1 AND SHOP.URL='$url'",'ID');
   if(!$pid){
