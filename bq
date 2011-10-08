@@ -120,7 +120,7 @@ post '/quiz'=>sub{
   #Validation rules    
   if(!$param->{'ordernum'}){
     $formvalidate=$formvalidate.'Введите номер заказа';
-  }elsif($param->{'mail'} !~/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$/){
+  }elsif($param->{'email'} !~/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$/){
     $formvalidate=$formvalidate.'Укажите корректный e-mail';
   }elsif(!$param->{'tosagree'}){
     $formvalidate=$formvalidate.'Не приняты условия Пользовательского соглашения';
@@ -138,7 +138,7 @@ post '/quiz'=>sub{
     }
     
     #Create order code
-    $dbh->do("INSERT INTO ORDERS (ID,STATUS,SYSDATE,ORDERMONTH,NUMBER,EMAIL) VALUES (NULL,0,NOW(),$param->{'ordermonth'},\"$param->{'ordernum'}\",\"$param->{'mail'}\")") || die $dbh->errstr;
+    $dbh->do("INSERT INTO ORDERS (ID,STATUS,SYSDATE,ORDERMONTH,NUMBER,EMAIL) VALUES (NULL,0,NOW(),$param->{'ordermonth'},\"$param->{'ordernum'}\",\"$param->{'email'}\")") || die $dbh->errstr;
     $orderid=$dbh->last_insert_id('','',"ORDERS",'ID');
     $sth=$dbh->prepare("SELECT QUESTION.ID AS QID FROM QUESTION WHERE QUESTION.SHOPID=$pid AND QUESTION.QUIZ=1");
     $sth->execute;
@@ -149,7 +149,7 @@ post '/quiz'=>sub{
       $dbh->do("INSERT INTO ANSWER (ID,QUESTIONID,ORDERID,CONTENT,SYSDATE) VALUES (NULL,$ref[0],$orderid,\"$answer\",NOW())") || die $dbh->errstr;
     }
     $self->session(quizid=>0);
-    $self->mail(to=>$param->{'orderemail'},
+    $self->mail(to=>$param->{'email'},
                 subject=>"Ваш бонусквест от магазина ".$shop->{$pid}{'URL'},
                 data=>"Приветствуем!\n\nВы приняли участие в опросе от магазина ".$shop->{$pid}{'SHOP'}." http://".$shop->{$pid}{'URL'}.
                 "\nВ благодарность за ваши ответы магазин дарит вам бонус.\nБонус будет активирован сразу после обработки данных опроса. Это займет немного времени.\nОб активации бонуса мы сразу же вас оповестим.\nНомер вашего опроса: $orderid\nСпасибо за то, что вы с нами!\n".$subscribe
