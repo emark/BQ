@@ -41,7 +41,7 @@ get '/:id' => [id=>qw/\d+/]=> sub{
   my $pid=$self->param('id');
   $pid=$dbh->selectrow_array("SELECT SHOP.ID FROM SHOP WHERE SHOP.ID=$pid") || 0;
   if(!$pid){
-    $self->stash(capt=>'Бонус не найден',message=>"Здесь пока нет бонусов. Подождем...");
+    $self->stash(capt=>'Опрос не найден',message=>"Здесь пока нет ни опросов ни бонусов. Подождем...");
     return $self->render('robot') unless $pid;
   }
   my $shop=$dbh->selectall_hashref("SELECT SHOP.ID,SHOP.URL,SHOP.NAME AS SHOP FROM SHOP WHERE SHOP.ID='$pid'",'ID');
@@ -178,7 +178,7 @@ post '/quiz'=>sub{
 
 get '/thankyou'=>sub{
   my $self=shift;
-  $self->stash(capt=>'Спасибо за ответы',message=>'О зачислении бонуса мы сообщим по электронной почте.');
+  $self->stash(capt=>'Спасибо за ответы',message=>'Мы отправили вам письмо на указанный адрес электронной почты.');
   $self->render('robot');
 };
 

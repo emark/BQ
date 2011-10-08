@@ -14,7 +14,10 @@
                 Пароль<br/>
                 <%=password_field 'pass'=>(class=>'formstyle',size=>15)%><br/>
                 <br/><%=submit_button 'Войти'=>(class=>'formstyle')%>
-                <P><%=link_to 'Регистрация'=>'/register.html'%> / <%=link_to 'Забыли пароль?'=>'/restore.html'%></P>
+                <P>
+                    <!--<%=link_to 'Регистрация'=>'/register.html'%> /-->
+                    <%=link_to 'Забыли пароль?'=>'/restore.html'%></P>
+                <br/>регистрация только по <%=link_to 'запросу'=>'http://www.bonusquest.ru/contacts.html'%>
                 </div>
             <%end%>
         </div><!--pagecard-->

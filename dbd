@@ -62,42 +62,42 @@ post '/auth'=>sub{
 	$self->render('partner_login');
 };
 
-get '/register'=>sub{
-	my $self=shift;
-	$self->stash(message=>'');
-	$self->render('partner_register');
-};
-
-post '/register'=>sub{
-	my $self=shift;
-	my $param=$self->req->params->to_hash;
-	$param->{'url'}=~s/(http:\/\/www\.)||(http:\/\/)||(www\.)//g;
-	my $message='Укажите адрес магазина';
-	my $check=$dbh->selectrow_array("SELECT 1 FROM SHOP WHERE URL=\"$param->{'url'}\" AND SHOP.STATUS=1") || undef;
-	$message='Партнер уже зарегистрирован' unless !$check;
-	if($param->{'email'} !~ /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$/){
-		$message='Вы неверно указали адрес электронной почты.';
-		$check=1;
-	}
-	if(!$check && $param->{'url'} && $param->{'email'}){
-		#Generate bonuscode
-		my @char=('a'..'z','A'..'Z','1'..'9');
-		my $pass='';
-    foreach(1..8){
-      $pass.=$char[int(rand(60))];
-    }
-		$dbh->do("INSERT INTO SHOP(ID,URL,NAME,EMAIL,PASS,TEL) VALUES(NULL,\"$param->{'url'}\",\"$param->{'name'}\",\"$param->{'email'}\",\"$pass\",\"$param->{'tel'}\")");
-		$self->mail(to=>$param->{'email'},
-								subject=>'Регистрация партнера',
-								data=>"Приветствуем!\nПоздравляем с регистрацией в BonusQuest.\n\nСайт $param->{'name'}, http://$param->{'url'}\n".
-"Ваш пароль доступа: $pass\n\nДоступ к партнерской части будет открыт после подтверждения ваших данных.".$subscribe
-								);
-		$self->stash(capt=>'Спасибо за регистрацию',message=>'Дальнейшие инструкции отправлены на ваш адрес электронной почты.');
-		return $self->render('/robot');
-	}
-	$self->stash(message=>$message);
-	$self->render('partner_register');
-};
+#get '/register'=>sub{
+#	my $self=shift;
+#	$self->stash(message=>'');
+#	$self->render('partner_register');
+#};
+#
+#post '/register'=>sub{
+#	my $self=shift;
+#	my $param=$self->req->params->to_hash;
+#	$param->{'url'}=~s/(http:\/\/www\.)||(http:\/\/)||(www\.)//g;
+#	my $message='Укажите адрес магазина';
+#	my $check=$dbh->selectrow_array("SELECT 1 FROM SHOP WHERE URL=\"$param->{'url'}\" AND SHOP.STATUS=1") || undef;
+#	$message='Партнер уже зарегистрирован' unless !$check;
+#	if($param->{'email'} !~ /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$/){
+#		$message='Вы неверно указали адрес электронной почты.';
+#		$check=1;
+#	}
+#	if(!$check && $param->{'url'} && $param->{'email'}){
+#		#Generate bonuscode
+#		my @char=('a'..'z','A'..'Z','1'..'9');
+#		my $pass='';
+#    foreach(1..8){
+#      $pass.=$char[int(rand(60))];
+#    }
+#		$dbh->do("INSERT INTO SHOP(ID,URL,NAME,EMAIL,PASS,TEL) VALUES(NULL,\"$param->{'url'}\",\"$param->{'name'}\",\"$param->{'email'}\",\"$pass\",\"$param->{'tel'}\")");
+#		$self->mail(to=>$param->{'email'},
+#								subject=>'Регистрация партнера',
+#								data=>"Приветствуем!\nПоздравляем с регистрацией в BonusQuest.\n\nСайт $param->{'name'}, http://$param->{'url'}\n".
+#"Ваш пароль доступа: $pass\n\nДоступ к партнерской части будет открыт после подтверждения ваших данных.".$subscribe
+#								);
+#		$self->stash(capt=>'Спасибо за регистрацию',message=>'Дальнейшие инструкции отправлены на ваш адрес электронной почты.');
+#		return $self->render('/robot');
+#	}
+#	$self->stash(message=>$message);
+#	$self->render('partner_register');
+#};
 
 get '/restore'=>sub{
 	my $self=shift;

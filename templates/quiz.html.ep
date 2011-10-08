@@ -17,11 +17,11 @@
             %}
             <P>Месяц заказа:
             <%= select_field 'ordermonth'=>$selectmonths=>(class=>'formstyle')%>
-            <br><i style="font-size:16px">(покупка совершена не более 3 месяцев назад)</i></P>
+            <br><i>(покупка совершена не более 3 месяцев назад)</i></P>
             <P>Номер заказа: <%=text_field 'ordernum'=>(size=>10,class=>'formstyle')%>
-            <br><i style="font-size:16px">(укажите номер вашего предыдущего заказа)</i></P>
+            <br><i>(укажите номер вашего предыдущего заказа)</i></P>
             <P>Ваш e-mail: <%=text_field 'mail'=>(class=>'formstyle',size=>15)%>
-            <br><i style="font-size:16px">(был использован при прошлом заказе)</i></P>
+            <br><i>(был использован при прошлом заказе)</i></P>
             <P><%=check_box 'tosagree'=>(class=>'formstyle')%> Я принимаю условия <%=link_to 'Пользовательского соглашения'=>"/tos.html"%></P>
 %}
             <H2>Ваше мнение</H2>
