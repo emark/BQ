@@ -39,12 +39,13 @@ get '/' => sub {
 get '/:id' => [id=>qw/\d+/]=> sub{
   my $self=shift;
   my $pid=$self->param('id');
+  $pid=$dbh->selectrow_array("SELECT SHOP.ID FROM SHOP WHERE SHOP.ID=$pid") || 0;
+  if(!$pid){
+    $self->stash(capt=>'Бонус не найден',message=>"Здесь пока нет бонусов. Подождем...");
+    return $self->render('robot') unless $pid;
+  }
   my $shop=$dbh->selectall_hashref("SELECT SHOP.ID,SHOP.URL,SHOP.NAME AS SHOP FROM SHOP WHERE SHOP.ID='$pid'",'ID');
   my $question=$dbh->selectall_hashref("SELECT QUESTION.ID,QUESTION.CONTENT,QUESTION.TYPE,QUESTION.ANSWERS FROM QUESTION LEFT JOIN SHOP ON QUESTION.SHOPID=SHOP.ID WHERE QUESTION.QUIZ=1 AND SHOP.ID=$pid",'ID') || 0;
-  if(!$question){
-    $self->stash(capt=>'Бонус не найден',message=>"Здесь пока нет бонусов. Подождем...");
-    return $self->render('robot') unless $question;
-  }
   my @months=('Months','Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь');
   my $selectmonths=[];
   my @lt=localtime;
