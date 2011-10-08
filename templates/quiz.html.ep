@@ -21,34 +21,32 @@
             <P>Номер заказа: <%=text_field 'ordernum'=>(size=>10,class=>'formstyle')%>
             <br><i style="font-size:16px">(укажите номер вашего предыдущего заказа)</i></P>
             <P>Ваш e-mail: <%=text_field 'mail'=>(class=>'formstyle',size=>15)%>
-            <br><i style="font-size:16px">(использовался при заказе)</i></P>
+            <br><i style="font-size:16px">(был использован при прошлом заказе)</i></P>
             <P><%=check_box 'tosagree'=>(class=>'formstyle')%> Я принимаю условия <%=link_to 'Пользовательского соглашения'=>"/tos.html"%></P>
 %}
             <H2>Ваше мнение</H2>
             %if ($questmessage){
                 <%= tag 'P'=>(class=>'errormsg')=>$questmessage%>
             %}
-            <i>
             %foreach my $questionid(keys %{$question}){
-                <P><%=$question->{$questionid}{'CONTENT'}%>
+                <P class=question><%=$question->{$questionid}{'CONTENT'}%>
                 %if($question->{$questionid}{'TYPE'} eq '0'){
-                    <br/><%= text_area $question->{$questionid}{'ID'}=>(cols=>40,rows=>3,class=>'formstyle')=>begin%><%=$question->{$questionid}{'ANSWERS'}%><%end%>
+                    <br/><%= text_area $question->{$questionid}{'ID'}=>(cols=>30,rows=>3,class=>'formstyle')=>begin%><%=$question->{$questionid}{'ANSWERS'}%><%end%>
                 %}elsif($question->{$questionid}{'TYPE'} eq '1'){
                     %my @answer=split('\;',$question->{$questionid}{'ANSWERS'});
                     %foreach my $key(@answer){
-                        <%= radio_button $question->{$questionid}{'ID'} => $key =>(class=>'formstyle')%><%=$key%>
+                        <br/><%= radio_button $question->{$questionid}{'ID'} => $key =>(class=>'formstyle')%>&nbsp;<%=$key%>
                     %}
                 %}elsif($question->{$questionid}{'TYPE'} eq '2'){
                     %my @answer=split('\;',$question->{$questionid}{'ANSWERS'});
                     %foreach my $key(@answer){
-                        <%= check_box $question->{$questionid}{'ID'} => $key =>(class=>'formstyle')%><%=$key%>
+                        <br/><%= check_box $question->{$questionid}{'ID'} => $key =>(class=>'formstyle')%>&nbsp;<%=$key%>
                     %}
                 %}elsif($question->{$questionid}{'TYPE'} eq '3'){
-                    <%= text_field $question->{$questionid}{'ID'} =>(class=>'formstyle',size=>10)%>
+                    <br/><%= text_field $question->{$questionid}{'ID'} =>(class=>'formstyle',size=>10)%>
                 %}
                 </P>
             %}
-            </i>
             <%end%><!--end form -->
             <P align=center><a href="javascript: submitform('qform')" class=myButton>Я хочу получить бонус</a></P>
         </div><!--pagecard-->
