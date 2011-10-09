@@ -63,6 +63,8 @@ html{
 }#pagecard .question{
 	font-style: italic;
 	font-size:18px;
+}.question label:hover{
+    background-color:#F9FFE0;
 }#container{
 	position: relative;
 	min-height: 100%;

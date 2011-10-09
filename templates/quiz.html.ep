@@ -35,12 +35,12 @@
                 %}elsif($question->{$questionid}{'TYPE'} eq '1'){
                     %my @answer=split('\;',$question->{$questionid}{'ANSWERS'});
                     %foreach my $key(@answer){
-                        <br/><%= radio_button $question->{$questionid}{'ID'} => $key =>(class=>'formstyle')%>&nbsp;<%=$key%>
+                        <br/><%= radio_button $question->{$questionid}{'ID'} => $key =>(class=>'formstyle'),id=>$key%>&nbsp;<%=tag 'label'=>(for=>$key,class=>'question')=>begin%><%=$key%><%end%>
                     %}
                 %}elsif($question->{$questionid}{'TYPE'} eq '2'){
                     %my @answer=split('\;',$question->{$questionid}{'ANSWERS'});
                     %foreach my $key(@answer){
-                        <br/><%= check_box $question->{$questionid}{'ID'} => $key =>(class=>'formstyle')%>&nbsp;<%=$key%>
+                        <br/><%= check_box $question->{$questionid}{'ID'} => $key =>(class=>'formstyle'),id=>$key%>&nbsp;<label for="<%=$key%>"><%=$key%></label>
                     %}
                 %}elsif($question->{$questionid}{'TYPE'} eq '3'){
                     <br/><%= text_field $question->{$questionid}{'ID'} =>(class=>'formstyle',size=>10)%>

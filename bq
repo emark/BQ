@@ -36,7 +36,7 @@ get '/' => sub {
   $self->render('index');
 };
 
-get '/:id' => [id=>qw/\d+/]=> sub{
+get '/q:id' => [id=>qw/\d+/]=> sub{
   my $self=shift;
   my $pid=$self->param('id');
   $pid=$dbh->selectrow_array("SELECT SHOP.ID FROM SHOP WHERE SHOP.ID=$pid") || 0;
