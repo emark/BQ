@@ -48,7 +48,7 @@
 <%end%>
 <div id=view">
   <center>
-  <%=link_to 'Посмотреть опрос'=>"http://www.bonusquest.ru/$pid"=>(target=>'_blank',class=>'MyButton',title=>'Посмотреть как выглядит опрос')%>
+  <%=link_to 'Посмотреть опрос'=>"http://www.bonusquest.ru/q$pid"=>(target=>'_blank',class=>'MyButton',title=>'Посмотреть как выглядит опрос')%>
   </center>
 </div>
         </div><!--pagecard-->

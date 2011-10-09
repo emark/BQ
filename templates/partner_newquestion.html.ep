@@ -5,14 +5,23 @@
             <%=tag 'H2'=>'Новый вопрос'%>
 %my @qtype=('Текст','Выбор','Множество','Строка');
 <%=form_for '/quiz.html'=>(method=>'post')=>begin%>
-<table border=0 width=100%>
+<table border=0>
   <tr style="font-style: italic">
-    <td>
-      Тип вопроса
-    </td>
     <td colspan=1>
       Содержание вопроса
-    </td></tr>
+    </td>
+  </tr>
+  <tr>
+    <td colspan=1>
+      <%=text_field 'content'=>type=>'text',maxlength=>100,size=>60,class=>'formstyle'%><br/>
+    </td>
+  </tr>
+  <tr style="font-style: italic">
+    <td colspan=1>
+    Варианты ответов
+    </td>
+  </tr>
+  <tr>
   <tr>
     <td>
       <select name='type' class=formstyle>
@@ -22,18 +31,10 @@
       %$n++}
       </select>
     </td>
-    <td colspan=1>
-      <%=text_field 'content'=>type=>'text',maxlength=>100,size=>40,class=>'formstyle'%><br/>
-    </td>
-  </tr>
-  <tr style="font-style: italic">
-    <td colspan=2>
-    Варианты ответов
-    </td>
   </tr>
   <tr>
-    <td colspan=2>
-<%=text_area 'answers'=>(rows=>5,cols=>20,class=>'formstyle')=>begin%><%end%>
+    <td colspan=1>
+<%=text_area 'answers'=>(rows=>5,cols=>25,class=>'formstyle')=>begin%><%end%>
 <%=hidden_field 'questid'=>0%>
     </td>
   </tr>

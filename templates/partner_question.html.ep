@@ -5,15 +5,23 @@
             <%=tag 'H2'=>'Редактирование вопроса'%>
 %my @qtype=('Текст','Выбор','Множество','Строка');
 <%=form_for '/quiz.html'=>(method=>'post')=>begin%>
-<table border=0 width=100%>
+<table border=0>
   <tr style="font-style: italic">
-    <td>
-      Тип вопроса
-    </td>
     <td colspan=1>
       Содержание вопроса
-    </td></tr>
+    </td>
+  </tr>
 %foreach my $questionid(keys %{$question}){
+  <tr>
+    <td colspan=1>
+      <%=text_field 'content'=>"$question->{$questionid}{'CONTENT'}"=>(maxlength=>100,size=>60,class=>'formstyle')%>
+    </td>
+  </tr>
+  <tr style="font-style: italic">
+    <td colspan=2>
+    Варианты ответов
+    </td>
+  </tr>
   <tr>
     <td>
       <select name='type' class=formstyle>
@@ -26,19 +34,11 @@
         ><%=$key%>
       %$n++}
     </td>
-    <td colspan=1>
-      <%=text_field 'content'=>"$question->{$questionid}{'CONTENT'}"=>(maxsize=>20,size=>40,class=>'formstyle')%>
-    </td>
-  </tr>
-  <tr style="font-style: italic">
-    <td colspan=2>
-    Варианты ответов
-    </td>
   </tr>
   <tr>
     <td colspan=2>
       %my @answer=split('\;',$question->{$questionid}{'ANSWERS'});
-<%=text_area 'answers'=>(rows=>5,cols=>20,class=>'formstyle')=>begin%>
+<%=text_area 'answers'=>(rows=>5,cols=>25,class=>'formstyle')=>begin%>
 %foreach my $key (@answer){
 <%=$key%>
 %}
