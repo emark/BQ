@@ -20,7 +20,7 @@
             <br><i>(покупка совершена не более 3 месяцев назад)</i></P>
             <P>Номер заказа: <%=text_field 'ordernum'=>(size=>10,class=>'formstyle')%>
             <br><i>(укажите номер вашего предыдущего заказа)</i></P>
-            <P>Ваш e-mail: <%=text_field 'email'=>(class=>'formstyle',size=>15)%>
+            <P>Ваш e-mail: <%=text_field 'email'=>(class=>'formstyle',size=>30)%>
             <br><i>(был использован при прошлом заказе)</i></P>
             <P><%=check_box 'tosagree'=>(class=>'formstyle')%> Я принимаю условия <%=link_to 'Пользовательского соглашения'=>"/tos.html"%></P>
 %}
