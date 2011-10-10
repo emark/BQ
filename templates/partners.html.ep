@@ -5,11 +5,46 @@
 <div id=content>
     <div id="quizform">
         <div id=pagecard>
-            <H2>Партнеры BonusQuest</H2>
+            <H2>Бонусы от партнёров</H2>
+            <table width=100% border=0>
+                <tr style="font-style:italic">
+                    <td>
+                        Партнёр
+                    </td>
+                    <td>
+                        Адрес
+                    </td>
+                    <td>
+                        Описание
+                    </td>
+                    <td align=center>
+                        Получить бонус
+                    </td>
+                </tr>
             %foreach my $shopid(keys %{$shop}){
-                <H3><%=$shop->{$shopid}{'NAME'}%></H3>
-                <P style="text-indent: 20px;"><%=link_to "http://$shop->{$shopid}{'URL'}"=>"http://$shop->{$shopid}{'URL'}"=>(target=>'blank')%></P>
+                <tr>
+                    <td>
+                        <%=$shop->{$shopid}{'NAME'}%>
+                    </td>
+                    <td>
+                        <%=link_to "http://$shop->{$shopid}{'URL'}"=>"http://$shop->{$shopid}{'URL'}"=>(target=>'blank')%>
+                    </td>
+                    <td>
+                        <%=$shop->{$shopid}{'DESCRIPTION'}%>
+                    </td>
+                    <td align=center>
+                        %if(!$shop->{$shopid}{'QUIZ'} || $shop->{$shopid}{'QUIZ'}==0){
+                            <img src="/media/icon/bstar.png" border=0 title='Бонусы временно не выдает'>
+                        %}else{
+                            <a href="<%=url_for "/q$shop->{$shopid}{'ID'}"%>"><img src="/media/icon/gstar.png" border=0 title='Получить бонус за ответы'></a>
+                        %}
+                    </td>
+                </tr>
             %}
+            </table>
+            <P align=center>
+                <a href="/forbusiness.html" class=myButton>Я тоже хочу стать партнёром</a>
+            </P>
         </div><!--pagecard-->
     </div><!--quizform-->
 </div><!--content-->

@@ -32,7 +32,6 @@ app->hook(before_dispatch => sub {
 get '/' => sub {
   my $self = shift;
   my $partners=$dbh->selectrow_array("SELECT COUNT(SHOP.ID) FROM SHOP WHERE SHOP.STATUS=1");
-  $self->stash(partners=>$partners);
   $self->render('index');
 };
 
@@ -40,12 +39,12 @@ get '/q:id' => [id=>qw/\d+/]=> sub{
   my $self=shift;
   my $pid=$self->param('id');
   $pid=$dbh->selectrow_array("SELECT SHOP.ID FROM SHOP WHERE SHOP.ID=$pid") || 0;
-  if(!$pid){
-    $self->stash(capt=>'Опрос не найден',message=>"Здесь пока нет ни опросов ни бонусов. Подождем...");
-    return $self->render('robot') unless $pid;
-  }
   my $shop=$dbh->selectall_hashref("SELECT SHOP.ID,SHOP.URL,SHOP.NAME AS SHOP FROM SHOP WHERE SHOP.ID='$pid'",'ID');
-  my $question=$dbh->selectall_hashref("SELECT QUESTION.ID,QUESTION.CONTENT,QUESTION.TYPE,QUESTION.ANSWERS FROM QUESTION LEFT JOIN SHOP ON QUESTION.SHOPID=SHOP.ID WHERE QUESTION.QUIZ=1 AND SHOP.ID=$pid",'ID') || 0;
+  my $question=$dbh->selectall_hashref("SELECT QUESTION.ID,QUESTION.CONTENT,QUESTION.TYPE,QUESTION.ANSWERS FROM QUESTION LEFT JOIN SHOP ON QUESTION.SHOPID=SHOP.ID WHERE QUESTION.QUIZ=1 AND SHOP.ID=$pid",'ID') || undef;
+  if(!%{$question}){
+    $self->stash(capt=>'Опрос не найден',message=>"Здесь пока нет ни опросов ни бонусов. Подождем...");
+    return $self->render('robot');
+  }
   my @months=('Months','Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь');
   my $selectmonths=[];
   my @lt=localtime;
@@ -67,19 +66,14 @@ get '/quiz'=>sub{
   my $self=shift;
   my $url=$self->param('url');
   return $self->redirect_to('/') unless $url;
-  $url=~s/http:\/\/||shop\.||www\.||store\.//g;#Drop subdomain from URL
-  #Regexp utf encoding error
-  #if($url !~ /^[А-Яа-яA-Za-z0-9.-]+\.[A-Za-z]{2,4}$/){
-  #  $self->stash(message=>'Bad URL >:/');
-  #  return $self->render('robot');
-  #}
+  $url=~s/http:\/\/||^shop\.||www\.||store\.//g;#Drop subdomain from URL
   $url=substr($url,0,50);#Cut url length to 50 char's
   my $pid=$dbh->selectrow_array("SELECT SHOP.ID FROM SHOP WHERE SHOP.URL='$url'") || 0;
   my $shop=$dbh->selectall_hashref("SELECT SHOP.ID,SHOP.URL,SHOP.NAME AS SHOP FROM SHOP WHERE SHOP.URL='$url'",'ID');
   my $question=$dbh->selectall_hashref("SELECT QUESTION.ID,QUESTION.CONTENT,QUESTION.TYPE,QUESTION.ANSWERS FROM QUESTION LEFT JOIN SHOP ON QUESTION.SHOPID=SHOP.ID WHERE QUESTION.QUIZ=1 AND SHOP.URL='$url'",'ID');
-  if(!$pid){
+  if(!%{$question}){
     $self->stash(capt=>'Бонус не найден',message=>"Магазин $url пока не предоставляет бонусы.");
-    return $self->render('robot') unless $pid;
+    return $self->render('robot');
   }
   my @months=('Months','Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь');
   my $selectmonths=[];
@@ -201,9 +195,9 @@ post '/balance'=>sub{
     }
     if($n<6){
       my $x=6-$n;
-      $mailmessage=$mailmessage."\nДля получения подарка осталось собрать всего $x бонуса.\nКак заработать бонус смотрите здесь http://www.bonusquest.ru/help.html";
+      $mailmessage=$mailmessage."\nЧтобы забрать подарок, бонусов нужно собрать ещё $x.\nКак получить бонус смотрите здесь http://www.bonusquest.ru/help.html";
     }else{
-      $mailmessage=$mailmessage."\nПоздравляем, у вас достаточно бонусов для получения подарка.\nСписок подарков здесь http://www.bonusquest.ru/prizes.html";
+      $mailmessage=$mailmessage."\nПоздравляем, у вас достаточно бонусов для получения подарка.\nСписок подарков здесь http://www.bonusquest.ru/gifts.html";
     }
     $self->mail(to=>$email,
                 subject=>'Список действующих бонусов',
@@ -215,7 +209,7 @@ post '/balance'=>sub{
 
 get '/partners'=>sub{
   my $self=shift;
-  my $shop=$dbh->selectall_hashref("SELECT SHOP.ID,SHOP.NAME,SHOP.URL,SHOP.DESCRIPTION FROM SHOP WHERE SHOP.STATUS=1 ORDER BY SHOP.URL",'ID');
+  my $shop=$dbh->selectall_hashref("SELECT SHOP.ID,SHOP.NAME,SHOP.URL,SHOP.DESCRIPTION,QUESTION.QUIZ FROM SHOP LEFT JOIN QUESTION ON SHOP.ID=QUESTION.SHOPID WHERE SHOP.STATUS=1 GROUP BY SHOP.ID",'ID');
   $self->stash(shop=>$shop);
   $self->render('partners');
 };

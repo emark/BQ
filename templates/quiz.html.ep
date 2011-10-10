@@ -1,5 +1,5 @@
 %layout 'default', title 'Отвечай на вопросы и получай бонусы';
-<%#=test%>
+%#dev
 <div id=subhead>
 <%=form_for 'quiz.html'=>(method=>'post',id=>"qform")=>begin%>
 <%=hidden_field 'pid'=>$pid%>
@@ -11,20 +11,20 @@
 <div id=content>
     <div id="quizform">
         <div id=pagecard>
-            <H2>Укажите данные прошлого заказа</H2>
+            <H2>Данные прошлой покупки</H2>
             %if ($formmessage){
             <%= tag 'P'=>(class=>'errormsg')=>$formmessage%>
             %}
-            <P>Месяц заказа:
+            <P>В каком месяце покупали:
             <%= select_field 'ordermonth'=>$selectmonths=>(class=>'formstyle')%>
             <br><i>(покупка совершена не более 3 месяцев назад)</i></P>
             <P>Номер заказа: <%=text_field 'ordernum'=>(size=>10,class=>'formstyle')%>
-            <br><i>(укажите номер вашего предыдущего заказа)</i></P>
-            <P>Ваш e-mail: <%=text_field 'email'=>(class=>'formstyle',size=>30)%>
-            <br><i>(был использован при прошлом заказе)</i></P>
-            <P><%=check_box 'tosagree'=>(class=>'formstyle')%> Я принимаю условия <%=link_to 'Пользовательского соглашения'=>"/tos.html"%></P>
+            <br><i>(укажите номер вашего прошлого заказа)</i></P>
+            <P>Ваш e-mail: <%=text_field 'email'=>(class=>'formstyle',size=>22)%>
+            <br><i>(был использован при заказе)</i></P>
+            <P><%=check_box 'tosagree'=>(class=>'formstyle'),id=>'tos'%> <label for=tos>Я принимаю условия</label> <%=link_to 'Пользовательского соглашения'=>"/tos.html"%></P>
 %}
-            <H2>Ваше мнение</H2>
+            <H2>Нам важно ваше мнение</H2>
             %if ($questmessage){
                 <%= tag 'P'=>(class=>'errormsg')=>$questmessage%>
             %}
@@ -35,12 +35,12 @@
                 %}elsif($question->{$questionid}{'TYPE'} eq '1'){
                     %my @answer=split('\;',$question->{$questionid}{'ANSWERS'});
                     %foreach my $key(@answer){
-                        <br/><%= radio_button $question->{$questionid}{'ID'} => $key =>(class=>'formstyle'),id=>$key%>&nbsp;<%=tag 'label'=>(for=>$key,class=>'question')=>begin%><%=$key%><%end%>
+                        <br/><%= radio_button $question->{$questionid}{'ID'} => $key =>(class=>'formstyle'),id=>"$question->{$questionid}{'ID'}-$key"%>&nbsp;<%=tag 'label'=>(for=>"$question->{$questionid}{'ID'}-$key",class=>'question')=>begin%><%=$key%><%end%>
                     %}
                 %}elsif($question->{$questionid}{'TYPE'} eq '2'){
                     %my @answer=split('\;',$question->{$questionid}{'ANSWERS'});
                     %foreach my $key(@answer){
-                        <br/><%= check_box $question->{$questionid}{'ID'} => $key =>(class=>'formstyle'),id=>$key%>&nbsp;<label for="<%=$key%>"><%=$key%></label>
+                        <br/><%= check_box $question->{$questionid}{'ID'} => $key =>(class=>'formstyle'),id=>"$question->{$questionid}{'ID'}-$key"%>&nbsp;<%=tag 'label'=>(for=>"$question->{$questionid}{'ID'}-$key",class=>'question')=>begin%><%=$key%><%end%>
                     %}
                 %}elsif($question->{$questionid}{'TYPE'} eq '3'){
                     <br/><%= text_field $question->{$questionid}{'ID'} =>(class=>'formstyle',size=>10)%>

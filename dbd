@@ -25,7 +25,7 @@ app->plugin(mail => {
 app->secret($appconf[5]);
 app->hook(before_dispatch => sub {
                my $self = shift;
-               $self->req->url->base(Mojo::URL->new(q{http://partner.bonusquest.ru/}))
+               #$self->req->url->base(Mojo::URL->new(q{http://partner.bonusquest.ru/}))
 	       }
 	  );
 
@@ -141,13 +141,14 @@ post '/quiz'=>sub{
 	my $content=$self->param('content');#Question content
 	my $type=$self->param('type');
 	my $answers=$self->param('answers');
-	$answers=~s/\s\n/;/g;
-	if(@questionid){
+	$answers=~s/\s\n/;/g if $answers;
+	#if(@questionid){
 		$dbh->do("UPDATE QUESTION SET QUESTION.QUIZ=0 WHERE QUESTION.SHOPID=$pid");#Set quiz status to null
 		foreach my $key(@questionid){
 			$dbh->do("UPDATE QUESTION SET QUESTION.QUIZ=1 WHERE QUESTION.SHOPID=$pid AND QUESTION.ID=$key");
 		}
-	}if($content){
+	#}
+	if($content){
 		if($questid){
 			$dbh->do("UPDATE QUESTION SET QUESTION.CONTENT=\"$content\",QUESTION.TYPE=\"$type\",QUESTION.ANSWERS=\"$answers\" WHERE QUESTION.ID=$questid AND QUESTION.SHOPID=$pid");
 		}else{
