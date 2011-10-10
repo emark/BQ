@@ -49,6 +49,9 @@
             %}
             <%end%><!--end form -->
             <P align=center><a href="javascript: submitform('qform')" class=myButton>Я хочу получить бонус</a></P>
+            <!--<div id=social>-->
+            <!--    <P>Поделись бонусами с друзьями</P>-->
+            <!--</div>-->
         </div><!--pagecard-->
     </div><!--quizform-->
 </div><!--content-->
