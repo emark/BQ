@@ -15,7 +15,7 @@
             %if ($formmessage){
             <%= tag 'P'=>(class=>'errormsg')=>$formmessage%>
             %}
-            <P>В каком месяце покупали:
+            <P>Месяц прошлой покупки:
             <%= select_field 'ordermonth'=>$selectmonths=>(class=>'formstyle')%>
             <br><i>(покупка совершена не более 3 месяцев назад)</i></P>
             <P>Номер заказа: <%=text_field 'ordernum'=>(size=>10,class=>'formstyle')%>
