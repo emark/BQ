@@ -34,7 +34,7 @@
                     </td>
                     <td align=center>
                         %if(!$shop->{$shopid}{'QUIZ'} || $shop->{$shopid}{'QUIZ'}==0){
-                            <img src="/media/icon/bstar.png" border=0 title='Бонусы временно не выдает'>
+                            <img src="/media/icon/bstar.png" border=0 title='Бонусы закончились'>
                         %}else{
                             <a href="<%=url_for "/q$shop->{$shopid}{'ID'}.html"%>"><img src="/media/icon/gstar.png" border=0 title='Получить бонус за ответы'></a>
                         %}

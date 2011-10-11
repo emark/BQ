@@ -113,7 +113,7 @@ post '/quiz'=>sub{
     
   #Validation rules    
   if(!$param->{'ordernum'}){
-    $formvalidate=$formvalidate.'Введите номер заказа';
+    $formvalidate=$formvalidate.'Введите номер прошлого заказа';
   }elsif($param->{'email'} !~/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$/){
     $formvalidate=$formvalidate.'Укажите корректный e-mail';
   }elsif(!$param->{'tosagree'}){
@@ -212,6 +212,11 @@ get '/partners'=>sub{
   my $shop=$dbh->selectall_hashref("SELECT SHOP.ID,SHOP.NAME,SHOP.URL,SHOP.DESCRIPTION,QUESTION.QUIZ FROM SHOP LEFT JOIN QUESTION ON SHOP.ID=QUESTION.SHOPID WHERE SHOP.STATUS=1 GROUP BY SHOP.ID",'ID');
   $self->stash(shop=>$shop);
   $self->render('partners');
+};
+
+get '/gifts'=>sub{
+  my $self=shift;
+  $self->render('gifts.html.ep');
 };
 
 post '/sendclaim'=>sub{

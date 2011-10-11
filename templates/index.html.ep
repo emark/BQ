@@ -4,14 +4,14 @@
           <span style="font-family:'Coustard'">BonusQuest</span><br/>
           <div style="font-size:20px;font-style:italic;font-weight:100;text-shadow: none">
             Отвечай на <%= link_to "вопросы"=>'/partners.html'=>(style=>'color:#FFF;text-decoration:none;border-bottom-style:dashed;border-bottom-width: thin;')%>, собирай бонусы
-            и получай подарки!
+            и получай <%= link_to "подарки"=>'/gifts.html'=>(style=>'color:#FFF;text-decoration:none;border-bottom-style:dashed;border-bottom-width: thin;')%>!
           </div>
         </center>
         </div><!--head-->
       <div id=content>
         
 <table width=100% border=0>
-    <tr><td height=50></td></tr>
+    <tr><td height=50 colspan=3></td></tr>
     <tr align=center valign=top>
         <td>
             <div class=pcard style="background-color: #E6EDDA;">

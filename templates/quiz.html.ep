@@ -28,8 +28,9 @@
             %if ($questmessage){
                 <%= tag 'P'=>(class=>'errormsg')=>$questmessage%>
             %}
+            <OL class=question>
             %foreach my $questionid(keys %{$question}){
-                <P class=question><%=$question->{$questionid}{'CONTENT'}%>
+                <LI><P><%=$question->{$questionid}{'CONTENT'}%>
                 %if($question->{$questionid}{'TYPE'} eq '0'){
                     <br/><%= text_area $question->{$questionid}{'ID'}=>(cols=>30,rows=>3,class=>'formstyle')=>begin%><%=$question->{$questionid}{'ANSWERS'}%><%end%>
                 %}elsif($question->{$questionid}{'TYPE'} eq '1'){
@@ -47,10 +48,11 @@
                 %}
                 </P>
             %}
+            </OL>
             <%end%><!--end form -->
             <P align=center><a href="javascript: submitform('qform')" class=myButton>Я хочу получить бонус</a></P>
             <!--<div id=social>-->
-            <!--    <P>Поделись бонусами с друзьями</P>-->
+            <!--    <P>Ваши друзья тоже могут получить бонусы.</P>-->
             <!--</div>-->
         </div><!--pagecard-->
     </div><!--quizform-->
