@@ -69,14 +69,15 @@ html{
 		border-top-right-radius: 3px;
 		border-bottom-left-radius: 3px;
 		border-bottom-right-radius: 3px;
+}#pagecard .changebg{
+		padding-left:3px;
+		padding-bottom:3px;
 }#pagecard .changebg:hover{
-    background-color:#EBC9FF;
+		background-color:#EBC9FF;
 		border-top-left-radius: 3px;
 		border-top-right-radius: 3px;
 		border-bottom-left-radius: 3px;
 		border-bottom-right-radius: 3px;
-		/*border: dashed thin;*/
-		/*border-color:#6D6D6D;*/
 }#container{
 	position: relative;
 	min-height: 100%;
@@ -124,7 +125,7 @@ html{
     clear: both;
     margin: 0;
     padding: 0;
-    height: 1;
+    height: 1px;
     font-size: 1px;
     height: 100px;
 }#footer{
