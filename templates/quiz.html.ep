@@ -16,7 +16,7 @@
             <%= tag 'P'=>(class=>'errormsg')=>$formmessage%>
             %}
             <P>Месяц прошлой покупки:
-            <%= select_field 'ordermonth'=>$selectmonths=>(class=>'formstyle')%>&nbsp;<b class=changebg title ='Месяц покупки в магазине'>&nbsp;&nbsp;?&nbsp;&nbsp;</b>
+            <%= select_field 'ordermonth'=>$selectmonths=>(class=>'formstyle')%>&nbsp;<b class=changebg title ='Покупка '>&nbsp;&nbsp;?&nbsp;&nbsp;</b>
             <br><i>(покупка совершена не более 3 месяцев назад)</i></P>
             <P>Номер заказа: <%=text_field 'ordernum'=>(size=>10,class=>'formstyle')%>&nbsp;<b class=changebg title ='Месяц покупки в магазине'>&nbsp;&nbsp;?&nbsp;&nbsp;</b>
             <br><i>(укажите номер вашего прошлого заказа)</i></P>
