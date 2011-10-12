@@ -65,6 +65,18 @@ html{
 	font-size:18px;
 }.question label:hover{
     background-color:#F9FFE0;
+		border-top-left-radius: 3px;
+		border-top-right-radius: 3px;
+		border-bottom-left-radius: 3px;
+		border-bottom-right-radius: 3px;
+}#pagecard .changebg:hover{
+    background-color:#EBC9FF;
+		border-top-left-radius: 3px;
+		border-top-right-radius: 3px;
+		border-bottom-left-radius: 3px;
+		border-bottom-right-radius: 3px;
+		/*border: dashed thin;*/
+		/*border-color:#6D6D6D;*/
 }#container{
 	position: relative;
 	min-height: 100%;
@@ -80,7 +92,7 @@ html{
     font-size: 70px;
     color:#FFFFFF;
     text-decoration:none;
-	text-shadow:1px 3px 10px #510202;
+		text-shadow:1px 3px 10px #510202;
 }#subhead{
     height: 120px;
     width: 100%;

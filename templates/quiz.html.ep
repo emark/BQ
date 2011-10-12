@@ -16,11 +16,11 @@
             <%= tag 'P'=>(class=>'errormsg')=>$formmessage%>
             %}
             <P>Месяц прошлой покупки:
-            <%= select_field 'ordermonth'=>$selectmonths=>(class=>'formstyle')%>
+            <%= select_field 'ordermonth'=>$selectmonths=>(class=>'formstyle')%>&nbsp;<b class=changebg title ='Месяц покупки в магазине'>&nbsp;&nbsp;?&nbsp;&nbsp;</b>
             <br><i>(покупка совершена не более 3 месяцев назад)</i></P>
-            <P>Номер заказа: <%=text_field 'ordernum'=>(size=>10,class=>'formstyle')%>
+            <P>Номер заказа: <%=text_field 'ordernum'=>(size=>10,class=>'formstyle')%>&nbsp;<b class=changebg title ='Месяц покупки в магазине'>&nbsp;&nbsp;?&nbsp;&nbsp;</b>
             <br><i>(укажите номер вашего прошлого заказа)</i></P>
-            <P>Ваш e-mail: <%=text_field 'email'=>(class=>'formstyle',size=>22)%>
+            <P>Ваш e-mail: <%=text_field 'email'=>(class=>'formstyle',size=>22)%>&nbsp;<b class=changebg title ='Месяц покупки в магазине'>&nbsp;&nbsp;?&nbsp;&nbsp;</b>
             <br><i>(был использован при заказе)</i></P>
             <P><%=check_box 'tosagree'=>(class=>'formstyle'),id=>'tos'%> <label for=tos>Я принимаю условия</label> <%=link_to 'Пользовательского соглашения'=>"/tos.html"%></P>
 %}
@@ -30,7 +30,7 @@
             %}
             <OL class=question>
             %foreach my $questionid(keys %{$question}){
-                <LI><P><%=$question->{$questionid}{'CONTENT'}%>
+                <LI><P class=changebg><%=$question->{$questionid}{'CONTENT'}%>
                 %if($question->{$questionid}{'TYPE'} eq '0'){
                     <br/><%= text_area $question->{$questionid}{'ID'}=>(cols=>30,rows=>3,class=>'formstyle')=>begin%><%=$question->{$questionid}{'ANSWERS'}%><%end%>
                 %}elsif($question->{$questionid}{'TYPE'} eq '1'){

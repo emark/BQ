@@ -207,7 +207,7 @@ post '/balance'=>sub{
   $self->render('robot');
 };
 
-get '/partners'=>sub{
+get '/bonuses'=>sub{
   my $self=shift;
   my $shop=$dbh->selectall_hashref("SELECT SHOP.ID,SHOP.NAME,SHOP.URL,SHOP.DESCRIPTION,QUESTION.QUIZ FROM SHOP LEFT JOIN QUESTION ON SHOP.ID=QUESTION.SHOPID WHERE SHOP.STATUS=1 GROUP BY SHOP.ID",'ID');
   $self->stash(shop=>$shop);

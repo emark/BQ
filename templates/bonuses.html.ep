@@ -1,15 +1,15 @@
-%layout 'default', title 'Партнеры BonusQuest';
+%layout 'default', title 'Дарим бонусы за ваше мнение BonusQuest';
 <div id=subhead>
     <span class=sublogo><a href="/" style="color:#FFF;text-decoration:none;">BonusQuest</a></span>
 </div><!--head-->
 <div id=content>
     <div id="quizform">
         <div id=pagecard>
-            <H2>Бонусы от партнёров</H2>
+            <H2>Отвечай на вопросы и получай бонусы</H2>
             <table width=100% border=0>
                 <tr style="font-style:italic">
                     <td>
-                        Партнёр
+                        Бонусодаритель
                     </td>
                     <td>
                         Адрес
@@ -27,7 +27,7 @@
                         <%=$shop->{$shopid}{'NAME'}%>
                     </td>
                     <td>
-                        <%=link_to "http://$shop->{$shopid}{'URL'}"=>"http://$shop->{$shopid}{'URL'}"=>(target=>'blank')%>
+                        <%=link_to "http://$shop->{$shopid}{'URL'}"=>"http://$shop->{$shopid}{'URL'}"=>(target=>'blank',title=>'Переход на сайт')%>
                     </td>
                     <td>
                         <%=$shop->{$shopid}{'DESCRIPTION'}%>
@@ -36,7 +36,7 @@
                         %if(!$shop->{$shopid}{'QUIZ'} || $shop->{$shopid}{'QUIZ'}==0){
                             <img src="/media/icon/bstar.png" border=0 title='Бонусы закончились'>
                         %}else{
-                            <a href="<%=url_for "/q$shop->{$shopid}{'ID'}.html"%>"><img src="/media/icon/gstar.png" border=0 title='Получить бонус за ответы'></a>
+                            <a href="<%=url_for "/q$shop->{$shopid}{'ID'}.html"%>"><img src="/media/icon/gstar.png" border=0 title='Получить бонус за ответы' class=changebg></a>
                         %}
                     </td>
                 </tr>

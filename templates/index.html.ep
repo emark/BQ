@@ -3,7 +3,7 @@
         <center>
           <span style="font-family:'Coustard'">BonusQuest</span><br/>
           <div style="font-size:20px;font-style:italic;font-weight:100;text-shadow: none">
-            Отвечай на <%= link_to "вопросы"=>'/partners.html'=>(style=>'color:#FFF;text-decoration:none;border-bottom-style:dashed;border-bottom-width: thin;')%>, собирай бонусы
+            Отвечай на <%= link_to "вопросы"=>'/bonuses.html'=>(style=>'color:#FFF;text-decoration:none;border-bottom-style:dashed;border-bottom-width: thin;')%>, собирай бонусы
             и получай <%= link_to "подарки"=>'/gifts.html'=>(style=>'color:#FFF;text-decoration:none;border-bottom-style:dashed;border-bottom-width: thin;')%>!
           </div>
         </center>
