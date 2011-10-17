@@ -73,11 +73,33 @@ html{
 		padding-left:3px;
 		padding-bottom:3px;
 }#pagecard .changebg:hover{
-		background-color:#EBC9FF;
+		background-color:#E3F2F7;
 		border-top-left-radius: 3px;
 		border-top-right-radius: 3px;
 		border-bottom-left-radius: 3px;
 		border-bottom-right-radius: 3px;
+}#quiz-nav{
+		width:auto;
+		border-bottom-style: dashed;
+		border-bottom-width: thin;
+		background-color:#FFF;
+}#quiz-nav .captbutton{
+		font-size:18px;
+		font-style:italic;
+		color: #4C4C4C;
+		text-decoration: none;
+		margin-right:30px;
+		padding: 5px 5px 5px 5px;
+		border-top-left-radius: 3px;
+		border-top-right-radius: 3px;
+		border-bottom-left-radius: 3px;
+		border-bottom-right-radius: 3px;
+}#quiz-nav .captbutton:hover{
+		font-size:18px;
+		font-style:italic;
+		color: #4C4C4C;
+		text-decoration: none;
+		background-color: #EFEFEF;
 }#container{
 	position: relative;
 	min-height: 100%;

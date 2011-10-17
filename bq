@@ -25,7 +25,7 @@ app->plugin(mail => {
 app->secret($appconf[5]);
 app->hook(before_dispatch => sub {
                my $self = shift;
-               $self->req->url->base(Mojo::URL->new(q{http://www.bonusquest.ru/}))
+               #$self->req->url->base(Mojo::URL->new(q{http://www.bonusquest.ru/}))
 	       }
 	  );
 
@@ -39,83 +39,45 @@ get '/q:id' => [id=>qw/\d+/]=> sub{
   my $self=shift;
   my $pid=$self->param('id');
   $pid=$dbh->selectrow_array("SELECT SHOP.ID FROM SHOP WHERE SHOP.ID=$pid") || 0;
-  my $shop=$dbh->selectall_hashref("SELECT SHOP.ID,SHOP.URL,SHOP.NAME AS SHOP,SHOP.BONUS FROM SHOP WHERE SHOP.ID='$pid'",'ID');
+  my $shop=$dbh->selectall_hashref("SELECT SHOP.ID,SHOP.URL,SHOP.NAME AS SHOP,SHOP.DESCRIPTION,SHOP.EMAIL,SHOP.TEL,SHOP.BONUSINFO FROM SHOP WHERE SHOP.ID='$pid'",'ID');
   my $question=$dbh->selectall_hashref("SELECT QUESTION.ID,QUESTION.CONTENT,QUESTION.TYPE,QUESTION.ANSWERS FROM QUESTION LEFT JOIN SHOP ON QUESTION.SHOPID=SHOP.ID WHERE QUESTION.QUIZ=1 AND SHOP.ID=$pid",'ID') || undef;
   if(!%{$question}){
     $self->stash(capt=>'Опрос не найден',message=>"Здесь пока нет ни опросов ни бонусов. Подождем...");
     return $self->render('robot');
   }
-  my @months=('Months','Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь');
-  my $selectmonths=[];
-  my @lt=localtime;
-  my $n=$lt[4]-1;
-  for my $i(0..2){#For 3 last months
-    $selectmonths->[$i]=[$months[$n],$n];
-    $n++;
-  }
   $self->stash(pid=>$pid,
                shop=>$shop,
                question=>$question,
-               selectmonths=>$selectmonths,
                formmessage=>'',
                questmessage=>'');
   $self->render('quiz');
 };
 
-get '/quiz'=>sub{
+post '/q:id' => [id=>qw/\d+/]=> sub{
   my $self=shift;
-  my $url=$self->param('url');
-  return $self->redirect_to('/') unless $url;
-  $url=~s/http:\/\/||^shop\.||www\.||store\.//g;#Drop subdomain from URL
-  $url=substr($url,0,50);#Cut url length to 50 char's
-  my $pid=$dbh->selectrow_array("SELECT SHOP.ID FROM SHOP WHERE SHOP.URL='$url'") || 0;
-  my $shop=$dbh->selectall_hashref("SELECT SHOP.ID,SHOP.URL,SHOP.NAME AS SHOP,SHOP.BONUS FROM SHOP WHERE SHOP.URL='$url'",'ID');
-  my $question=$dbh->selectall_hashref("SELECT QUESTION.ID,QUESTION.CONTENT,QUESTION.TYPE,QUESTION.ANSWERS FROM QUESTION LEFT JOIN SHOP ON QUESTION.SHOPID=SHOP.ID WHERE QUESTION.QUIZ=1 AND SHOP.URL='$url'",'ID');
-  if(!%{$question}){
-    $self->stash(capt=>'Бонус не найден',message=>"Магазин $url пока не предоставляет бонусы.");
-    return $self->render('robot');
-  }
-  my @months=('Months','Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь');
-  my $selectmonths=[];
-  my @lt=localtime;
-  my $n=$lt[4]-1;
-  for my $i(0..2){#For 3 last months
-    $selectmonths->[$i]=[$months[$n],$n];
-    $n++;
-  }
-  $self->stash(pid=>$pid,
-               shop=>$shop,
-               question=>$question,
-               selectmonths=>$selectmonths,
-               formmessage=>'',
-               questmessage=>'');
-  $self->render('quiz');
-};
-
-post '/quiz'=>sub{
-  my $self=shift;
-  #return $self->redirect_to('/') unless $self->param('pid');#Defend from double refresh
   my $pid=$self->param('pid');
   my $param = $self->req->params->to_hash;
   my $answer='';
-  my $orderid='';
+  my $bonusid='';
   my $sth;
   my @ref;
   my $SQL='';
   my @char=('a'..'z','A'..'Z','1'..'9');
+  my $bonusinfo='';#write information of bonus as a string
   my $bonuscode='';
   my $formvalidate='';
   my $questvalidate='';
   
-  my $shop=$dbh->selectall_hashref("SELECT SHOP.ID,SHOP.URL,SHOP.NAME AS SHOP FROM SHOP WHERE SHOP.ID='$pid'",'ID');
+  my $shop=$dbh->selectall_hashref("SELECT SHOP.ID,SHOP.URL,SHOP.NAME AS SHOP,SHOP.BONUSINFO FROM SHOP WHERE SHOP.ID='$pid'",'ID');
   my $question=$dbh->selectall_hashref("SELECT QUESTION.ID,QUESTION.CONTENT,QUESTION.TYPE,QUESTION.ANSWERS FROM QUESTION LEFT JOIN SHOP ON QUESTION.SHOPID=SHOP.ID WHERE QUESTION.QUIZ=1 AND SHOP.ID=$pid",'ID') || 0;
   my $quizcheck=$dbh->selectall_arrayref("SELECT QUESTION.ID FROM QUESTION WHERE QUESTION.SHOPID=$pid AND QUESTION.QUIZ=1");
+  my $bonuscodestatus=$dbh->selectrow_array("SELECT 1 FROM BONUS LEFT JOIN ANSWER ON BONUS.ID=ANSWER.BONUSID LEFT JOIN QUESTION ON ANSWER.QUESTIONID=QUESTION.ID WHERE QUESTION.SHOPID=$pid AND BONUS.STATUS=0 AND BONUS.EMAIL=\"$param->{'email'}\" GROUP BY BONUS.EMAIL");
     
   #Validation rules    
-  if(!$param->{'ordernum'}){
-    $formvalidate=$formvalidate.'Введите номер прошлого заказа';
-  }elsif($param->{'email'} !~/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$/){
+  if($param->{'email'} !~/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$/){
     $formvalidate=$formvalidate.'Укажите корректный e-mail';
+  }elsif($bonuscodestatus==1){
+    $formvalidate=$formvalidate.'На указанном адресе есть ещё действующий код бонуса';
   }elsif(!$param->{'tosagree'}){
     $formvalidate=$formvalidate.'Не приняты условия Пользовательского соглашения';
   }
@@ -127,42 +89,37 @@ post '/quiz'=>sub{
   
   if(!$formvalidate && !$questvalidate){
     #Generate bonuscode
-    foreach(1..8){
+    foreach(1..12){
       $bonuscode.=$char[int(rand(60))];
     }
     
     #Create order code
-    $dbh->do("INSERT INTO ORDERS (ID,STATUS,SYSDATE,ORDERMONTH,NUMBER,EMAIL) VALUES (NULL,0,NOW(),$param->{'ordermonth'},\"$param->{'ordernum'}\",\"$param->{'email'}\")") || die $dbh->errstr;
-    $orderid=$dbh->last_insert_id('','',"ORDERS",'ID');
+    $bonusinfo=$dbh->selectrow_array("SELECT SHOP.BONUSINFO FROM SHOP WHERE SHOP.ID=$pid");
+    $dbh->do("INSERT INTO BONUS (ID,STATUS,SYSDATE,EMAIL,CODE,BONUSINFO) VALUES (NULL,0,NOW(),\"$param->{'email'}\",\"$bonuscode\",\"$bonusinfo\")") || die $dbh->errstr;
+    $bonusid=$dbh->last_insert_id('','',"BONUS",'ID');
     $sth=$dbh->prepare("SELECT QUESTION.ID AS QID FROM QUESTION WHERE QUESTION.SHOPID=$pid AND QUESTION.QUIZ=1");
     $sth->execute;
     
     #Record answer to DB
     while(@ref=$sth->fetchrow_array){
       $answer=join(';',$self->param($ref[0]));
-      $dbh->do("INSERT INTO ANSWER (ID,QUESTIONID,ORDERID,CONTENT,SYSDATE) VALUES (NULL,$ref[0],$orderid,\"$answer\",NOW())") || die $dbh->errstr;
+      $dbh->do("INSERT INTO ANSWER (ID,QUESTIONID,BONUSID,CONTENT,SYSDATE) VALUES (NULL,$ref[0],$bonusid,\"$answer\",NOW())") || die $dbh->errstr;
     }
     $self->session(quizid=>0);
+    
     $self->mail(to=>$param->{'email'},
-                subject=>"Ваш бонусквест от магазина ".$shop->{$pid}{'URL'},
-                data=>"Приветствуем!\n\nВы приняли участие в опросе от магазина ".$shop->{$pid}{'SHOP'}." http://".$shop->{$pid}{'URL'}.
-                "\nВ благодарность за ваши ответы магазин дарит вам бонус.\nБонус будет активирован сразу после обработки данных опроса. Это займет немного времени.\nОб активации бонуса мы сразу же вас оповестим.\nНомер вашего опроса: $orderid\nСпасибо за то, что вы с нами!\n".$subscribe
-                );
+                subject=>"Ваш код бонуса от ".$shop->{$pid}{'URL'},
+                data=>"Приветствуем!\n\nВы приняли участие в опросе от ".$shop->{$pid}{'SHOP'}." http://".$shop->{$pid}{'URL'}.
+                "\nВ благодарность за ваши ответы ".$shop->{$pid}{'SHOP'}." дарит вам бонус: ".$bonusinfo."\n".
+                "Ваш код: $bonuscode\nИспользовать бонус вы можете уже сейчас! При следующем обращении в ".$shop->{$pid}{'SHOP'}." просто укажите код $bonuscode в комментарии к заказу.".
+                "\nЕсли вам необходимо распечатать код или уточнить какие бонусы у вас есть, вы можете это сделать на сайте BonusQuest (http://www.bonusquest.ru)".
+                "\nСпасибо за то, что вы с нами!\n".$subscribe);
     $self->redirect_to('thankyou.html');
   }else{
     
     # Validation is not OK
-    my @months=('Months','Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь');
-    my $selectmonths=[];
-    my @lt=localtime;
-    my $n=$lt[4]-1;
-    for my $i(0..2){#For 3 last months
-      $selectmonths->[$i]=[$months[$n],$n];
-      $n++;
-    }
     $self->stash(pid=>$pid,
                  shop=>$shop,
-                 selectmonths=>$selectmonths,
                  formmessage=>$formvalidate,
                  questmessage=>$questvalidate,
                  question=>$question);
@@ -224,7 +181,7 @@ post '/sendclaim'=>sub{
   my $bonuscode=$self->param('bonuscode') || 0;
   my $description=$self->param('description');
   my $message='';
-  my $bonuscodeid=$dbh->selectrow_array("SELECT ORDERS.ID FROM ORDERS WHERE ORDERS.ID='$bonuscode'") || 0;
+  my $bonuscodeid=$dbh->selectrow_array("SELECT BONUS.ID FROM BONUS WHERE BONUS.CODE='$bonuscode'") || 0;
   if($bonuscodeid){
     $dbh->do("INSERT INTO CLAIM (ID,BONUSID,DESCRIPTION,SDATE) VALUES (NULL,$bonuscodeid,\"$description\",NOW())") || die $dbh->err;
     $message='Спасибо за обращение. Мы сообщим вам о результатах на адрес электронной почты указанный в бонусе.';

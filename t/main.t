@@ -6,5 +6,5 @@ $ENV{MOJO_HOME} = "$FindBin::Bin/../";
 require "$ENV{MOJO_HOME}/bq";
 
 my $t = Test::Mojo->new;
-$t->get_ok('/quizs');
+$t->get_ok('/');
 done_testing;

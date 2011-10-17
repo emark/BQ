@@ -1,9 +1,10 @@
-%layout 'default', title 'Отвечай на вопросы и получай бонусы';
+%layout 'default', title 'Дарим бонусы за ваше мнение';
 %#dev
 <div id=subhead>
-<%=form_for 'quiz.html'=>(method=>'post',id=>"qform")=>begin%>
+<%=form_for "q$pid.html"=>(method=>'post',id=>"qform")=>begin%>
 <%=hidden_field 'pid'=>$pid%>
 %foreach my $shopid(keys %{$shop}){
+%title $shop->{$shopid}{'SHOP'}.' '.$shop->{$shopid}{'BONUSINFO'};
     <span align=left class=sublogo><a href="/" style="color:#FFF;text-decoration:none;">BonusQuest</a></span>
     <center><i><%=$shop->{$shopid}{'SHOP'}%><br><span style="font-style:normal;font-size:14px;text-shadow:none;">
     <%= link_to $shop->{$shopid}{'URL'}=>"http://$shop->{$shopid}{'URL'}"=>(style=>"color:#FFF;text-decoration:none;",target=>'blank')%></span></i></center>
@@ -11,20 +12,43 @@
 <div id=content>
     <div id="quizform">
         <div id=pagecard>
-            <H2>Данные прошлой покупки</H2>
+            <div id=quiz-nav>
+                <P align=left>
+                    <a href="javascript:ShowLayer(1)" onClick="" class=captbutton>Что это такое</a>
+                    <a href="javascript:ShowLayer(2)" class=captbutton>Как заполнять</a>
+                    <a href="javascript:ShowLayer(3)" class=captbutton>Организатор опроса</a>
+                </P>
+                <div id=1 style="display:none">
+                    <P align=right><a href="javascript:HideLayer(1)"><img src="/media/icon/close.png" border=0 title='Закрыть подсказку'></a></P>
+                    <P>Вы находитесь на сайте системы опросов БонусКвест</P>
+                </div><!--1-->
+                <div id=2 style="display:none">
+                    <P align=right><a href="javascript:HideLayer(2)"><img src="/media/icon/close.png" border=0 title='Закрыть подсказку'></a></P>
+                    <P>Для получения бонуса, необходимо ответить на вопросы анкеты</P>
+                </div><!--2-->
+                <div id=3 style="display:none">
+                    <P align=right><a href="javascript:HideLayer(3)"><img src="/media/icon/close.png" border=0 title='Закрыть подсказку'></a></P>                    
+                    <%=tag 'P'=>'Наименование: '.$shop->{$shopid}{'SHOP'}%>
+                    <%=tag 'P'=>'Адрес сайта: '.$shop->{$shopid}{'URL'}%>
+                    <%=tag 'P'=>'Описание: '.$shop->{$shopid}{'DESCRIPTION'}%>
+                    <%=tag 'P'=>'Электронная почта: '.$shop->{$shopid}{'EMAIL'}%>
+                    <%=tag 'P'=>'Контактный телефон: '.$shop->{$shopid}{'TEL'}%>
+                </div><!--3-->
+            </div><!--quiz-nav-->
+            <div id='bonusinfo'>
+            <%=tag 'H2'=>'Ваш бонус'%>
+            <P style="vertical-align: top"><%=$shop->{$shopid}{'BONUSINFO'}%>&nbsp;            
+            <a href="https://twitter.com/share" class="twitter-share-button" data-count="none" data-via="bonusquest_ru" data-lang="ru">Твитнуть</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script>
+            </P>
             %if ($formmessage){
             <%= tag 'P'=>(class=>'errormsg')=>$formmessage%>
             %}
-            <!--<P>Месяц прошлой покупки:
-            <%= select_field 'ordermonth'=>$selectmonths=>(class=>'formstyle')%>&nbsp;<b class=changebg title ='Покупка '>&nbsp;&nbsp;?&nbsp;&nbsp;</b>
-            <br><i>(покупка совершена не более 3 месяцев назад)</i></P>
-            <P>Номер заказа: <%=text_field 'ordernum'=>(size=>10,class=>'formstyle')%>&nbsp;<b class=changebg title ='Месяц покупки в магазине'>&nbsp;&nbsp;?&nbsp;&nbsp;</b>
-            <br><i>(укажите номер вашего прошлого заказа)</i></P>-->
-            <P>Ваш e-mail: <%=text_field 'email'=>(class=>'formstyle',size=>22)%><!--&nbsp;<b class=changebg title ='Месяц покупки в магазине'>&nbsp;&nbsp;?&nbsp;&nbsp;</b>-->
-            <br><i>(будет использован только для получения бонуса)</i></P>
+            <P>Укажите e-mail: <%=text_field 'email'=>(class=>'formstyle',size=>22)%><!--&nbsp;<b class=changebg title ='Месяц покупки в магазине'>&nbsp;&nbsp;?&nbsp;&nbsp;</b>-->
+            <br><i>(будет использован для получения бонус кода)</i></P>
             <P><%=check_box 'tosagree'=>(class=>'formstyle'),id=>'tos'%> <label for=tos>Я принимаю условия</label> <%=link_to 'Пользовательского соглашения'=>"/tos.html"%></P>
 %}
-            <H2>Нам важно ваше мнение</H2>
+            </div><!--bonusinfo-->
+            <%=tag 'H2'=>'Нам важно ваше мнение'%>
             %if ($questmessage){
                 <%= tag 'P'=>(class=>'errormsg')=>$questmessage%>
             %}
@@ -51,9 +75,6 @@
             </OL>
             <%end%><!--end form -->
             <P align=center><a href="javascript: submitform('qform')" class=myButton>Я хочу получить бонус</a></P>
-            <!--<div id=social>-->
-            <!--    <P>Ваши друзья тоже могут получить бонусы.</P>-->
-            <!--</div>-->
         </div><!--pagecard-->
     </div><!--quizform-->
 </div><!--content-->
