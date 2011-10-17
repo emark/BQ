@@ -1,0 +1,12 @@
+%layout 'default', title 'Информация о бонусе';
+%#dev
+<div id=subhead>
+    <span align=left class=sublogo><a href="/" style="color:#FFF;text-decoration:none;">BonusQuest</a></span>    
+</div><!--head-->
+<div id=content>
+    <div id="quizform">
+        <div id=pagecard>
+            
+        </div><!--pagecard-->
+    </div><!--quizform-->
+</div><!--content-->

@@ -15,14 +15,14 @@
     <tr align=center valign=top>
         <td>
             <div class=pcard style="background-color: #E6EDDA;">
-                <i style="color:#435B45;font-size:18px;font-weight:bold;text-shadow:1px 1px 0px #FFFFFF;">Проверить бонус</i>
+                <i style="color:#435B45;font-size:18px;font-weight:bold;text-shadow:1px 1px 0px #FFFFFF;">Информация о бонусе</i>
                 <br/><a href="/help.html#how_it_works" style="color:#7A917A;font-style:italic;font-size:14px;text-decoration: none;border-bottom-style: dashed;border-bottom-width: thin;">Как это работает?</a>
             <div class=cardline style="background-color: #96AD6D;">
-                <%=form_for '/quiz.html'=>(method=>'get',id=>'bonusform')=>begin%>
-                http://<%=text_field 'url'=>(class=>'formstyle',size=>15)%><%end%><br/>
+                <%=form_for '/bonus.html'=>(method=>'post',id=>'bonusform')=>begin%>
+                Код: <%=text_field 'bonuscode'=>(class=>'formstyle',size=>15)%><%end%><br/>
             </div>
-            <P align=center><a href="javascript: submitform('bonusform')" class=myButton>Получить бонус</a></P>
-            <i style="color:#7A917A;font-size:16px">Укажите адрес интернет-магазина для получения бонус-кода</i>
+            <P align=center><a href="javascript: submitform('bonusform')" class=myButton>Отправить запрос</a></P>
+            <i style="color:#7A917A;font-size:16px">Укажите код бонуса выданный вам после прохождения опроса</i>
             </div>
         </td>
         <td>

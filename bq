@@ -77,7 +77,7 @@ post '/q:id' => [id=>qw/\d+/]=> sub{
   if($param->{'email'} !~/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$/){
     $formvalidate=$formvalidate.'Укажите корректный e-mail';
   }elsif($bonuscodestatus==1){
-    $formvalidate=$formvalidate.'На указанном адресе есть ещё действующий код бонуса';
+    $formvalidate=$formvalidate.'У вас есть ещё действующий код бонуса';
   }elsif(!$param->{'tosagree'}){
     $formvalidate=$formvalidate.'Не приняты условия Пользовательского соглашения';
   }
@@ -141,20 +141,14 @@ post '/balance'=>sub{
     $self->stash(capt=>'Ошибка написания',message=>'Вы неверно указали адрес электронной почты.');
     return $self->render('robot');
   }
-  my $balance=$dbh->selectall_arrayref("SELECT ORDERS.ID,SHOP.NAME,SHOP.URL FROM ORDERS LEFT JOIN ANSWER ON ORDERS.ID=ANSWER.ORDERID LEFT JOIN QUESTION ON ANSWER.QUESTIONID=QUESTION.ID LEFT JOIN SHOP ON QUESTION.SHOPID=SHOP.ID WHERE ORDERS.STATUS=2 AND ORDERS.EMAIL=\"$email\" GROUP BY ORDERS.ID") || undef;
+  my $balance=$dbh->selectall_arrayref("SELECT BONUS.CODE,SHOP.NAME,SHOP.URL FROM BONUS LEFT JOIN ANSWER ON ORDERS.ID=ANSWER.ORDERID LEFT JOIN QUESTION ON ANSWER.QUESTIONID=QUESTION.ID LEFT JOIN SHOP ON QUESTION.SHOPID=SHOP.ID WHERE BONUS.STATUS=0 AND BONUS.EMAIL=\"$email\" GROUP BY BONUS.ID") || undef;
   my $mailmessage='';
   if($balance->[0]){
     my $n=1;
     $mailmessage="Приветствуем!\nВы или возможно кто-то другой попросил прислать список действующих бонусов.\nИтак, ваши бонусы:\n";
     foreach my $key(@{$balance}){
-      $mailmessage=$mailmessage."$n. Бонус от магазина $key->[1], http://$key->[2]\n";
+      $mailmessage=$mailmessage."$n. Бонус от $key->[1], (http://$key->[2])\nКод:$key->[0]\n\n";
       $n++;
-    }
-    if($n<6){
-      my $x=6-$n;
-      $mailmessage=$mailmessage."\nЧтобы забрать подарок, бонусов нужно собрать ещё $x.\nКак получить бонус смотрите здесь http://www.bonusquest.ru/help.html";
-    }else{
-      $mailmessage=$mailmessage."\nПоздравляем, у вас достаточно бонусов для получения подарка.\nСписок подарков здесь http://www.bonusquest.ru/gifts.html";
     }
     $self->mail(to=>$email,
                 subject=>'Список действующих бонусов',
@@ -164,16 +158,17 @@ post '/balance'=>sub{
   $self->render('robot');
 };
 
-get '/bonuses'=>sub{
+post '/bonus'=>sub{
   my $self=shift;
-  my $shop=$dbh->selectall_hashref("SELECT SHOP.ID,SHOP.NAME,SHOP.URL,SHOP.DESCRIPTION,QUESTION.QUIZ FROM SHOP LEFT JOIN QUESTION ON SHOP.ID=QUESTION.SHOPID WHERE SHOP.STATUS=1 GROUP BY SHOP.ID",'ID');
-  $self->stash(shop=>$shop);
-  $self->render('partners');
-};
-
-get '/gifts'=>sub{
-  my $self=shift;
-  $self->render('gifts.html.ep');
+  my $bonuscode=$self->param('bonuscode');
+  return $self->redirect_to('/') unless $bonuscode;
+  my $bonusinfo=$dbh->selectall_hashref("SELECT BONUS.ID,BONUS.STATUSDATE,BONUS.STATUS,BONUS.BONUSINFO FROM BONUS WHERE BONUS.CODE=\"$bonuscode\"",'ID') || undef;
+  if(!%{$bonusinfo}){
+    $self->stash(capt=>'Бонус не найден',message=>'Указанный код не найден. Вероятно вы ошиблись при вводе кода бонуса.');
+    return $self->render('robot');
+  }
+  $self->stash(bonusinfo=>$bonusinfo);
+  $self->render('bonus');
 };
 
 post '/sendclaim'=>sub{
