@@ -39,7 +39,7 @@ get '/q:id' => [id=>qw/\d+/]=> sub{
   my $self=shift;
   my $pid=$self->param('id');
   $pid=$dbh->selectrow_array("SELECT SHOP.ID FROM SHOP WHERE SHOP.ID=$pid") || 0;
-  my $shop=$dbh->selectall_hashref("SELECT SHOP.ID,SHOP.URL,SHOP.NAME AS SHOP FROM SHOP WHERE SHOP.ID='$pid'",'ID');
+  my $shop=$dbh->selectall_hashref("SELECT SHOP.ID,SHOP.URL,SHOP.NAME AS SHOP,SHOP.BONUS FROM SHOP WHERE SHOP.ID='$pid'",'ID');
   my $question=$dbh->selectall_hashref("SELECT QUESTION.ID,QUESTION.CONTENT,QUESTION.TYPE,QUESTION.ANSWERS FROM QUESTION LEFT JOIN SHOP ON QUESTION.SHOPID=SHOP.ID WHERE QUESTION.QUIZ=1 AND SHOP.ID=$pid",'ID') || undef;
   if(!%{$question}){
     $self->stash(capt=>'Опрос не найден',message=>"Здесь пока нет ни опросов ни бонусов. Подождем...");
@@ -69,7 +69,7 @@ get '/quiz'=>sub{
   $url=~s/http:\/\/||^shop\.||www\.||store\.//g;#Drop subdomain from URL
   $url=substr($url,0,50);#Cut url length to 50 char's
   my $pid=$dbh->selectrow_array("SELECT SHOP.ID FROM SHOP WHERE SHOP.URL='$url'") || 0;
-  my $shop=$dbh->selectall_hashref("SELECT SHOP.ID,SHOP.URL,SHOP.NAME AS SHOP FROM SHOP WHERE SHOP.URL='$url'",'ID');
+  my $shop=$dbh->selectall_hashref("SELECT SHOP.ID,SHOP.URL,SHOP.NAME AS SHOP,SHOP.BONUS FROM SHOP WHERE SHOP.URL='$url'",'ID');
   my $question=$dbh->selectall_hashref("SELECT QUESTION.ID,QUESTION.CONTENT,QUESTION.TYPE,QUESTION.ANSWERS FROM QUESTION LEFT JOIN SHOP ON QUESTION.SHOPID=SHOP.ID WHERE QUESTION.QUIZ=1 AND SHOP.URL='$url'",'ID');
   if(!%{$question}){
     $self->stash(capt=>'Бонус не найден',message=>"Магазин $url пока не предоставляет бонусы.");

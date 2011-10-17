@@ -15,13 +15,13 @@
             %if ($formmessage){
             <%= tag 'P'=>(class=>'errormsg')=>$formmessage%>
             %}
-            <P>Месяц прошлой покупки:
+            <!--<P>Месяц прошлой покупки:
             <%= select_field 'ordermonth'=>$selectmonths=>(class=>'formstyle')%>&nbsp;<b class=changebg title ='Покупка '>&nbsp;&nbsp;?&nbsp;&nbsp;</b>
             <br><i>(покупка совершена не более 3 месяцев назад)</i></P>
             <P>Номер заказа: <%=text_field 'ordernum'=>(size=>10,class=>'formstyle')%>&nbsp;<b class=changebg title ='Месяц покупки в магазине'>&nbsp;&nbsp;?&nbsp;&nbsp;</b>
-            <br><i>(укажите номер вашего прошлого заказа)</i></P>
-            <P>Ваш e-mail: <%=text_field 'email'=>(class=>'formstyle',size=>22)%>&nbsp;<b class=changebg title ='Месяц покупки в магазине'>&nbsp;&nbsp;?&nbsp;&nbsp;</b>
-            <br><i>(был использован при заказе)</i></P>
+            <br><i>(укажите номер вашего прошлого заказа)</i></P>-->
+            <P>Ваш e-mail: <%=text_field 'email'=>(class=>'formstyle',size=>22)%><!--&nbsp;<b class=changebg title ='Месяц покупки в магазине'>&nbsp;&nbsp;?&nbsp;&nbsp;</b>-->
+            <br><i>(будет использован только для получения бонуса)</i></P>
             <P><%=check_box 'tosagree'=>(class=>'formstyle'),id=>'tos'%> <label for=tos>Я принимаю условия</label> <%=link_to 'Пользовательского соглашения'=>"/tos.html"%></P>
 %}
             <H2>Нам важно ваше мнение</H2>
