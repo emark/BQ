@@ -43,14 +43,14 @@ get '/q:id' => [id=>qw/\d+/]=> sub{
   my $self=shift;
   my $pid=$self->param('id');
   $pid=$dbh->selectrow_array("SELECT PROVIDER.ID FROM PROVIDER WHERE PROVIDER.ID=$pid") || 0;
-  my $shop=$dbh->selectall_hashref("SELECT PROVIDER.ID,PROVIDER.URL,PROVIDER.NAME AS PROVIDER,PROVIDER.DESCRIPTION,PROVIDER.EMAIL,PROVIDER.TEL,PROVIDER.BONUSINFO FROM PROVIDER WHERE PROVIDER.ID='$pid'",'ID');
+  my $provider=$dbh->selectall_hashref("SELECT PROVIDER.ID,PROVIDER.URL,PROVIDER.NAME AS PROVIDER,PROVIDER.DESCRIPTION,PROVIDER.EMAIL,PROVIDER.TEL,PROVIDER.BONUSINFO FROM PROVIDER WHERE PROVIDER.ID='$pid'",'ID');
   my $question=$dbh->selectall_hashref("SELECT QUESTION.ID,QUESTION.CONTENT,QUESTION.TYPE,QUESTION.ANSWERS FROM QUESTION LEFT JOIN PROVIDER ON QUESTION.PID=PROVIDER.ID WHERE QUESTION.QUIZ=1 AND PROVIDER.ID=$pid",'ID') || undef;
   if(!%{$question}){
     $self->stash(capt=>'Опрос не найден',message=>"Здесь пока нет ни опросов ни бонусов. Подождем...");
     return $self->render('robot');
   }
   $self->stash(pid=>$pid,
-               shop=>$shop,
+               provider=>$provider,
                question=>$question,
                formmessage=>'',
                questmessage=>'');
@@ -72,7 +72,7 @@ post '/q:id' => [id=>qw/\d+/]=> sub{
   my $formvalidate='';
   my $questvalidate='';
   
-  my $shop=$dbh->selectall_hashref("SELECT PROVIDER.ID,PROVIDER.URL,PROVIDER.NAME AS PROVIDER,PROVIDER.BONUSINFO FROM PROVIDER WHERE PROVIDER.ID='$pid'",'ID');
+  my $provider=$dbh->selectall_hashref("SELECT PROVIDER.ID,PROVIDER.URL,PROVIDER.NAME AS PROVIDER,PROVIDER.BONUSINFO FROM PROVIDER WHERE PROVIDER.ID='$pid'",'ID');
   my $question=$dbh->selectall_hashref("SELECT QUESTION.ID,QUESTION.CONTENT,QUESTION.TYPE,QUESTION.ANSWERS FROM QUESTION LEFT JOIN PROVIDER ON QUESTION.PID=PROVIDER.ID WHERE QUESTION.QUIZ=1 AND PROVIDER.ID=$pid",'ID') || 0;
   my $quizcheck=$dbh->selectall_arrayref("SELECT QUESTION.ID FROM QUESTION WHERE QUESTION.PID=$pid AND QUESTION.QUIZ=1");
   my $bonuscodestatus=$dbh->selectrow_array("SELECT 1 FROM BONUS LEFT JOIN ANSWER ON BONUS.ID=ANSWER.BONUSID LEFT JOIN QUESTION ON ANSWER.QUESTIONID=QUESTION.ID WHERE QUESTION.PID=$pid AND BONUS.STATUS=0 AND BONUS.EMAIL=\"$param->{'email'}\" GROUP BY BONUS.EMAIL");
@@ -81,7 +81,7 @@ post '/q:id' => [id=>qw/\d+/]=> sub{
   if($param->{'email'} !~/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$/){
     $formvalidate=$formvalidate.'Укажите корректный e-mail';
   }elsif($bonuscodestatus==1){
-    $formvalidate=$formvalidate.'У вас есть ещё действующий код бонуса';
+    $formvalidate=$formvalidate.'У вас есть действующий код бонуса';
   }elsif(!$param->{'tosagree'}){
     $formvalidate=$formvalidate.'Не приняты условия Пользовательского соглашения';
   }
@@ -112,10 +112,10 @@ post '/q:id' => [id=>qw/\d+/]=> sub{
     $self->session(quizid=>0);
     
     $self->mail(to=>$param->{'email'},
-                subject=>"Ваш код бонуса от ".$shop->{$pid}{'URL'},
-                data=>"Приветствуем!\n\nВы приняли участие в опросе от ".$shop->{$pid}{'PROVIDER'}." http://".$shop->{$pid}{'URL'}.
-                "\nВ благодарность за ваши ответы ".$shop->{$pid}{'PROVIDER'}." дарит вам бонус: ".$bonusinfo."\n".
-                "Ваш код: $bonuscode\nИспользовать бонус вы можете уже сейчас! При обращении в ".$shop->{$pid}{'PROVIDER'}." просто укажите код $bonuscode в комментарии к вашему заказу.".
+                subject=>"Ваш код бонуса от ".$provider->{$pid}{'URL'},
+                data=>"Приветствуем!\n\nВы приняли участие в опросе от ".$provider->{$pid}{'PROVIDER'}." http://".$provider->{$pid}{'URL'}.
+                "\nВ благодарность за ваши ответы ".$provider->{$pid}{'PROVIDER'}." дарит вам бонус: ".$bonusinfo."\n".
+                "Ваш код: $bonuscode\nИспользовать бонус вы можете уже сейчас! При обращении в ".$provider->{$pid}{'PROVIDER'}." просто укажите код $bonuscode в комментарии к вашему заказу.".
                 "\nЕсли вам необходимо распечатать код или уточнить какие бонусы у вас есть, вы можете это сделать на сайте BonusQuest (http://www.bonusquest.ru)".
                 "\nСпасибо за то, что вы с нами!\n".$subscribe);
     $self->redirect_to('thankyou.html');
@@ -123,7 +123,7 @@ post '/q:id' => [id=>qw/\d+/]=> sub{
     
     # Validation is not OK
     $self->stash(pid=>$pid,
-                 shop=>$shop,
+                 provider=>$provider,
                  formmessage=>$formvalidate,
                  questmessage=>$questvalidate,
                  question=>$question);

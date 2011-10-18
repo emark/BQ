@@ -3,8 +3,8 @@
         <center>
           <span style="font-family:'Coustard'">BonusQuest</span><br/>
           <div style="font-size:20px;font-style:italic;font-weight:100;text-shadow: none">
-            Отвечай на <%= link_to "вопросы"=>'/bonuses.html'=>(style=>'color:#FFF;text-decoration:none;border-bottom-style:dashed;border-bottom-width: thin;')%>, собирай бонусы
-            и получай <%= link_to "подарки"=>'/gifts.html'=>(style=>'color:#FFF;text-decoration:none;border-bottom-style:dashed;border-bottom-width: thin;')%>!
+            Отвечай на <%= link_to "вопросы"=>'/'=>(style=>'color:#FFF;text-decoration:none;border-bottom-style:dashed;border-bottom-width: thin;')%>
+            и получай <%= link_to "бонусы"=>'/gifts.html'=>(style=>'color:#FFF;text-decoration:none;border-bottom-style:dashed;border-bottom-width: thin;')%>!
           </div>
         </center>
         </div><!--head-->

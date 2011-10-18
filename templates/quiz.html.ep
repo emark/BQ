@@ -3,11 +3,11 @@
 <div id=subhead>
 <%=form_for "q$pid.html"=>(method=>'post',id=>"qform")=>begin%>
 <%=hidden_field 'pid'=>$pid%>
-%foreach my $shopid(keys %{$shop}){
-%title $shop->{$shopid}{'PROVIDER'}.': '.$shop->{$shopid}{'BONUSINFO'};
+%foreach my $shopid(keys %{$provider}){
+%title $provider->{$pid}{'PROVIDER'}.': '.$provider->{$pid}{'BONUSINFO'};
     <span align=left class=sublogo><a href="/" style="color:#FFF;text-decoration:none;">BonusQuest</a></span>
-    <center><i><%=$shop->{$shopid}{'PROVIDER'}%><br><span style="font-style:normal;font-size:14px;text-shadow:none;">
-    <%= link_to $shop->{$shopid}{'URL'}=>"http://$shop->{$shopid}{'URL'}"=>(style=>"color:#FFF;text-decoration:none;",target=>'blank')%></span></i></center>
+    <center><i><%=$provider->{$shopid}{'PROVIDER'}%><br><span style="font-style:normal;font-size:14px;text-shadow:none;">
+    <%= link_to $provider->{$shopid}{'URL'}=>"http://$provider->{$shopid}{'URL'}"=>(style=>"color:#FFF;text-decoration:none;",target=>'blank')%></span></i></center>
 </div><!--head-->
 <div id=content>
     <div id="quizform">
@@ -28,16 +28,16 @@
                 </div><!--2-->
                 <div id=3 style="display:none">
                     <P align=right><a href="javascript:HideLayer(3)"><img src="/media/icon/close.png" border=0 title='Закрыть подсказку'></a></P>                    
-                    <%=tag 'P'=>'Наименование: '.$shop->{$shopid}{'PROVIDER'}%>
-                    <%=tag 'P'=>'Деятельность: '.$shop->{$shopid}{'DESCRIPTION'}%>
-                    <%=tag 'P'=>'Интернет: '.$shop->{$shopid}{'URL'}%>
-                    <%=tag 'P'=>'Электронная почта: '.$shop->{$shopid}{'EMAIL'}%>
-                    <%=tag 'P'=>'Контактный телефон: '.$shop->{$shopid}{'TEL'}%>
+                    <%=tag 'P'=>"Наименование: $provider->{$shopid}{'PROVIDER'}"%>
+                    <%=tag 'P'=>"Деятельность: $provider->{$shopid}{'DESCRIPTION'}"%>
+                    <%=tag 'P'=>"Интернет: $provider->{$shopid}{'URL'}"%>
+                    <%=tag 'P'=>"Электронная почта: $provider->{$shopid}{'EMAIL'}"%>
+                    <%=tag 'P'=>"Контактный телефон: $provider->{$shopid}{'TEL'}"%>
                 </div><!--3-->
             </div><!--quiz-nav-->
             <div id='bonusinfo'>
             <%=tag 'H2'=>'Ваш бонус'%>
-            <P style="vertical-align: top"><%=$shop->{$shopid}{'BONUSINFO'}%>&nbsp;            
+            <P style="vertical-align: top"><%=$provider->{$shopid}{'BONUSINFO'}%>&nbsp;            
             <a href="https://twitter.com/share" class="twitter-share-button" data-count="none" data-via="bonusquest_ru" data-lang="ru">Твитнуть</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script>
             </P>
             %if ($formmessage){
