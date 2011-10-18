@@ -41,7 +41,7 @@
                     Активация:
                 </td>
                 <td>
-                    <%=$bonusinfo->{$bonusid}{'STATUSDATE'}%>
+                    <%=$bonusinfo->{$bonusid}{'ACTIVATION'}%>
                 </td>
             </tr>
     %}
