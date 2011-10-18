@@ -92,20 +92,35 @@
             </tr>
 %}
             </table>
-            <div id=printversion>
+            <div id=service>
+                <%=tag 'H2'=>'Прочие действия'%>
+            <table border=0 width=100%>
+                <tr>
+                    <td>
                 <%=form_for '/bonus/print.html'=>(method=>'post',target=>'_print')=>begin%>
-                <%=text_field $fn=>(size=>15)%>
+                <%=text_field $fn=>(size=>15,class=>'formstyle')%>
                 <%=hidden_field 'fn'=>$fn%>
-                <%=submit_button 'Печать бонуса'%>
+                <%=submit_button 'Печать бонуса'=>(class=>'formstyle')%>
                 <%end%>
-            </div><!--printversion-->
-            <div id=closebonus>
+                    </td>
+                    <td align=left>
                 <%=form_for '/bonus/close.html'=>(method=>'post')=>begin%>
-                <%=text_field $fn=>(size=>15)%>
+                <%=text_field $fn=>(size=>15,class=>'formstyle')%>
                 <%=hidden_field 'fn'=>$fn%>
-                <%=submit_button 'Отменить бонус'%>
+                <%=submit_button 'Отменить бонус'=>(class=>'formstyle')%>
                 <%end%>
-            </div><!--printversion-->
-        </div><!--pagecard-->
-    </div><!--quizform-->
-</div><!--content-->
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <i>Вы можете распечатать информацию о бонусе для предъявления на месте</i>
+                    </td>
+                    <td>
+                        <i>После отмены у вас будет возможность получить новый код</i>
+                    </td>
+                </tr>
+            </table>
+            </div><!--#service-->
+        </div><!--#pagecard-->
+    </div><!--#quizform-->
+</div><!--#content-->

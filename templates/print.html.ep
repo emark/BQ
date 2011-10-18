@@ -71,7 +71,7 @@
                     Интернет:
                 </td>
                 <td>
-                    <%=link_to "http://$bonusinfo->{$bonusid}{'URL'}"=>"http://$bonusinfo->{$bonusid}{'URL'}"=>(target=>'_blank')%>
+                    <%=$bonusinfo->{$bonusid}{'URL'}%>
                 </td>
                 <td>
             </tr>
