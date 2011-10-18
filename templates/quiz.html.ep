@@ -6,7 +6,7 @@
 %foreach my $shopid(keys %{$shop}){
 %title $shop->{$shopid}{'SHOP'}.' '.$shop->{$shopid}{'BONUSINFO'};
     <span align=left class=sublogo><a href="/" style="color:#FFF;text-decoration:none;">BonusQuest</a></span>
-    <center><i><%=$shop->{$shopid}{'SHOP'}%><br><span style="font-style:normal;font-size:14px;text-shadow:none;">
+    <center><i><%=$shop->{$shopid}{'PROVIDER'}%><br><span style="font-style:normal;font-size:14px;text-shadow:none;">
     <%= link_to $shop->{$shopid}{'URL'}=>"http://$shop->{$shopid}{'URL'}"=>(style=>"color:#FFF;text-decoration:none;",target=>'blank')%></span></i></center>
 </div><!--head-->
 <div id=content>

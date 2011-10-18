@@ -43,9 +43,9 @@ get '/' => sub {
 get '/q:id' => [id=>qw/\d+/]=> sub{
   my $self=shift;
   my $pid=$self->param('id');
-  $pid=$dbh->selectrow_array("SELECT SHOP.ID FROM SHOP WHERE SHOP.ID=$pid") || 0;
-  my $shop=$dbh->selectall_hashref("SELECT SHOP.ID,SHOP.URL,SHOP.NAME AS SHOP,SHOP.DESCRIPTION,SHOP.EMAIL,SHOP.TEL,SHOP.BONUSINFO FROM SHOP WHERE SHOP.ID='$pid'",'ID');
-  my $question=$dbh->selectall_hashref("SELECT QUESTION.ID,QUESTION.CONTENT,QUESTION.TYPE,QUESTION.ANSWERS FROM QUESTION LEFT JOIN SHOP ON QUESTION.SHOPID=SHOP.ID WHERE QUESTION.QUIZ=1 AND SHOP.ID=$pid",'ID') || undef;
+  $pid=$dbh->selectrow_array("SELECT PROVIDER.ID FROM PROVIDER WHERE PROVIDER.ID=$pid") || 0;
+  my $shop=$dbh->selectall_hashref("SELECT PROVIDER.ID,PROVIDER.URL,PROVIDER.NAME AS PROVIDER,PROVIDER.DESCRIPTION,PROVIDER.EMAIL,PROVIDER.TEL,PROVIDER.BONUSINFO FROM PROVIDER WHERE PROVIDER.ID='$pid'",'ID');
+  my $question=$dbh->selectall_hashref("SELECT QUESTION.ID,QUESTION.CONTENT,QUESTION.TYPE,QUESTION.ANSWERS FROM QUESTION LEFT JOIN PROVIDER ON QUESTION.PID=PROVIDER.ID WHERE QUESTION.QUIZ=1 AND PROVIDER.ID=$pid",'ID') || undef;
   if(!%{$question}){
     $self->stash(capt=>'Опрос не найден',message=>"Здесь пока нет ни опросов ни бонусов. Подождем...");
     return $self->render('robot');
@@ -73,10 +73,10 @@ post '/q:id' => [id=>qw/\d+/]=> sub{
   my $formvalidate='';
   my $questvalidate='';
   
-  my $shop=$dbh->selectall_hashref("SELECT SHOP.ID,SHOP.URL,SHOP.NAME AS SHOP,SHOP.BONUSINFO FROM SHOP WHERE SHOP.ID='$pid'",'ID');
-  my $question=$dbh->selectall_hashref("SELECT QUESTION.ID,QUESTION.CONTENT,QUESTION.TYPE,QUESTION.ANSWERS FROM QUESTION LEFT JOIN SHOP ON QUESTION.SHOPID=SHOP.ID WHERE QUESTION.QUIZ=1 AND SHOP.ID=$pid",'ID') || 0;
-  my $quizcheck=$dbh->selectall_arrayref("SELECT QUESTION.ID FROM QUESTION WHERE QUESTION.SHOPID=$pid AND QUESTION.QUIZ=1");
-  my $bonuscodestatus=$dbh->selectrow_array("SELECT 1 FROM BONUS LEFT JOIN ANSWER ON BONUS.ID=ANSWER.BONUSID LEFT JOIN QUESTION ON ANSWER.QUESTIONID=QUESTION.ID WHERE QUESTION.SHOPID=$pid AND BONUS.STATUS=0 AND BONUS.EMAIL=\"$param->{'email'}\" GROUP BY BONUS.EMAIL");
+  my $shop=$dbh->selectall_hashref("SELECT PROVIDER.ID,PROVIDER.URL,PROVIDER.NAME AS PROVIDER,PROVIDER.BONUSINFO FROM PROVIDER WHERE PROVIDER.ID='$pid'",'ID');
+  my $question=$dbh->selectall_hashref("SELECT QUESTION.ID,QUESTION.CONTENT,QUESTION.TYPE,QUESTION.ANSWERS FROM QUESTION LEFT JOIN PROVIDER ON QUESTION.PID=PROVIDER.ID WHERE QUESTION.QUIZ=1 AND PROVIDER.ID=$pid",'ID') || 0;
+  my $quizcheck=$dbh->selectall_arrayref("SELECT QUESTION.ID FROM QUESTION WHERE QUESTION.PID=$pid AND QUESTION.QUIZ=1");
+  my $bonuscodestatus=$dbh->selectrow_array("SELECT 1 FROM BONUS LEFT JOIN ANSWER ON BONUS.ID=ANSWER.BONUSID LEFT JOIN QUESTION ON ANSWER.QUESTIONID=QUESTION.ID WHERE QUESTION.PID=$pid AND BONUS.STATUS=0 AND BONUS.EMAIL=\"$param->{'email'}\" GROUP BY BONUS.EMAIL");
     
   #Validation rules    
   if($param->{'email'} !~/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$/){
@@ -99,10 +99,10 @@ post '/q:id' => [id=>qw/\d+/]=> sub{
     }
     
     #Create order code
-    $bonusinfo=$dbh->selectrow_array("SELECT SHOP.BONUSINFO FROM SHOP WHERE SHOP.ID=$pid");
+    $bonusinfo=$dbh->selectrow_array("SELECT PROVIDER.BONUSINFO FROM PROVIDER WHERE PROVIDER.ID=$pid");
     $dbh->do("INSERT INTO BONUS (ID,STATUS,SYSDATE,EMAIL,CODE,BONUSINFO) VALUES (NULL,0,NOW(),\"$param->{'email'}\",\"$bonuscode\",\"$bonusinfo\")") || die $dbh->errstr;
     $bonusid=$dbh->last_insert_id('','',"BONUS",'ID');
-    $sth=$dbh->prepare("SELECT QUESTION.ID AS QID FROM QUESTION WHERE QUESTION.SHOPID=$pid AND QUESTION.QUIZ=1");
+    $sth=$dbh->prepare("SELECT QUESTION.ID AS QID FROM QUESTION WHERE QUESTION.PID=$pid AND QUESTION.QUIZ=1");
     $sth->execute;
     
     #Record answer to DB
@@ -114,9 +114,9 @@ post '/q:id' => [id=>qw/\d+/]=> sub{
     
     $self->mail(to=>$param->{'email'},
                 subject=>"Ваш код бонуса от ".$shop->{$pid}{'URL'},
-                data=>"Приветствуем!\n\nВы приняли участие в опросе от ".$shop->{$pid}{'SHOP'}." http://".$shop->{$pid}{'URL'}.
-                "\nВ благодарность за ваши ответы ".$shop->{$pid}{'SHOP'}." дарит вам бонус: ".$bonusinfo."\n".
-                "Ваш код: $bonuscode\nИспользовать бонус вы можете уже сейчас! При обращении в ".$shop->{$pid}{'SHOP'}." просто укажите код $bonuscode в комментарии к вашему заказу.".
+                data=>"Приветствуем!\n\nВы приняли участие в опросе от ".$shop->{$pid}{'PROVIDER'}." http://".$shop->{$pid}{'URL'}.
+                "\nВ благодарность за ваши ответы ".$shop->{$pid}{'PROVIDER'}." дарит вам бонус: ".$bonusinfo."\n".
+                "Ваш код: $bonuscode\nИспользовать бонус вы можете уже сейчас! При обращении в ".$shop->{$pid}{'PROVIDER'}." просто укажите код $bonuscode в комментарии к вашему заказу.".
                 "\nЕсли вам необходимо распечатать код или уточнить какие бонусы у вас есть, вы можете это сделать на сайте BonusQuest (http://www.bonusquest.ru)".
                 "\nСпасибо за то, что вы с нами!\n".$subscribe);
     $self->redirect_to('thankyou.html');
@@ -145,7 +145,7 @@ post '/balance'=>sub{
     $self->stash(capt=>'Ошибка написания',message=>'Вы неверно указали адрес электронной почты.');
     return $self->render('robot');
   }
-  my $balance=$dbh->selectall_arrayref("SELECT BONUS.CODE,SHOP.NAME,SHOP.URL,BONUS.BONUSINFO FROM BONUS LEFT JOIN ANSWER ON BONUS.ID=ANSWER.BONUSID LEFT JOIN QUESTION ON ANSWER.QUESTIONID=QUESTION.ID LEFT JOIN SHOP ON QUESTION.SHOPID=SHOP.ID WHERE BONUS.STATUS=0 AND BONUS.EMAIL=\"$email\" GROUP BY BONUS.ID") || undef;
+  my $balance=$dbh->selectall_arrayref("SELECT BONUS.CODE,PROVIDER.NAME,PROVIDER.URL,BONUS.BONUSINFO FROM BONUS LEFT JOIN ANSWER ON BONUS.ID=ANSWER.BONUSID LEFT JOIN QUESTION ON ANSWER.QUESTIONID=QUESTION.ID LEFT JOIN PROVIDER ON QUESTION.PID=PROVIDER.ID WHERE BONUS.STATUS=0 AND BONUS.EMAIL=\"$email\" GROUP BY BONUS.ID") || undef;
   my $mailmessage='';
   if($balance->[0]){
     my $n=1;
@@ -172,7 +172,7 @@ post '/bonus'=>sub{
   foreach(1..20){
       $fieldname.=$char[int(rand(60))];#Generate unique fieldname
     }
-  my $bonusinfo=$dbh->selectall_hashref("SELECT BONUS.ID,BONUS.SYSDATE,BONUS.STATUSDATE,BONUS.STATUS,BONUS.BONUSINFO,SHOP.NAME AS PROVIDER,SHOP.URL,SHOP.EMAIL,SHOP.TEL,SHOP.DESCRIPTION FROM BONUS LEFT JOIN ANSWER ON BONUS.ID=ANSWER.BONUSID LEFT JOIN QUESTION ON ANSWER.QUESTIONID=QUESTION.ID LEFT JOIN SHOP ON QUESTION.SHOPID=SHOP.ID WHERE BONUS.CODE=\"$bonuscode\" GROUP BY BONUS.CODE",'ID') || undef;
+  my $bonusinfo=$dbh->selectall_hashref("SELECT BONUS.ID,BONUS.SYSDATE,BONUS.STATUSDATE,BONUS.STATUS,BONUS.BONUSINFO,PROVIDER.NAME AS PROVIDER,PROVIDER.URL,PROVIDER.EMAIL,PROVIDER.TEL,PROVIDER.DESCRIPTION FROM BONUS LEFT JOIN ANSWER ON BONUS.ID=ANSWER.BONUSID LEFT JOIN QUESTION ON ANSWER.QUESTIONID=QUESTION.ID LEFT JOIN PROVIDER ON QUESTION.PID=PROVIDER.ID WHERE BONUS.CODE=\"$bonuscode\" GROUP BY BONUS.CODE",'ID') || undef;
   if(!%{$bonusinfo}){
     $self->stash(capt=>'Бонус не найден',message=>'Указанный код не найден. Вероятно вы ошиблись при вводе кода бонуса.');
     return $self->render('robot');
@@ -188,7 +188,7 @@ post '/bonus/:actions'=>sub{
   my $param=$self->req->params->to_hash;
   my $fn=$param->{'fn'};
   my $bonuscode=$param->{$fn};#Get unique bonuscode fielname
-  my $bonusinfo=$dbh->selectall_hashref("SELECT BONUS.ID,BONUS.CODE,BONUS.SYSDATE,BONUS.STATUSDATE,BONUS.STATUS,BONUS.BONUSINFO,SHOP.NAME AS PROVIDER,SHOP.URL,SHOP.EMAIL,SHOP.TEL,SHOP.DESCRIPTION FROM BONUS LEFT JOIN ANSWER ON BONUS.ID=ANSWER.BONUSID LEFT JOIN QUESTION ON ANSWER.QUESTIONID=QUESTION.ID LEFT JOIN SHOP ON QUESTION.SHOPID=SHOP.ID WHERE BONUS.CODE=\"$bonuscode\" GROUP BY BONUS.CODE",'ID') || undef;
+  my $bonusinfo=$dbh->selectall_hashref("SELECT BONUS.ID,BONUS.CODE,BONUS.SYSDATE,BONUS.STATUSDATE,BONUS.STATUS,BONUS.BONUSINFO,PROVIDER.NAME AS PROVIDER,PROVIDER.URL,PROVIDER.EMAIL,PROVIDER.TEL,PROVIDER.DESCRIPTION FROM BONUS LEFT JOIN ANSWER ON BONUS.ID=ANSWER.BONUSID LEFT JOIN QUESTION ON ANSWER.QUESTIONID=QUESTION.ID LEFT JOIN PROVIDER ON QUESTION.PID=PROVIDER.ID WHERE BONUS.CODE=\"$bonuscode\" GROUP BY BONUS.CODE",'ID') || undef;
   if(!%{$bonusinfo}){
     $self->stash(capt=>'Бонус не найден',message=>'Указанный код не найден. Вероятно вы ошиблись при вводе кода бонуса.');
     return $self->render('robot');
