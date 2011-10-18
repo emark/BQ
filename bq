@@ -211,7 +211,7 @@ post '/sendclaim'=>sub{
   my $message='';
   my $bonuscodeid=$dbh->selectrow_array("SELECT BONUS.ID FROM BONUS WHERE BONUS.CODE='$bonuscode'") || 0;
   if($bonuscodeid){
-    $dbh->do("INSERT INTO CLAIM (ID,BONUSID,DESCRIPTION,SDATE) VALUES (NULL,$bonuscodeid,\"$description\",NOW())") || die $dbh->err;
+    $dbh->do("INSERT INTO CLAIM (ID,BONUSID,DESCRIPTION,SYSDATE) VALUES (NULL,$bonuscodeid,\"$description\",NOW())") || die $dbh->err;
     $message='Спасибо за обращение. Мы сообщим вам о результатах на адрес электронной почты.';
   }else{
     $message="Код бонуса <b>$bonuscode</b> неверен. Укажите правильный код.";
