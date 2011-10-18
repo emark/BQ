@@ -4,7 +4,7 @@ use lib "/home/hosting_locumtest/usr/local/lib/perl5";
 use Mojolicious::Lite;
 use DBI;
 use utf8;
-plugin 'mail';
+#plugin 'mail';
 
 open (DBCONF,"< app.conf") || die "Error open dbconfig file";
 my @appconf=<DBCONF>;
@@ -31,7 +31,12 @@ app->hook(before_dispatch => sub {
 
 get '/' => sub {
   my $self = shift;
-  my $partners=$dbh->selectrow_array("SELECT COUNT(SHOP.ID) FROM SHOP WHERE SHOP.STATUS=1");
+  my @char=('a'..'z','A'..'Z','1'..'9');
+  my $fieldname='';
+  foreach(1..20){
+      $fieldname.=$char[int(rand(60))];#Generate unique fieldname
+  }
+  $self->stash(fn=>$fieldname);
   $self->render('index');
 };
 
@@ -111,7 +116,7 @@ post '/q:id' => [id=>qw/\d+/]=> sub{
                 subject=>"Ваш код бонуса от ".$shop->{$pid}{'URL'},
                 data=>"Приветствуем!\n\nВы приняли участие в опросе от ".$shop->{$pid}{'SHOP'}." http://".$shop->{$pid}{'URL'}.
                 "\nВ благодарность за ваши ответы ".$shop->{$pid}{'SHOP'}." дарит вам бонус: ".$bonusinfo."\n".
-                "Ваш код: $bonuscode\nИспользовать бонус вы можете уже сейчас! При следующем обращении в ".$shop->{$pid}{'SHOP'}." просто укажите код $bonuscode в комментарии к заказу.".
+                "Ваш код: $bonuscode\nИспользовать бонус вы можете уже сейчас! При обращении в ".$shop->{$pid}{'SHOP'}." просто укажите код $bonuscode в комментарии к вашему заказу.".
                 "\nЕсли вам необходимо распечатать код или уточнить какие бонусы у вас есть, вы можете это сделать на сайте BonusQuest (http://www.bonusquest.ru)".
                 "\nСпасибо за то, что вы с нами!\n".$subscribe);
     $self->redirect_to('thankyou.html');
@@ -136,39 +141,68 @@ get '/thankyou'=>sub{
 post '/balance'=>sub{
   my $self=shift;
   my $email=$self->param('email');
-  return $self->redirect_to('/') unless $email;
-  if($email !~ /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$/){
+  if(!$email || $email !~ /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$/){
     $self->stash(capt=>'Ошибка написания',message=>'Вы неверно указали адрес электронной почты.');
     return $self->render('robot');
   }
-  my $balance=$dbh->selectall_arrayref("SELECT BONUS.CODE,SHOP.NAME,SHOP.URL FROM BONUS LEFT JOIN ANSWER ON ORDERS.ID=ANSWER.ORDERID LEFT JOIN QUESTION ON ANSWER.QUESTIONID=QUESTION.ID LEFT JOIN SHOP ON QUESTION.SHOPID=SHOP.ID WHERE BONUS.STATUS=0 AND BONUS.EMAIL=\"$email\" GROUP BY BONUS.ID") || undef;
+  my $balance=$dbh->selectall_arrayref("SELECT BONUS.CODE,SHOP.NAME,SHOP.URL,BONUS.BONUSINFO FROM BONUS LEFT JOIN ANSWER ON BONUS.ID=ANSWER.BONUSID LEFT JOIN QUESTION ON ANSWER.QUESTIONID=QUESTION.ID LEFT JOIN SHOP ON QUESTION.SHOPID=SHOP.ID WHERE BONUS.STATUS=0 AND BONUS.EMAIL=\"$email\" GROUP BY BONUS.ID") || undef;
   my $mailmessage='';
   if($balance->[0]){
     my $n=1;
     $mailmessage="Приветствуем!\nВы или возможно кто-то другой попросил прислать список действующих бонусов.\nИтак, ваши бонусы:\n";
     foreach my $key(@{$balance}){
-      $mailmessage=$mailmessage."$n. Бонус от $key->[1], (http://$key->[2])\nКод:$key->[0]\n\n";
+      $mailmessage=$mailmessage."$n. $key->[1], http://$key->[2]\nБонус: $key->[3]\nКод: $key->[0]\n\n";
       $n++;
     }
     $self->mail(to=>$email,
                 subject=>'Список действующих бонусов',
                 data=>$mailmessage.$subscribe);
   }
-  $self->stash(capt=>'Ваш баланс отправлен',message=>'Список подтвержденных бонусов отправлен на указанный адрес электронной почты.');
+  $self->stash(capt=>'Ваши бонусы отправлены',message=>'Список действующих бонусов отправлен на указанный адрес электронной почты.');
   $self->render('robot');
 };
 
 post '/bonus'=>sub{
   my $self=shift;
-  my $bonuscode=$self->param('bonuscode');
-  return $self->redirect_to('/') unless $bonuscode;
-  my $bonusinfo=$dbh->selectall_hashref("SELECT BONUS.ID,BONUS.STATUSDATE,BONUS.STATUS,BONUS.BONUSINFO FROM BONUS WHERE BONUS.CODE=\"$bonuscode\"",'ID') || undef;
+  my $param=$self->req->params->to_hash;
+  my $fn=$param->{'fn'};
+  my $bonuscode=$param->{$fn};#Get unique bonuscode fielname
+  my @char=('a'..'z','A'..'Z','1'..'9');
+  my $fieldname='';
+  foreach(1..20){
+      $fieldname.=$char[int(rand(60))];#Generate unique fieldname
+    }
+  my $bonusinfo=$dbh->selectall_hashref("SELECT BONUS.ID,BONUS.SYSDATE,BONUS.STATUSDATE,BONUS.STATUS,BONUS.BONUSINFO,SHOP.NAME AS PROVIDER,SHOP.URL,SHOP.EMAIL,SHOP.TEL,SHOP.DESCRIPTION FROM BONUS LEFT JOIN ANSWER ON BONUS.ID=ANSWER.BONUSID LEFT JOIN QUESTION ON ANSWER.QUESTIONID=QUESTION.ID LEFT JOIN SHOP ON QUESTION.SHOPID=SHOP.ID WHERE BONUS.CODE=\"$bonuscode\" GROUP BY BONUS.CODE",'ID') || undef;
   if(!%{$bonusinfo}){
     $self->stash(capt=>'Бонус не найден',message=>'Указанный код не найден. Вероятно вы ошиблись при вводе кода бонуса.');
     return $self->render('robot');
   }
-  $self->stash(bonusinfo=>$bonusinfo);
+  $self->stash(bonusinfo=>$bonusinfo,
+               fn=>$fieldname);
   $self->render('bonus');
+};
+
+post '/bonus/:actions'=>sub{
+  my $self=shift;
+  my $actions=$self->param('actions');
+  my $param=$self->req->params->to_hash;
+  my $fn=$param->{'fn'};
+  my $bonuscode=$param->{$fn};#Get unique bonuscode fielname
+  my $bonusinfo=$dbh->selectall_hashref("SELECT BONUS.ID,BONUS.CODE,BONUS.SYSDATE,BONUS.STATUSDATE,BONUS.STATUS,BONUS.BONUSINFO,SHOP.NAME AS PROVIDER,SHOP.URL,SHOP.EMAIL,SHOP.TEL,SHOP.DESCRIPTION FROM BONUS LEFT JOIN ANSWER ON BONUS.ID=ANSWER.BONUSID LEFT JOIN QUESTION ON ANSWER.QUESTIONID=QUESTION.ID LEFT JOIN SHOP ON QUESTION.SHOPID=SHOP.ID WHERE BONUS.CODE=\"$bonuscode\" GROUP BY BONUS.CODE",'ID') || undef;
+  if(!%{$bonusinfo}){
+    $self->stash(capt=>'Бонус не найден',message=>'Указанный код не найден. Вероятно вы ошиблись при вводе кода бонуса.');
+    return $self->render('robot');
+  }
+  if($actions eq 'print'){
+    $self->stash(bonusinfo=>$bonusinfo,bonuscode=>$bonuscode,fn=>$fn);
+    return $self->render('print');
+  }elsif($actions eq 'close'){
+    $dbh->do("UPDATE BONUS SET BONUS.STATUS=1,BONUS.STATUSDATE=NOW() WHERE BONUS.CODE=\"$bonuscode\" AND BONUS.STATUS=0");
+    $self->stash(capt=>'Бонус отменён',message=>'Получение бонусной услуги по данному коду невозможно.');
+    return $self->render('robot');
+  }
+  $self->stash(capt=>'Действие не определено',message=>'Непонятно, как вы сюда попали то?');
+  $self->render('robot');
 };
 
 post '/sendclaim'=>sub{
@@ -179,7 +213,7 @@ post '/sendclaim'=>sub{
   my $bonuscodeid=$dbh->selectrow_array("SELECT BONUS.ID FROM BONUS WHERE BONUS.CODE='$bonuscode'") || 0;
   if($bonuscodeid){
     $dbh->do("INSERT INTO CLAIM (ID,BONUSID,DESCRIPTION,SDATE) VALUES (NULL,$bonuscodeid,\"$description\",NOW())") || die $dbh->err;
-    $message='Спасибо за обращение. Мы сообщим вам о результатах на адрес электронной почты указанный в бонусе.';
+    $message='Спасибо за обращение. Мы сообщим вам о результатах на адрес электронной почты.';
   }else{
     $message="Код бонуса <b>$bonuscode</b> неверен. Укажите правильный код.";
   }

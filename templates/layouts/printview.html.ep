@@ -1,0 +1,23 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+    "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+    <head>
+        <title><%=title%></title>
+    </head>
+    <body>
+      <H2>Билет на получение бонуса</H2>
+        <div id=help>
+          <P><i>Предъявите этот билет при получении услуги или во время покупки товара.<br/>Будьте аккуратны, ведь вашим бонусом может воспользоваться кто-нибудь другой!</i></P>
+        </div>
+        <div id=content>
+          <%=content%>
+        </div>
+        <div id=support>
+          <P>
+            BonusQuest система онлайн-опросов http://www.bonusquest.ru<br/>
+            Рассмотрение претензий http://www.bonusquest.ru/claims.html<br/>
+            Служба поддержки: hello@bonusquest.ru
+          </P>
+        </div>
+    </body>
+</html>

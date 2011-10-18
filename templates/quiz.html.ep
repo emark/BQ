@@ -29,8 +29,8 @@
                 <div id=3 style="display:none">
                     <P align=right><a href="javascript:HideLayer(3)"><img src="/media/icon/close.png" border=0 title='Закрыть подсказку'></a></P>                    
                     <%=tag 'P'=>'Наименование: '.$shop->{$shopid}{'SHOP'}%>
-                    <%=tag 'P'=>'Адрес сайта: '.$shop->{$shopid}{'URL'}%>
-                    <%=tag 'P'=>'Описание: '.$shop->{$shopid}{'DESCRIPTION'}%>
+                    <%=tag 'P'=>'Деятельность: '.$shop->{$shopid}{'DESCRIPTION'}%>
+                    <%=tag 'P'=>'Интернет: '.$shop->{$shopid}{'URL'}%>
                     <%=tag 'P'=>'Электронная почта: '.$shop->{$shopid}{'EMAIL'}%>
                     <%=tag 'P'=>'Контактный телефон: '.$shop->{$shopid}{'TEL'}%>
                 </div><!--3-->

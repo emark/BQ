@@ -19,9 +19,9 @@
                 <br/><a href="/help.html#how_it_works" style="color:#7A917A;font-style:italic;font-size:14px;text-decoration: none;border-bottom-style: dashed;border-bottom-width: thin;">Как это работает?</a>
             <div class=cardline style="background-color: #96AD6D;">
                 <%=form_for '/bonus.html'=>(method=>'post',id=>'bonusform')=>begin%>
-                Код: <%=text_field 'bonuscode'=>(class=>'formstyle',size=>15)%><%end%><br/>
+                Код: <%=text_field $fn=>(class=>'formstyle',size=>15)%><%=hidden_field 'fn'=>$fn%><%end%><br/>
             </div>
-            <P align=center><a href="javascript: submitform('bonusform')" class=myButton>Отправить запрос</a></P>
+            <P align=center><a href="javascript: submitform('bonusform')" class=myButton>Посмотреть</a></P>
             <i style="color:#7A917A;font-size:16px">Укажите код бонуса выданный вам после прохождения опроса</i>
             </div>
         </td>
@@ -68,7 +68,7 @@
                 <%=form_for '/balance.html'=>(method=>'post',id=>'balanceform')=>begin%>Email: <%=text_field 'email'=>(class=>'formstyle',size=>15)%><br/>
                 <%end%>
             </div>
-            <P align=center><a href="javascript: submitform('balanceform')" class=myButton>Проверить баланс</a></P>
+            <P align=center><a href="javascript: submitform('balanceform')" class=myButton>Проверить</a></P>
             <i style="color:#79858E;font-size:16px">Адрес электронной почты, указываемый в опросах</i>
             </div>
         </td>

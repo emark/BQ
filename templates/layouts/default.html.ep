@@ -51,7 +51,7 @@
           <%=link_to 'БонусКвест'=>'/'%> -
           <%=link_to 'Помощь'=>'/help.html'%> -
           <%=link_to 'Соглашение'=>'/tos.html'%> -
-          <%=link_to 'Есть претензии?'=>'/claims.html'%> -
+          <%=link_to 'Бонус не дают?'=>'/claims.html'%> -
           <%=link_to 'Для бизнеса'=>'/forbusiness.html'%> -
           <%=link_to 'Контакты'=>'/contacts.html'%>
         </i></P>

@@ -1,15 +1,16 @@
-%layout 'default', title 'Информация о бонусе';
+%layout 'printview',title 'Версия для печати';
 %#dev
-<div id=subhead>
-    <span align=left class=sublogo><a href="/" style="color:#FFF;text-decoration:none;">BonusQuest</a></span>    
-</div><!--head-->
-<div id=content>
-    <div id="quizform">
-        <div id=pagecard>
 %my @bonusstatus=('активен','неактивен');
-            <%=tag 'H2'=>'Информация о бонусе'%>
-            <table border=0>
+          <table border=0>
 %foreach my $bonusid(keys %{$bonusinfo}){
+            <tr>
+                <td>
+                    Код:
+                </td>
+                <td>
+                    <b style="font-family:sans-serif;"><%=$bonusinfo->{$bonusid}{'CODE'}%></b>
+                </td>
+            </tr>
             <tr>
                 <td>
                     Бонус:
@@ -91,21 +92,4 @@
                 </td>
             </tr>
 %}
-            </table>
-            <div id=printversion>
-                <%=form_for '/bonus/print.html'=>(method=>'post',target=>'_print')=>begin%>
-                <%=text_field $fn=>(size=>15)%>
-                <%=hidden_field 'fn'=>$fn%>
-                <%=submit_button 'Печать бонуса'%>
-                <%end%>
-            </div><!--printversion-->
-            <div id=closebonus>
-                <%=form_for '/bonus/close.html'=>(method=>'post')=>begin%>
-                <%=text_field $fn=>(size=>15)%>
-                <%=hidden_field 'fn'=>$fn%>
-                <%=submit_button 'Отменить бонус'%>
-                <%end%>
-            </div><!--printversion-->
-        </div><!--pagecard-->
-    </div><!--quizform-->
-</div><!--content-->
+          </table>
