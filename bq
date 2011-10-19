@@ -250,7 +250,7 @@ get '/dashboard'=>sub{
 	return $self->redirect_to('/provider/logout') unless $self->session('pid');
 	my $pid=$self->session('pid');
 	my $provider=$self->session('provider');
-  my $bonusinfo=$dbh->selectrow_arrayref("SELECT PROVIDER.BONUSINFO,PROVIDER.ACTIVATION FROM PROVIDER WHERE PROVIDER.ID=$pid AND PROVIDER.STATUS=1 ");
+  my $bonusinfo=$dbh->selectrow_arrayref("SELECT PROVIDER.BONUSINFO,PROVIDER.UPDATE FROM PROVIDER WHERE PROVIDER.ID=$pid AND PROVIDER.STATUS=1 ");
   my $question=$dbh->selectall_hashref("SELECT QUESTION.ID,QUESTION.CONTENT,QUESTION.TYPE,QUESTION.QUIZ,COUNT(ANSWER.ID) AS ANSWERS FROM QUESTION LEFT JOIN ANSWER ON QUESTION.ID=ANSWER.QUESTIONID WHERE QUESTION.PID=$pid GROUP BY QUESTION.ID",'ID');
 	$self->stash(pid=>$pid,
 							 provider=>$provider,
@@ -275,7 +275,7 @@ post '/dashboard'=>sub{
 	my $answers=$self->param('answers');
 	$answers=~s/\s\n/;/g if $answers;#Set ';' separate for answer variant
 	if($refferer){#Set questions on quiz
-		$dbh->do("UPDATE PROVIDER SET PROVIDER.BONUSINFO=\"$bonusinfo\",PROVIDER.ACTIVATION=NOW() WHERE PROVIDER.ID=$pid");#Update bonus info
+		$dbh->do("UPDATE PROVIDER SET PROVIDER.BONUSINFO=\"$bonusinfo\",PROVIDER.UPDATE=NOW() WHERE PROVIDER.ID=$pid");#Update bonus info
     $dbh->do("UPDATE QUESTION SET QUESTION.QUIZ=0 WHERE QUESTION.PID=$pid");#Set quiz status to null
 		foreach my $key(@questionid){
 			$dbh->do("UPDATE QUESTION SET QUESTION.QUIZ=1 WHERE QUESTION.PID=$pid AND QUESTION.ID=$key");
@@ -289,7 +289,7 @@ post '/dashboard'=>sub{
       }
     }
 	}
-	$bonusinfo=$dbh->selectrow_arrayref("SELECT PROVIDER.BONUSINFO,PROVIDER.ACTIVATION FROM PROVIDER WHERE PROVIDER.ID=$pid AND PROVIDER.STATUS=1");
+	$bonusinfo=$dbh->selectrow_arrayref("SELECT PROVIDER.BONUSINFO,PROVIDER.UPDATE FROM PROVIDER WHERE PROVIDER.ID=$pid AND PROVIDER.STATUS=1");
   my $question=$dbh->selectall_hashref("SELECT QUESTION.ID,QUESTION.CONTENT,QUESTION.TYPE,QUESTION.QUIZ,COUNT(ANSWER.ID) AS ANSWERS FROM QUESTION LEFT JOIN ANSWER ON QUESTION.ID=ANSWER.QUESTIONID WHERE QUESTION.PID=$pid GROUP BY QUESTION.ID",'ID');
 	$self->stash(provider=>$provider,
 							 pid=>$pid,
