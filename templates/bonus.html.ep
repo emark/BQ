@@ -6,7 +6,7 @@
 <div id=content>
     <div id="quizform">
         <div id=pagecard>
-%my @bonusstatus=('активен','неактивен');
+%my @bonusstatus=('активен','отменен','подтвержден');
             <%=tag 'H2'=>'Информация о бонусе'%>
             <table border=0>
 %foreach my $bonusid(keys %{$bonusinfo}){

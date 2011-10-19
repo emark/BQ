@@ -1,10 +1,16 @@
-%layout 'dashboard',title 'Редактирование вопроса';
+%layout 'default',title 'Редактирование вопроса';
+%#dev
+<div id=subhead>
+    <span align=left class=sublogo><a href="/dashboard.html" style="color:#FFF;text-decoration:none;">BonusQuest</a></span>
+    <center><i><%=$provider%><br><span style="font-style:normal;font-size:14px;text-shadow:none;">
+    <%= link_to 'Завершить работу в системе'=>'/provider/logout.html'=>(style=>"color:#FFF;text-decoration:none;")%></span></i></center>
+</div><!--head-->
 <div id=content>
     <div id="quizform">
         <div id=pagecard>
             <%=tag 'H2'=>'Редактирование вопроса'%>
 %my @qtype=('Текст','Выбор','Множество','Строка');
-<%=form_for '/quiz.html'=>(method=>'post')=>begin%>
+<%=form_for '/dashboard.html'=>(method=>'post')=>begin%>
 <table border=0>
   <tr style="font-style: italic">
     <td colspan=1>
@@ -49,7 +55,7 @@
 %}
 <tr>
     <td colspan=2><br/>
-        <%=submit_button 'Сохранить вопрос'=>(class=>'formstyle')%> или <%=link_to 'Закрыть без сохранения'=>'/quiz.html'%>
+        <%=submit_button 'Сохранить вопрос'=>(class=>'formstyle')%> или <%=link_to 'Закрыть без сохранения'=>'/dashboard.html'%>
     </td>
 </tr>
 </table><br/>

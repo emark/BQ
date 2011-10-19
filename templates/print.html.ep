@@ -1,6 +1,6 @@
 %layout 'printview',title 'Версия для печати';
 %#dev
-%my @bonusstatus=('активен','неактивен');
+%my @bonusstatus=('активен','отменен','подтвержден');
           <table border=0>
 %foreach my $bonusid(keys %{$bonusinfo}){
             <tr>

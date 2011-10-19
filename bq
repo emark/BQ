@@ -24,7 +24,7 @@ app->plugin(mail => {
 app->secret($appconf[5]);
 app->hook(before_dispatch => sub {
                my $self = shift;
-               $self->req->url->base(Mojo::URL->new(q{http://www.bonusquest.ru/}))
+               #$self->req->url->base(Mojo::URL->new(q{http://www.bonusquest.ru/}))
 	       }
 	  );
 
@@ -166,6 +166,7 @@ post '/bonus'=>sub{
   my $param=$self->req->params->to_hash;
   my $fn=$param->{'fn'};
   my $bonuscode=$param->{$fn};#Get unique bonuscode fielname
+  $bonuscode=0 if $bonuscode !~ /^[A-Za-z0-9.]+$/;#Check code for injection
   my @char=('a'..'z','A'..'Z','1'..'9');
   my $fieldname='';
   foreach(1..20){
@@ -173,7 +174,7 @@ post '/bonus'=>sub{
     }
   my $bonusinfo=$dbh->selectall_hashref("SELECT BONUS.ID,BONUS.SYSDATE,BONUS.ACTIVATION,BONUS.STATUS,BONUS.BONUSINFO,PROVIDER.NAME AS PROVIDER,PROVIDER.URL,PROVIDER.EMAIL,PROVIDER.TEL,PROVIDER.DESCRIPTION FROM BONUS LEFT JOIN ANSWER ON BONUS.ID=ANSWER.BONUSID LEFT JOIN QUESTION ON ANSWER.QUESTIONID=QUESTION.ID LEFT JOIN PROVIDER ON QUESTION.PID=PROVIDER.ID WHERE BONUS.CODE=\"$bonuscode\" GROUP BY BONUS.CODE",'ID') || undef;
   if(!%{$bonusinfo}){
-    $self->stash(capt=>'Бонус не найден',message=>'Указанный код не найден. Вероятно вы ошиблись при вводе кода бонуса.');
+    $self->stash(capt=>'Бонус не найден',message=>'Указанный код не найден. Вероятно вы ошиблись при вводе кода бонуса.'.$bonuscode);
     return $self->render('robot');
   }
   $self->stash(bonusinfo=>$bonusinfo,
@@ -187,7 +188,8 @@ post '/bonus/:actions'=>sub{
   my $param=$self->req->params->to_hash;
   my $fn=$param->{'fn'};
   my $bonuscode=$param->{$fn};#Get unique bonuscode fielname
-  my $bonusinfo=$dbh->selectall_hashref("SELECT BONUS.ID,BONUS.CODE,BONUS.SYSDATE,BONUS.ACTIVATION,BONUS.STATUS,BONUS.BONUSINFO,PROVIDER.NAME AS PROVIDER,PROVIDER.URL,PROVIDER.EMAIL,PROVIDER.TEL,PROVIDER.DESCRIPTION FROM BONUS LEFT JOIN ANSWER ON BONUS.ID=ANSWER.BONUSID LEFT JOIN QUESTION ON ANSWER.QUESTIONID=QUESTION.ID LEFT JOIN PROVIDER ON QUESTION.PID=PROVIDER.ID WHERE BONUS.CODE=\"$bonuscode\" GROUP BY BONUS.CODE",'ID') || undef;
+  $bonuscode=0 if $bonuscode !~ /^[A-Za-z0-9.]+$/;#Check code for injection
+  my $bonusinfo=$dbh->selectall_hashref("SELECT BONUS.ID,BONUS.CODE,BONUS.SYSDATE,BONUS.ACTIVATION,BONUS.STATUS,BONUS.BONUSINFO,PROVIDER.NAME AS PROVIDER,PROVIDER.URL,PROVIDER.EMAIL,PROVIDER.TEL,PROVIDER.DESCRIPTION FROM BONUS LEFT JOIN ANSWER ON BONUS.ID=ANSWER.BONUSID LEFT JOIN QUESTION ON ANSWER.QUESTIONID=QUESTION.ID LEFT JOIN PROVIDER ON QUESTION.PID=PROVIDER.ID WHERE BONUS.CODE=\"$bonuscode\" AND BONUS.STATUS=0 GROUP BY BONUS.CODE",'ID') || undef;
   if(!%{$bonusinfo}){
     $self->stash(capt=>'Бонус не найден',message=>'Указанный код не найден. Вероятно вы ошиблись при вводе кода бонуса.');
     return $self->render('robot');
@@ -207,6 +209,7 @@ post '/bonus/:actions'=>sub{
 post '/sendclaim'=>sub{
   my $self=shift;
   my $bonuscode=$self->param('bonuscode') || 0;
+  $bonuscode=0 if $bonuscode !~ /^[A-Za-z0-9.]+$/;#Check code for injection
   my $description=$self->param('description');
   my $message='';
   my $bonuscodeid=$dbh->selectrow_array("SELECT BONUS.ID FROM BONUS WHERE BONUS.CODE='$bonuscode'") || 0;
@@ -221,4 +224,105 @@ post '/sendclaim'=>sub{
   $self->render('robot');
 };
 
+#--- Provider area
+post '/provider/auth'=>sub{
+  my $self = shift;
+  my $param=$self->req->params->to_hash;
+  my $provider=$dbh->selectrow_arrayref("SELECT PROVIDER.ID,PROVIDER.NAME FROM PROVIDER WHERE PROVIDER.LOGIN=\"$param->{'login'}\" AND PROVIDER.PASS=\"$param->{'pass'}\" AND PROVIDER.STATUS=1") || undef;
+  if($provider->[0]){
+		$self->session(pid=>$provider->[0],
+                   provider=>$provider->[1]);
+		return $self->redirect_to('dashboard.html');  
+  }
+  $self->stash(capt=>'Ошибка входа',message=>'Ошибка при вводе логина или пароля');
+	$self->render('robot');
+};
+
+get '/provider/logout'=>sub{
+	my $self=shift;
+	$self->session(pid=>'',provider=>'');
+	$self->stash(capt=>'Удачного дня',message=>'Спасибо вам за время проведенное на нашем сайте.');
+	$self->render('robot');
+};
+
+get '/dashboard'=>sub{
+	my $self=shift;
+	return $self->redirect_to('/provider/logout') unless $self->session('pid');
+	my $pid=$self->session('pid');
+	my $provider=$self->session('provider');
+  my $question=$dbh->selectall_hashref("SELECT QUESTION.ID,QUESTION.CONTENT,QUESTION.TYPE,QUESTION.QUIZ,COUNT(ANSWER.ID) AS ANSWERS FROM QUESTION LEFT JOIN ANSWER ON QUESTION.ID=ANSWER.QUESTIONID WHERE QUESTION.PID=$pid GROUP BY QUESTION.ID",'ID');
+	$self->stash(pid=>$pid,
+							 provider=>$provider,
+               question=>$question);
+	$self->render('dashboard');
+};
+
+post '/dashboard'=>sub{
+	my $self=shift;
+	return $self->redirect_to('/provider/logout') unless $self->session('pid');
+	my $pid=$self->session('pid');
+	my $provider=$self->session('provider');
+	my @questionid=$self->param('questionid');
+	my $questid=$self->param('questid');#ID for single question
+	my $content=$self->param('content');#Question content
+	my $type=$self->param('type');
+	my $answers=$self->param('answers');
+	$answers=~s/\s\n/;/g if $answers;
+	#if(@questionid){
+		$dbh->do("UPDATE QUESTION SET QUESTION.QUIZ=0 WHERE QUESTION.PID=$pid");#Set quiz status to null
+		foreach my $key(@questionid){
+			$dbh->do("UPDATE QUESTION SET QUESTION.QUIZ=1 WHERE QUESTION.PID=$pid AND QUESTION.ID=$key");
+		}
+	#}
+	if($content){
+		if($questid){
+			$dbh->do("UPDATE QUESTION SET QUESTION.CONTENT=\"$content\",QUESTION.TYPE=\"$type\",QUESTION.ANSWERS=\"$answers\" WHERE QUESTION.ID=$questid AND QUESTION.PID=$pid");
+		}else{
+			$dbh->do("INSERT INTO QUESTION(ID,CONTENT,TYPE,ANSWERS,PID,QUIZ) VALUES(NULL,\"$content\",\"$type\",\"$answers\",$pid,0)");
+		}
+	}
+	my $question=$dbh->selectall_hashref("SELECT QUESTION.ID,QUESTION.CONTENT,QUESTION.TYPE,QUESTION.QUIZ,COUNT(ANSWER.ID) AS ANSWERS FROM QUESTION LEFT JOIN ANSWER ON QUESTION.ID=ANSWER.QUESTIONID WHERE QUESTION.PID=$pid GROUP BY QUESTION.ID",'ID');
+	$self->stash(provider=>$provider,
+							 pid=>$pid,
+							 question=>$question);
+	$self->render('dashboard');
+};
+
+get '/question'=>sub{#Create new question in the form
+	my $self=shift;
+	return $self->redirect_to('/provider/logout') unless $self->session('pid');
+	my $pid=$self->session('pid');
+	my $provider=$self->session('provider');
+	$self->stash(provider=>$provider);
+	$self->render('newquestion');
+};
+
+get '/question/:id'=>sub{#Edit question in the form
+	my $self=shift;
+	return $self->redirect_to('/provider/login') unless $self->session('pid');
+	my $pid=$self->session('pid');
+	my $provider=$self->session('provider');
+	my $questid=$self->param('id');
+	my $question=$dbh->selectall_hashref("SELECT QUESTION.ID,QUESTION.CONTENT,QUESTION.TYPE,QUESTION.ANSWERS FROM QUESTION WHERE QUESTION.ID=$questid AND QUESTION.PID=$pid",'ID');
+	$self->stash(provider=>$provider,
+							 question=>$question);
+	$self->render('question');
+};
+
+post '/provider/bonus'=>sub{
+  my $self=shift;
+  return $self->redirect_to('/provider/login') unless $self->session('pid');
+	my $pid=$self->session('pid');
+  my $param=$self->req->params->to_hash;
+  my $bonuscode=$self->param('bonuscode');#Get unique bonuscode fielname
+  $bonuscode=0 if $bonuscode !~ /^[A-Za-z0-9.]+$/;#Check code for injection
+  my $bonusinfo=$dbh->selectall_hashref("SELECT BONUS.ID,BONUS.SYSDATE,BONUS.ACTIVATION,BONUS.STATUS,BONUS.BONUSINFO,PROVIDER.NAME AS PROVIDER,PROVIDER.URL,PROVIDER.EMAIL,PROVIDER.TEL,PROVIDER.DESCRIPTION FROM BONUS LEFT JOIN ANSWER ON BONUS.ID=ANSWER.BONUSID LEFT JOIN QUESTION ON ANSWER.QUESTIONID=QUESTION.ID LEFT JOIN PROVIDER ON QUESTION.PID=PROVIDER.ID WHERE BONUS.CODE=\"$bonuscode\" AND BONUS.STATUS=0 AND PROVIDER.ID=$pid AND PROVIDER.STATUS=1 GROUP BY BONUS.CODE",'ID') || undef;
+  if(!%{$bonusinfo}){
+    $self->stash(capt=>'Код не найден',message=>'Указанный код не найден. Вероятно вы ошиблись при вводе или бонус уже неактивен.');
+    return $self->render('robot');
+  }
+  $dbh->do("UPDATE BONUS SET BONUS.STATUS=2, BONUS.ACTIVATION=NOW() WHERE BONUS.CODE=\"$bonuscode\"");
+  $self->stash(capt=>'Бонус подтвержден',message=>'Бонус успешно подтвержден.');
+  $self->render('robot');
+};
 app->start;

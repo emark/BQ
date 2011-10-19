@@ -1,0 +1,78 @@
+%layout 'default',title 'Мой опрос от BonusQuest';
+%#dev
+<div id=subhead>
+    <span align=left class=sublogo><a href="/dashboard.html" style="color:#FFF;text-decoration:none;">BonusQuest</a></span>
+    <center><i><%=$provider%><br><span style="font-style:normal;font-size:14px;text-shadow:none;">
+    <%= link_to 'Завершить работу в системе'=>'/provider/logout.html'=>(style=>"color:#FFF;text-decoration:none;")%></span></i></center>
+</div><!--head-->
+<div id=content>
+    <div id="quizform">
+        <div id=pagecard>
+            <div id=quiz-nav>
+                <P align=left>
+                    <a href="javascript:ShowLayer(1)" onClick="" class=captbutton>Что это такое</a>
+                    <a href="javascript:ShowLayer(2)" class=captbutton>Как заполнять</a>
+                    <a href="javascript:ShowLayer(3)" class=captbutton>Регистрация кода</a>
+                </P>
+                <div id=1 style="display:none">
+                    <P align=right><a href="javascript:HideLayer(1)"><img src="/media/icon/close.png" border=0 title='Закрыть подсказку'></a></P>
+                    <P>Вы находитесь на сайте системы опросов БонусКвест</P>
+                </div><!--1-->
+                <div id=2 style="display:none">
+                    <P align=right><a href="javascript:HideLayer(2)"><img src="/media/icon/close.png" border=0 title='Закрыть подсказку'></a></P>
+                    <P>Для получения бонуса, необходимо ответить на вопросы анкеты</P>
+                </div><!--2-->
+                <div id=3 style="display:none">
+                     <%=form_for '/provider/bonus.html'=>(method=>'post',id=>'bonusform')=>begin%>
+                Код: <%=text_field 'bonuscode'=>(class=>'formstyle',size=>15)%>&nbsp;<%=submit_button%><%end%>
+                </div><!--3-->
+            </div><!--quiz-nav-->
+            <%=tag 'H2'=>'Текущий опрос'%>
+%my @status=('Off','On');
+%my @qtype=('Текст','Выбор','Множество','Строка');
+<%=form_for '/dashboard.html'=>(method=>'post')=>begin%>
+<table border=0 width=100%>
+%if(%{$question}){
+  <tr style="font-style: italic">
+    <td colspan=2>
+      Содержание вопроса
+    </td><td>
+      Тип вопроса
+    </td><td align=center>
+    Ответов
+    </td>
+  </tr>
+  %foreach my $questionid(keys %{$question}){
+  <tr>
+    <td>
+      <input type=checkbox title='Включить вопрос' name=questionid value="<%=$question->{$questionid}{'ID'}%>"
+      %if($question->{$questionid}{'QUIZ'}){
+      checked 
+      %}
+      >
+    </td><td>
+      <%#= link_to "$question->{$questionid}{'CONTENT'}"=>"/question/$question->{$questionid}{'ID'}"%>
+      <%=$question->{$questionid}{'CONTENT'}%> <a href="/question/<%=$question->{$questionid}{'ID'}%>"><img src='/media/icon/edit.gif' border=0 title='Редактировать вопрос'></a>
+    </td><td>
+      <%=$qtype[$question->{$questionid}{'TYPE'}]%>
+    </td><td align=center>
+      <%=$question->{$questionid}{'ANSWERS'}%>
+    </td>
+  </tr>
+  %}
+%}
+<tr>
+  <td colspan=4><br/>
+    <%=submit_button 'Сохранить'=>(class=>'formstyle')%> или <%=link_to 'Добавить вопрос'=>'/question.html'%>
+  </td>
+</tr>
+</table><br/>
+<%end%>
+<div id=view">
+  <center>
+  <%=link_to 'Посмотреть опрос'=>"/q$pid.html"=>(target=>'_blank',class=>'MyButton',title=>'Посмотреть как выглядит опрос')%>
+  </center>
+</div>
+        </div><!--pagecard-->
+    </div><!--quizform-->
+</div><!--content-->
