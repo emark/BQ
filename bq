@@ -268,13 +268,12 @@ post '/dashboard'=>sub{
 	my $type=$self->param('type');
 	my $answers=$self->param('answers');
 	$answers=~s/\s\n/;/g if $answers;
-	#if(@questionid){
+	if(!$content){#Set questions on quiz
 		$dbh->do("UPDATE QUESTION SET QUESTION.QUIZ=0 WHERE QUESTION.PID=$pid");#Set quiz status to null
 		foreach my $key(@questionid){
 			$dbh->do("UPDATE QUESTION SET QUESTION.QUIZ=1 WHERE QUESTION.PID=$pid AND QUESTION.ID=$key");
 		}
-	#}
-	if($content){
+	}else{#Working with defined question
 		if($questid){
 			$dbh->do("UPDATE QUESTION SET QUESTION.CONTENT=\"$content\",QUESTION.TYPE=\"$type\",QUESTION.ANSWERS=\"$answers\" WHERE QUESTION.ID=$questid AND QUESTION.PID=$pid");
 		}else{
