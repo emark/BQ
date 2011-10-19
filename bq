@@ -42,7 +42,7 @@ get '/' => sub {
 get '/q:id' => [id=>qw/\d+/]=> sub{
   my $self=shift;
   my $pid=$self->param('id');
-  $pid=$dbh->selectrow_array("SELECT PROVIDER.ID FROM PROVIDER WHERE PROVIDER.ID=$pid") || 0;
+  $pid=$dbh->selectrow_array("SELECT PROVIDER.ID FROM PROVIDER WHERE PROVIDER.ID=$pid AND PROVIDER.STATUS=1 AND LENGTH(PROVIDER.BONUSINFO)>0") || 0;
   my $provider=$dbh->selectall_hashref("SELECT PROVIDER.ID,PROVIDER.URL,PROVIDER.NAME AS PROVIDER,PROVIDER.DESCRIPTION,PROVIDER.EMAIL,PROVIDER.TEL,PROVIDER.BONUSINFO FROM PROVIDER WHERE PROVIDER.ID='$pid'",'ID');
   my $question=$dbh->selectall_hashref("SELECT QUESTION.ID,QUESTION.CONTENT,QUESTION.TYPE,QUESTION.ANSWERS FROM QUESTION LEFT JOIN PROVIDER ON QUESTION.PID=PROVIDER.ID WHERE QUESTION.QUIZ=1 AND PROVIDER.ID=$pid",'ID') || undef;
   if(!%{$question}){
@@ -75,12 +75,12 @@ post '/q:id' => [id=>qw/\d+/]=> sub{
   my $provider=$dbh->selectall_hashref("SELECT PROVIDER.ID,PROVIDER.URL,PROVIDER.NAME AS PROVIDER,PROVIDER.DESCRIPTION,PROVIDER.EMAIL,PROVIDER.TEL,PROVIDER.BONUSINFO FROM PROVIDER  WHERE PROVIDER.ID='$pid'",'ID');
   my $question=$dbh->selectall_hashref("SELECT QUESTION.ID,QUESTION.CONTENT,QUESTION.TYPE,QUESTION.ANSWERS FROM QUESTION LEFT JOIN PROVIDER ON QUESTION.PID=PROVIDER.ID WHERE QUESTION.QUIZ=1 AND PROVIDER.ID=$pid",'ID') || 0;
   my $quizcheck=$dbh->selectall_arrayref("SELECT QUESTION.ID FROM QUESTION WHERE QUESTION.PID=$pid AND QUESTION.QUIZ=1");
-  my $bonuscodestatus=$dbh->selectrow_array("SELECT 1 FROM BONUS LEFT JOIN ANSWER ON BONUS.ID=ANSWER.BONUSID LEFT JOIN QUESTION ON ANSWER.QUESTIONID=QUESTION.ID WHERE QUESTION.PID=$pid AND BONUS.STATUS=0 AND BONUS.EMAIL=\"$param->{'email'}\" GROUP BY BONUS.EMAIL");
+  my $bonuscodestatus=$dbh->selectrow_array("SELECT 1 FROM BONUS LEFT JOIN ANSWER ON BONUS.ID=ANSWER.BONUSID LEFT JOIN QUESTION ON ANSWER.QUESTIONID=QUESTION.ID WHERE QUESTION.PID=$pid AND BONUS.STATUS=0 AND BONUS.EMAIL=\"$param->{'email'}\" GROUP BY BONUS.EMAIL") || undef;
     
   #Validation rules    
   if($param->{'email'} !~/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$/){
     $formvalidate=$formvalidate.'Укажите корректный e-mail';
-  }elsif($bonuscodestatus==1){
+  }elsif($bonuscodestatus && $bonuscodestatus==1){
     $formvalidate=$formvalidate.'У вас есть действующий код бонуса';
   }elsif(!$param->{'tosagree'}){
     $formvalidate=$formvalidate.'Не приняты условия Пользовательского соглашения';
@@ -241,7 +241,7 @@ post '/provider/auth'=>sub{
 get '/provider/logout'=>sub{
 	my $self=shift;
 	$self->session(pid=>'',provider=>'');
-	$self->stash(capt=>'Удачного дня',message=>'Спасибо вам за время проведенное на нашем сайте.');
+  $self->stash(capt=>'Удачного дня',message=>'Спасибо вам за время проведенное на нашем сайте.');
 	$self->render('robot');
 };
 
@@ -250,9 +250,11 @@ get '/dashboard'=>sub{
 	return $self->redirect_to('/provider/logout') unless $self->session('pid');
 	my $pid=$self->session('pid');
 	my $provider=$self->session('provider');
+  my $bonusinfo=$dbh->selectrow_arrayref("SELECT PROVIDER.BONUSINFO,PROVIDER.ACTIVATION FROM PROVIDER WHERE PROVIDER.ID=$pid AND PROVIDER.STATUS=1 ");
   my $question=$dbh->selectall_hashref("SELECT QUESTION.ID,QUESTION.CONTENT,QUESTION.TYPE,QUESTION.QUIZ,COUNT(ANSWER.ID) AS ANSWERS FROM QUESTION LEFT JOIN ANSWER ON QUESTION.ID=ANSWER.QUESTIONID WHERE QUESTION.PID=$pid GROUP BY QUESTION.ID",'ID');
 	$self->stash(pid=>$pid,
 							 provider=>$provider,
+               bonusinfo=>$bonusinfo,
                question=>$question);
 	$self->render('dashboard');
 };
@@ -262,27 +264,36 @@ post '/dashboard'=>sub{
 	return $self->redirect_to('/provider/logout') unless $self->session('pid');
 	my $pid=$self->session('pid');
 	my $provider=$self->session('provider');
-	my @questionid=$self->param('questionid');
+  $self->req->headers->referrer=~/http:\/\/.*\/(dashboard).*/;#Get HTTP header Refferer
+  my $refferer=$1 || undef;
+	my $bonusinfo=$self->param('bonusinfo');#ID for single question
+  $bonusinfo=~s/\"//g;#Clear SQL injection
+  my @questionid=$self->param('questionid');
 	my $questid=$self->param('questid');#ID for single question
 	my $content=$self->param('content');#Question content
 	my $type=$self->param('type');
 	my $answers=$self->param('answers');
-	$answers=~s/\s\n/;/g if $answers;
-	if(!$content){#Set questions on quiz
-		$dbh->do("UPDATE QUESTION SET QUESTION.QUIZ=0 WHERE QUESTION.PID=$pid");#Set quiz status to null
+	$answers=~s/\s\n/;/g if $answers;#Set ';' separate for answer variant
+	if($refferer){#Set questions on quiz
+		$dbh->do("UPDATE PROVIDER SET PROVIDER.BONUSINFO=\"$bonusinfo\",PROVIDER.ACTIVATION=NOW() WHERE PROVIDER.ID=$pid");#Update bonus info
+    $dbh->do("UPDATE QUESTION SET QUESTION.QUIZ=0 WHERE QUESTION.PID=$pid");#Set quiz status to null
 		foreach my $key(@questionid){
 			$dbh->do("UPDATE QUESTION SET QUESTION.QUIZ=1 WHERE QUESTION.PID=$pid AND QUESTION.ID=$key");
 		}
 	}else{#Working with defined question
-		if($questid){
-			$dbh->do("UPDATE QUESTION SET QUESTION.CONTENT=\"$content\",QUESTION.TYPE=\"$type\",QUESTION.ANSWERS=\"$answers\" WHERE QUESTION.ID=$questid AND QUESTION.PID=$pid");
-		}else{
-			$dbh->do("INSERT INTO QUESTION(ID,CONTENT,TYPE,ANSWERS,PID,QUIZ) VALUES(NULL,\"$content\",\"$type\",\"$answers\",$pid,0)");
-		}
+		if($content){#If question content is not null
+      if($questid){
+      	$dbh->do("UPDATE QUESTION SET QUESTION.CONTENT=\"$content\",QUESTION.TYPE=\"$type\",QUESTION.ANSWERS=\"$answers\" WHERE QUESTION.ID=$questid AND QUESTION.PID=$pid");
+      }else{
+      	$dbh->do("INSERT INTO QUESTION(ID,CONTENT,TYPE,ANSWERS,PID,QUIZ) VALUES(NULL,\"$content\",\"$type\",\"$answers\",$pid,0)");
+      }
+    }
 	}
-	my $question=$dbh->selectall_hashref("SELECT QUESTION.ID,QUESTION.CONTENT,QUESTION.TYPE,QUESTION.QUIZ,COUNT(ANSWER.ID) AS ANSWERS FROM QUESTION LEFT JOIN ANSWER ON QUESTION.ID=ANSWER.QUESTIONID WHERE QUESTION.PID=$pid GROUP BY QUESTION.ID",'ID');
+	$bonusinfo=$dbh->selectrow_arrayref("SELECT PROVIDER.BONUSINFO,PROVIDER.ACTIVATION FROM PROVIDER WHERE PROVIDER.ID=$pid AND PROVIDER.STATUS=1");
+  my $question=$dbh->selectall_hashref("SELECT QUESTION.ID,QUESTION.CONTENT,QUESTION.TYPE,QUESTION.QUIZ,COUNT(ANSWER.ID) AS ANSWERS FROM QUESTION LEFT JOIN ANSWER ON QUESTION.ID=ANSWER.QUESTIONID WHERE QUESTION.PID=$pid GROUP BY QUESTION.ID",'ID');
 	$self->stash(provider=>$provider,
 							 pid=>$pid,
+               bonusinfo=>$bonusinfo,
 							 question=>$question);
 	$self->render('dashboard');
 };

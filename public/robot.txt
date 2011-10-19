@@ -1,5 +1,0 @@
-User-Agent: *
-Allow: /
-Disallow: cgi-bin/
-Disallow: /bonus/
-Host: www.bonusquest.ru

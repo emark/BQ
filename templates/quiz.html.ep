@@ -4,7 +4,7 @@
 <%=form_for "q$pid.html"=>(method=>'post',id=>"qform")=>begin%>
 <%=hidden_field 'pid'=>$pid%>
 %foreach my $pid(keys %{$provider}){
-%title $provider->{$pid}{'PROVIDER'}.': '.$provider->{$pid}{'BONUSINFO'};
+%title $provider->{$pid}{'PROVIDER'}.' - '.$provider->{$pid}{'BONUSINFO'};
     <span align=left class=sublogo><a href="/" style="color:#FFF;text-decoration:none;">BonusQuest</a></span>
     <center><i><%=$provider->{$pid}{'PROVIDER'}%><br><span style="font-style:normal;font-size:14px;text-shadow:none;">
     <%= link_to $provider->{$pid}{'URL'}=>"http://$provider->{$pid}{'URL'}"=>(style=>"color:#FFF;text-decoration:none;",target=>'blank')%></span></i></center>

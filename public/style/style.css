@@ -83,6 +83,26 @@ html{
 		border-bottom-style: dashed;
 		border-bottom-width: thin;
 		background-color:#FFF;
+}#pagecard .coolbutton{
+		font-size:18px;
+		font-style:italic;
+		color: #4C4C4C;
+		text-decoration: none;
+		padding: 15px 15px 15px 15px;
+		border-top-left-radius: 3px;
+		border-top-right-radius: 3px;
+		border-bottom-left-radius: 3px;
+		border-bottom-right-radius: 3px;
+		background-color: #EFFFC6;
+}#pagecard .coolbutton:hover{
+		font-size:18px;
+		font-style:italic;
+		color: #F2F2F2;
+		text-decoration: none;
+		background-color: #6E8436;
+}#pagecard .coolbutton:active{
+		position:relative;
+		top:10px;
 }#quiz-nav .captbutton{
 		font-size:18px;
 		font-style:italic;

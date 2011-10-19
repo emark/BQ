@@ -1,4 +1,4 @@
-%layout 'default', title 'BonusQuest - магазины могут быть лучше';
+%layout 'default', title 'BonusQuest - сделай мир немного лучше';
 %#dev
 <div id=subhead>
     <span class=sublogo><a href="/" style="color:#FFF;text-decoration:none;">BonusQuest</a></span>
