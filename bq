@@ -174,7 +174,7 @@ post '/bonus'=>sub{
     }
   my $bonusinfo=$dbh->selectall_hashref("SELECT BONUS.ID,BONUS.SYSDATE,BONUS.ACTIVATION,BONUS.STATUS,BONUS.BONUSINFO,PROVIDER.NAME AS PROVIDER,PROVIDER.URL,PROVIDER.EMAIL,PROVIDER.TEL,PROVIDER.DESCRIPTION FROM BONUS LEFT JOIN ANSWER ON BONUS.ID=ANSWER.BONUSID LEFT JOIN QUESTION ON ANSWER.QUESTIONID=QUESTION.ID LEFT JOIN PROVIDER ON QUESTION.PID=PROVIDER.ID WHERE BONUS.CODE=\"$bonuscode\" GROUP BY BONUS.CODE",'ID') || undef;
   if(!%{$bonusinfo}){
-    $self->stash(capt=>'Бонус не найден',message=>'Указанный код не найден. Вероятно вы ошиблись при вводе кода бонуса.'.$bonuscode);
+    $self->stash(capt=>'Бонус не найден',message=>'Указанный код не найден. Вероятно вы ошиблись при вводе кода бонуса.');
     return $self->render('robot');
   }
   $self->stash(bonusinfo=>$bonusinfo,
