@@ -112,7 +112,7 @@ post '/q:id' => [id=>qw/\d+/]=> sub{
     $self->session(quizid=>0);
     
     $self->mail(to=>$param->{'email'},
-                subject=>"Ваш код бонуса от ".$provider->{$pid}{'URL'},
+                subject=>"Ваш код бонуса от ".$provider->{$pid}{'PROVIDER'},
                 data=>"Приветствуем!\n\nВы приняли участие в опросе от ".$provider->{$pid}{'PROVIDER'}." http://".$provider->{$pid}{'URL'}.
                 "\nВ благодарность за ваши ответы ".$provider->{$pid}{'PROVIDER'}." дарит вам бонус: ".$bonusinfo."\n".
                 "Ваш код: $bonuscode\nИспользовать бонус вы можете уже сейчас! При обращении в ".$provider->{$pid}{'PROVIDER'}." просто укажите код $bonuscode в комментарии к вашему заказу.".
