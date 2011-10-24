@@ -242,7 +242,7 @@ post '/provider/register'=>sub{
     $self->mail(to=>$param->{'email'},
                 subject=>'Регистрация на сайте BonusQuest',
                 data=>"Поздравляем с успешной регистрацией!\n\nДля активации вашей учетной записи перейдите по следующей ссылке.\nhttp://www.bonusquest.ru/provider/activation?code=$activation\n\n".
-                "Если ссылка не открывается, скопируйте и вставьте в адресную строку броузера.".$subscribe
+                "Если ссылка не открывается, скопируйте и вставьте в адресную строку броузера.\n\nПосле активацииhttp://www.bonusquest.ru/create.html".$subscribe
                 );
     $self->stash(capt=>'Поздравляем!',message=>'Вы успешно зарегистрировались. Мы отправили вам письмо с инструкцией по активации.');
   }
@@ -252,11 +252,14 @@ post '/provider/register'=>sub{
 get '/provider/activation'=>sub{
   my $self=shift;
   my $activation=$self->param('code');
-  my $pid=$dbh->selectrow_array("SELECT PROVIDER.ID FROM PROVIDER WHERE ACTIVATION=\"$activation\" AND STATUS=0") || undef;
-  if($pid){
-      $dbh->do("UPDATE PROVIDER SET STATUS=1, ACTIVATION=''");
+  my $provider=$dbh->selectrow_arrayref("SELECT PROVIDER.ID,PROVIDER.NAME FROM PROVIDER WHERE ACTIVATION=\"$activation\" AND STATUS=0") || undef;
+  if($provider->[0]){
+      $dbh->do("UPDATE PROVIDER SET STATUS=1, ACTIVATION='' WHERE PROVIDER.ID=$provider->[0]");
+      $self->session(pid=>$provider->[0],
+                   provider=>$provider->[1]);
+      return $self->redirect_to('dashboard.html');  
   }
-  $self->stash(capt=>'Активация',message=>'Учетная запись уже активирована.');
+  $self->stash(capt=>'Активация',message=>'Учетная запись активирована. Вы можете выполнить вход на странице http://www.bonusquest.ru/create.html');
   $self->render('robot');
 };
 
