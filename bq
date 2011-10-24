@@ -230,7 +230,7 @@ post '/provider/register'=>sub{
   my $self = shift;
   my $param=$self->req->params->to_hash;
   my $provider=$dbh->selectrow_arrayref("SELECT PROVIDER.ID,PROVIDER.NAME FROM PROVIDER WHERE PROVIDER.LOGIN=\"$param->{'login'}\"") || undef;
-  if($provider->[0] || !$param->{login} || !$param->{pass} || !$param->{email} || ($param->{pass} ne $param->{cppass} )){#Login exist
+  if($provider->[0] || !$param->{organization} || !$param->{login} || !$param->{pass} || !$param->{email} || ($param->{pass} ne $param->{cppass} )){#Login exist
     $self->stash(capt=>'Ошибка регистрации',message=>'Выбранный логин уже зарегистрирован, укажите другой.');
   }else{
     my @char=('a'..'z','A'..'Z','1'..'9');
@@ -238,7 +238,7 @@ post '/provider/register'=>sub{
     foreach(1..25){
       $activation.=$char[int(rand(60))];#Generate unique fieldname
     }
-    $dbh->do("INSERT INTO PROVIDER (ID,LOGIN,PASS,EMAIL,ACTIVATION,STATUS) VALUES(NULL,\"$param->{'login'}\",\"$param->{'pass'}\",\"$param->{'email'}\",\"$activation\",0)");
+    $dbh->do("INSERT INTO PROVIDER (ID,NAME,LOGIN,PASS,EMAIL,ACTIVATION,STATUS) VALUES(NULL,\"$param->{'organization'}\",\"$param->{'login'}\",\"$param->{'pass'}\",\"$param->{'email'}\",\"$activation\",0)");
     $self->mail(to=>$param->{'email'},
                 subject=>'Регистрация на сайте BonusQuest',
                 data=>"Поздравляем с успешной регистрацией!\n\nДля активации вашей учетной записи перейдите по следующей ссылке.\nhttp://www.bonusquest.ru/provider/activation?code=$activation\n\n".
