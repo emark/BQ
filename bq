@@ -154,6 +154,7 @@ post '/balance'=>sub{
       $mailmessage=$mailmessage."$n. $key->[1], http://$key->[2]\nБонус: $key->[3]\nКод: $key->[0]\n\n";
       $n++;
     }
+    $mailmessage=$mailmessage."\nЧтобы получить бонус, укажите его код в комметарии при следующем заказе.\nРаспечатать код или отменить бонус вы можете на сайте http://www.bonusquest.ru";
     $self->mail(to=>$email,
                 subject=>'Список действующих бонусов',
                 data=>$mailmessage.$subscribe);
@@ -242,7 +243,7 @@ post '/provider/register'=>sub{
     $self->mail(to=>$param->{'email'},
                 subject=>'Регистрация на сайте BonusQuest',
                 data=>"Поздравляем с успешной регистрацией!\n\nДля активации вашей учетной записи перейдите по следующей ссылке.\nhttp://www.bonusquest.ru/provider/activation?code=$activation\n\n".
-                "Если ссылка не открывается, скопируйте и вставьте в адресную строку броузера.\n\nПосле активации используйте для входа эту ссылку http://www.bonusquest.ru/create.html".$subscribe
+                "Если ссылка не открывается, скопируйте и вставьте в адресную строку броузера.\n\nПосле активации используйте для входа эту ссылку http://www.bonusquest.ru/provider/auth.html".$subscribe
                 );
     $self->stash(capt=>'Поздравляем!',message=>'Вы успешно зарегистрировались. Мы отправили вам письмо с инструкцией по активации.');
   }
