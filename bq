@@ -198,7 +198,7 @@ post '/bonus/:actions'=>sub{
   if($actions eq 'print'){
     $self->stash(bonusinfo=>$bonusinfo,bonuscode=>$bonuscode,fn=>$fn);
     return $self->render('print');
-  }elsif($actions eq 'close'){
+  }elsif($actions eq 'cancel'){
     $dbh->do("UPDATE BONUS SET BONUS.STATUS=1,BONUS.ACTIVATION=NOW() WHERE BONUS.CODE=\"$bonuscode\" AND BONUS.STATUS=0");
     $self->stash(capt=>'Бонус отменён',message=>'Получение бонусной услуги по данному коду невозможно.');
     return $self->render('robot');

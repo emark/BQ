@@ -104,7 +104,7 @@
                 <%end%>
                     </td>
                     <td align=left>
-                <%=form_for '/bonus/close.html'=>(method=>'post')=>begin%>
+                <%=form_for '/bonus/cancel.html'=>(method=>'post')=>begin%>
                 <%=text_field $fn=>(size=>15,class=>'formstyle')%>
                 <%=hidden_field 'fn'=>$fn%>
                 <%=submit_button 'Отменить бонус'=>(class=>'formstyle')%>
