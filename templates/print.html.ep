@@ -8,7 +8,7 @@
                     Код:
                 </td>
                 <td>
-                    <b style="font-family: monospace;"><%=$bonusinfo->{$bonusid}{'CODE'}%></b>
+                    <b style="font-family: monospace;font-size:18px"><%=$bonusinfo->{$bonusid}{'CODE'}%></b>
                 </td>
             </tr>
             <tr>
