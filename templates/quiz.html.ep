@@ -15,12 +15,11 @@
             <div id=quiz-nav>
                 <P align=left>
                     <a href="javascript:ShowLayer(1)" onClick="" class=captbutton>Что это такое</a>
-                    <a href="javascript:ShowLayer(2)" class=captbutton>Как заполнять</a>
                     <a href="javascript:ShowLayer(3)" class=captbutton>Организатор опроса</a>
                 </P>
                 <div id=1 style="display:none">
                     <P align=right><a href="javascript:HideLayer(1)"><img src="/media/icon/close.png" border=0 title='Закрыть подсказку'></a></P>
-                    <P>Вы находитесь на сайте системы опросов БонусКвест</P>
+                    <P>Вы находитесь на странице опроса, который проводит <%=$provider->{$pid}{'PROVIDER'}%>. После заполнения всех вопросов мы отправим вам по электронной почте код для получения бонуса и инструкции к использованию.  Ваши ответы полностью анонимны для организатора опроса.</P>
                 </div><!--1-->
                 <div id=2 style="display:none">
                     <P align=right><a href="javascript:HideLayer(2)"><img src="/media/icon/close.png" border=0 title='Закрыть подсказку'></a></P>
@@ -28,16 +27,18 @@
                 </div><!--2-->
                 <div id=3 style="display:none">
                     <P align=right><a href="javascript:HideLayer(3)"><img src="/media/icon/close.png" border=0 title='Закрыть подсказку'></a></P>                    
-                    <%=tag 'P'=>"Наименование: $provider->{$pid}{'PROVIDER'}"%>
-                    <%=tag 'P'=>"Деятельность: $provider->{$pid}{'DESCRIPTION'}"%>
-                    <%=tag 'P'=>"Интернет: $provider->{$pid}{'URL'}"%>
-                    <%=tag 'P'=>"Электронная почта: $provider->{$pid}{'EMAIL'}"%>
-                    <%=tag 'P'=>"Контактный телефон: $provider->{$pid}{'TEL'}"%>
+                    <P>
+                    <%="Наименование: $provider->{$pid}{'PROVIDER'}"%><br/>
+                    <%="Деятельность: $provider->{$pid}{'DESCRIPTION'}"%><br/>
+                    <%="Интернет: $provider->{$pid}{'URL'}"%><br/>
+                    <%="Электронная почта: $provider->{$pid}{'EMAIL'}"%><br/>
+                    <%="Контактный телефон: $provider->{$pid}{'TEL'}"%>
+                    </P>
                 </div><!--3-->
             </div><!--quiz-nav-->
             <div id='bonusinfo'>
             <%=tag 'H2'=>'Ваш бонус'%>
-            <P style="vertical-align: top"><%=$provider->{$pid}{'BONUSINFO'}%>&nbsp;            
+            <P style="font-weight:bold;vertical-align: top"><%=$provider->{$pid}{'BONUSINFO'}%>&nbsp;
             <a href="https://twitter.com/share" class="twitter-share-button" data-count="none" data-via="bonusquest_ru" data-lang="ru">Твитнуть</a><script type="text/javascript" src="//platform.twitter.com/widgets.js"></script>
             </P>
             %if ($formmessage){

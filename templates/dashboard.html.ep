@@ -56,7 +56,7 @@
     </td><td class=questionlist>
       <%=$question->{$questionid}{'CONTENT'}%>
       <a href="/question/<%=$question->{$questionid}{'ID'}%>"><img src='/media/icon/message.png' border=0 title='Редактировать вопрос'></a>
-      <a href="/question/<%=$question->{$questionid}{'ID'}%>"><img src='/media/icon/delete.png' border=0 title='Удалить вопрос'></a>
+      <!--<a href="/question/<%=$question->{$questionid}{'ID'}%>"><img src='/media/icon/delete.png' border=0 title='Удалить вопрос'></a>-->
     </td><td>
       <%=$qtype[$question->{$questionid}{'TYPE'}]%>
     </td><td align=center>

@@ -24,7 +24,7 @@ app->plugin(mail => {
 app->secret($appconf[5]);
 app->hook(before_dispatch => sub {
                my $self = shift;
-               $self->req->url->base(Mojo::URL->new(q{http://www.bonusquest.ru/}))
+               #$self->req->url->base(Mojo::URL->new(q{http://www.bonusquest.ru/}))
 	       }
 	  );
 
@@ -131,6 +131,7 @@ post '/q:id' => [id=>qw/\d+/]=> sub{
   }
 };
 
+
 get '/thankyou'=>sub{
   my $self=shift;
   $self->stash(capt=>'Спасибо за ответы',message=>'Мы отправили вам письмо на указанный адрес электронной почты.');
@@ -225,6 +226,40 @@ post '/sendclaim'=>sub{
 };
 
 #--- Provider area
+post '/provider/register'=>sub{
+  my $self = shift;
+  my $param=$self->req->params->to_hash;
+  my $provider=$dbh->selectrow_arrayref("SELECT PROVIDER.ID,PROVIDER.NAME FROM PROVIDER WHERE PROVIDER.LOGIN=\"$param->{'login'}\"") || undef;
+  if($provider->[0] || !$param->{login} || !$param->{pass} || !$param->{email}){#Login exist
+    $self->stash(capt=>'Ошибка регистрации',message=>'Выбранный логин уже зарегистрирован, укажите другой.');
+  }else{
+    my @char=('a'..'z','A'..'Z','1'..'9');
+    my $activation='';
+    foreach(1..25){
+      $activation.=$char[int(rand(60))];#Generate unique fieldname
+    }
+    $dbh->do("INSERT INTO PROVIDER (ID,LOGIN,PASS,EMAIL,ACTIVATION,STATUS) VALUES(NULL,\"$param->{'login'}\",\"$param->{'pass'}\",\"$param->{'email'}\",\"$activation\",0)");
+    $self->mail(to=>$param->{'email'},
+                subject=>'Регистрация на сайте BonusQuest',
+                data=>"Поздравляем с успешной регистрацией!\n\nДля активации вашей учетной записи перейдите по следующей ссылке.\nhttp://www.bonusquest.ru/provider/activation?code=$activation\n\n".
+                "Если ссылка не открывается, скопируйте и вставьте в адресную строку броузера.".$subscribe
+                );
+    $self->stash(capt=>'Поздравляем!',message=>'Вы успешно зарегистрировались. Мы отправили вам письмо с инструкцией по активации.');
+  }
+	$self->render('robot');
+};
+
+get '/provider/activation'=>sub{
+  my $self=shift;
+  my $activation=$self->param('code');
+  my $pid=$dbh->selectrow_array("SELECT PROVIDER.ID FROM PROVIDER WHERE ACTIVATION=\"$activation\" AND STATUS=0") || undef;
+  if($pid){
+      $dbh->do("UPDATE PROVIDER SET STATUS=1, ACTIVATION=''");
+  }
+  $self->stash(capt=>'Активация',message=>'Учетная запись уже активирована.');
+  $self->render('robot');
+};
+
 post '/provider/auth'=>sub{
   my $self = shift;
   my $param=$self->req->params->to_hash;
