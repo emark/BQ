@@ -242,7 +242,7 @@ post '/provider/register'=>sub{
     $self->mail(to=>$param->{'email'},
                 subject=>'Регистрация на сайте BonusQuest',
                 data=>"Поздравляем с успешной регистрацией!\n\nДля активации вашей учетной записи перейдите по следующей ссылке.\nhttp://www.bonusquest.ru/provider/activation?code=$activation\n\n".
-                "Если ссылка не открывается, скопируйте и вставьте в адресную строку броузера.\n\nПосле активацииhttp://www.bonusquest.ru/create.html".$subscribe
+                "Если ссылка не открывается, скопируйте и вставьте в адресную строку броузера.\n\nПосле активации используйте для входа эту ссылку http://www.bonusquest.ru/create.html".$subscribe
                 );
     $self->stash(capt=>'Поздравляем!',message=>'Вы успешно зарегистрировались. Мы отправили вам письмо с инструкцией по активации.');
   }
@@ -259,8 +259,13 @@ get '/provider/activation'=>sub{
                    provider=>$provider->[1]);
       return $self->redirect_to('dashboard.html');  
   }
-  $self->stash(capt=>'Активация',message=>'Учетная запись активирована. Вы можете выполнить вход на странице http://www.bonusquest.ru/create.html');
+  $self->stash(capt=>'Активация',message=>'Учетная запись активирована. Вы можете выполнить вход на странице http://www.bonusquest.ru/provider/auth.html');
   $self->render('robot');
+};
+
+get '/provider/auth'=>sub{
+	my $self=shift;
+	$self->render('login');
 };
 
 post '/provider/auth'=>sub{
